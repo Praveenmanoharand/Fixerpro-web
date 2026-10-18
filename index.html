@@ -1,0 +1,2181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Amazon & Etsy Image Checker | ListingPreflight</title>
+<meta name="description" content="Check product photos against Amazon and Etsy image rules before you upload. See what will likely fail, fix it, and download. Runs in your browser.">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#0a0f1a">
+<meta name="author" content="Praveen">
+<meta name="keywords" content="amazon image checker, etsy image checker, product photo checker, listing image validator, e-commerce photo tools">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ListingPreflight">
+<meta property="og:title" content="Amazon & Etsy Image Checker | ListingPreflight">
+<meta property="og:description" content="Check product photos against Amazon and Etsy image rules before you upload. Runs in your browser.">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Amazon & Etsy Image Checker | ListingPreflight">
+<meta name="twitter:description" content="Check product photos against Amazon and Etsy image rules before you upload.">
+
+<!-- Responsive for ALL devices -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
+<meta name="mobile-web-app-capable" content="yes">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2300d4aa'/%3E%3Cpath d='M9 16.5l5 5 9-10' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ══════════════════════════════════════════════════════════════
+   DESIGN SYSTEM — Premium Dark Theme with Neon Accents
+   ══════════════════════════════════════════════════════════════ */
+:root {
+  /* Core palette */
+  --bg-primary: #0a0f1a;
+  --bg-secondary: #111827;
+  --bg-tertiary: #1a2332;
+  --bg-card: rgba(17, 24, 39, 0.7);
+  --bg-card-hover: rgba(26, 35, 50, 0.9);
+  --bg-glass: rgba(17, 24, 39, 0.5);
+
+  /* Text */
+  --text-primary: #f0f4f8;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  /* Accents */
+  --accent: #00d4aa;
+  --accent-light: #33ffcc;
+  --accent-glow: rgba(0, 212, 170, 0.3);
+  --accent-subtle: rgba(0, 212, 170, 0.08);
+
+  /* Status */
+  --success: #00d4aa;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #3b82f6;
+
+  /* Borders */
+  --border: rgba(148, 163, 184, 0.12);
+  --border-hover: rgba(0, 212, 170, 0.3);
+  --border-focus: var(--accent);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 30px rgba(0, 212, 170, 0.15);
+
+  /* Sizing */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-full: 999px;
+
+  /* Animation */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  color-scheme: dark;
+  box-sizing: border-box;
+}
+
+/* Light theme override */
+:root[data-theme="light"] {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f1f5f9;
+  --bg-card: rgba(255, 255, 255, 0.8);
+  --bg-card-hover: rgba(241, 245, 249, 0.95);
+  --bg-glass: rgba(255, 255, 255, 0.6);
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --accent: #059669;
+  --accent-light: #10b981;
+  --accent-glow: rgba(5, 150, 105, 0.2);
+  --accent-subtle: rgba(5, 150, 105, 0.06);
+  --border: rgba(15, 23, 42, 0.08);
+  --border-hover: rgba(5, 150, 105, 0.3);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.12);
+  --shadow-glow: 0 0 30px rgba(5, 150, 105, 0.1);
+  color-scheme: light;
+}
+
+/* ── Reset & Base ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; -webkit-text-size-adjust: 100%; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Animated Background ──────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(0, 212, 170, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 60% at 80% 85%, rgba(59, 130, 246, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse 70% 50% at 50% 50%, rgba(139, 92, 246, 0.03) 0%, transparent 50%);
+  animation: bgShift 20s ease-in-out infinite alternate;
+}
+@keyframes bgShift {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+/* ── Utility ──────────────────────────────────────────────── */
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.skip { position: absolute; left: 12px; top: -60px; background: var(--accent); color: var(--bg-primary); padding: 10px 18px; z-index: 1000; border-radius: var(--radius-md); font-weight: 600; text-decoration: none; transition: top 0.2s; }
+.skip:focus { top: 12px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+a { color: var(--accent); text-decoration: none; transition: color 0.2s, opacity 0.2s; }
+a:hover { color: var(--accent-light); }
+.mono { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.82rem; color: var(--text-muted); letter-spacing: 0.02em; }
+
+/* ── Container ────────────────────────────────────────────── */
+.container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+/* ── Header ───────────────────────────────────────────────── */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px) saturate(1.2);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+  border-bottom: 1px solid var(--border);
+  transition: box-shadow 0.3s;
+}
+header.scrolled { box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3); }
+header .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 64px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  text-decoration: none;
+  letter-spacing: -0.02em;
+}
+.brand svg { color: var(--accent); filter: drop-shadow(0 0 6px var(--accent-glow)); }
+.brand:hover svg { transform: scale(1.1); transition: transform 0.3s var(--ease-spring); }
+
+nav { display: flex; gap: 2px; align-items: center; }
+nav a {
+  color: var(--text-secondary);
+  padding: 8px 14px;
+  border-radius: var(--radius-full);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  position: relative;
+}
+nav a:hover { color: var(--text-primary); background: var(--accent-subtle); }
+nav a[aria-current="page"] {
+  color: var(--accent);
+  background: var(--accent-subtle);
+}
+
+.header-actions { display: flex; align-items: center; gap: 8px; }
+
+/* Theme toggle */
+.theme-toggle {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: all 0.3s;
+}
+.theme-toggle:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-subtle); }
+.theme-toggle svg { width: 18px; height: 18px; transition: transform 0.4s var(--ease-spring); }
+.theme-toggle:hover svg { transform: rotate(30deg); }
+
+/* ── Auth Elements ────────────────────────────────────────── */
+.au { display: flex; align-items: center; gap: 8px; }
+.au .lk { color: var(--text-secondary); padding: 8px 14px; font-size: 0.9rem; font-weight: 500; border-radius: var(--radius-full); transition: all 0.2s; }
+.au .lk:hover { color: var(--text-primary); background: var(--accent-subtle); }
+.am { position: relative; }
+.av {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--info));
+  color: white; display: grid; place-items: center;
+  font-size: 0.8rem; font-weight: 700;
+}
+.an { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+.menu {
+  position: absolute; right: 0; top: calc(100% + 8px);
+  min-width: 220px; background: var(--bg-secondary);
+  border: 1px solid var(--border); border-radius: var(--radius-lg);
+  padding: 6px; box-shadow: var(--shadow-lg); z-index: 200;
+  animation: menuIn 0.2s var(--ease-spring);
+}
+.menu[hidden] { display: none; }
+@keyframes menuIn { from { opacity: 0; transform: translateY(-8px) scale(0.96); } }
+.menu a, .menu button {
+  display: flex; width: 100%; align-items: center; gap: 10px;
+  padding: 10px 14px; border: 0; background: none;
+  color: var(--text-primary); font: inherit; font-size: 0.9rem;
+  border-radius: var(--radius-md); cursor: pointer; text-decoration: none;
+  text-align: left; min-height: 44px; transition: background 0.15s;
+}
+.menu a:hover, .menu button:hover { background: var(--accent-subtle); color: var(--accent); }
+
+/* ── Buttons ──────────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font: inherit; font-weight: 600; font-size: 0.92rem;
+  min-height: 44px; padding: 10px 22px;
+  border-radius: var(--radius-md); border: 1px solid var(--border);
+  background: var(--bg-card); color: var(--text-primary);
+  cursor: pointer; text-decoration: none; position: relative;
+  overflow: hidden;
+  transition: all 0.25s var(--ease-smooth);
+}
+.btn::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.05));
+  opacity: 0; transition: opacity 0.3s;
+}
+.btn:hover::before { opacity: 1; }
+.btn:hover:not(:disabled) {
+  border-color: var(--border-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+.btn:active:not(:disabled) { transform: translateY(0); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.btn.primary {
+  background: linear-gradient(135deg, var(--accent), #00b894);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: 700;
+}
+.btn.primary:hover:not(:disabled) {
+  box-shadow: var(--shadow-glow), var(--shadow-md);
+  filter: brightness(1.1);
+}
+
+.btn.lg { min-height: 52px; padding: 14px 28px; font-size: 1rem; border-radius: var(--radius-lg); }
+.btn.sm { min-height: 36px; padding: 6px 14px; font-size: 0.85rem; }
+.btn.icon-btn { width: 40px; min-height: 40px; padding: 0; border-radius: 50%; }
+
+/* Button loading state */
+.btn .spinner { display: none; }
+.btn.loading .spinner { display: inline-block; }
+.btn.loading .btn-text { opacity: 0.5; }
+
+/* ── Spinner ──────────────────────────────────────────────── */
+.spinner {
+  width: 18px; height: 18px;
+  border: 2.5px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  vertical-align: middle;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Section base ─────────────────────────────────────────── */
+.section { padding: 56px 0; }
+.section-sm { padding: 36px 0; }
+
+/* ── Typography ───────────────────────────────────────────── */
+h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, var(--text-primary) 60%, var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+h2 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 12px; }
+h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; }
+.lead { font-size: 1.1rem; color: var(--text-secondary); max-width: 60ch; margin-bottom: 24px; line-height: 1.7; }
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; padding: 4px 12px;
+  border-radius: var(--radius-full);
+  background: var(--accent-subtle); color: var(--accent);
+  border: 1px solid rgba(0, 212, 170, 0.2);
+}
+
+/* ── Forms ─────────────────────────────────────────────────── */
+label, .label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary); }
+input[type=text], input[type=email], input[type=password], textarea, select {
+  font: inherit; font-size: 0.95rem; color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border); border-radius: var(--radius-md);
+  padding: 12px 14px; width: 100%; min-height: 46px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--danger); }
+.field { margin-bottom: 18px; }
+.field-error { color: var(--danger); font-size: 0.82rem; margin-top: 4px; }
+input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--accent); margin: 2px 8px 0 0; flex: none; cursor: pointer; }
+
+/* ── Cards ─────────────────────────────────────────────────── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  backdrop-filter: blur(12px);
+  transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+}
+.card:hover {
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-glow);
+}
+.card-glow {
+  position: relative;
+}
+.card-glow::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--accent), var(--info), var(--accent));
+  z-index: -1;
+  opacity: 0;
+  filter: blur(8px);
+  transition: opacity 0.4s;
+}
+.card-glow:hover::before { opacity: 0.5; }
+
+/* ── Marketplace Selector ─────────────────────────────────── */
+.marketplace-selector { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+.marketplace-option {
+  position: relative; flex: 1; min-width: 200px; max-width: 340px; margin: 0;
+  font-size: 1rem; cursor: pointer;
+}
+.marketplace-option input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; z-index: 2; }
+.marketplace-option .option-content {
+  display: block; border: 1px solid var(--border);
+  background: var(--bg-card); padding: 16px 18px 16px 48px;
+  border-radius: var(--radius-md); min-height: 56px;
+  position: relative;
+  transition: all 0.3s var(--ease-smooth);
+}
+.marketplace-option .option-content::before {
+  content: ''; position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+  width: 18px; height: 18px; border: 2px solid var(--text-muted);
+  border-radius: 50%; transition: all 0.3s;
+}
+.marketplace-option .option-content b { display: block; font-weight: 700; }
+.marketplace-option .option-content small { color: var(--text-muted); font-size: 0.82rem; }
+.marketplace-option input:checked + .option-content {
+  border-color: var(--accent); background: var(--accent-subtle);
+  box-shadow: var(--shadow-glow);
+}
+.marketplace-option input:checked + .option-content::before {
+  border-color: var(--accent);
+  background: radial-gradient(circle, var(--accent) 42%, transparent 50%);
+}
+.marketplace-option input:focus-visible + .option-content {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+
+/* ── Drop Zone ────────────────────────────────────────────── */
+.dropzone {
+  position: relative;
+  border: 2px dashed var(--border);
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 40px 24px;
+  text-align: center;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+.dropzone:hover, .dropzone.active {
+  border-color: var(--accent);
+  background: var(--accent-subtle);
+  box-shadow: inset 0 0 30px var(--accent-glow);
+}
+.dropzone .dz-icon {
+  width: 56px; height: 56px; margin: 0 auto 16px;
+  border-radius: 50%; background: var(--accent-subtle);
+  display: grid; place-items: center;
+  transition: transform 0.4s var(--ease-spring);
+}
+.dropzone:hover .dz-icon { transform: scale(1.1) translateY(-4px); }
+.dropzone .dz-icon svg { width: 28px; height: 28px; color: var(--accent); }
+.dropzone p { color: var(--text-secondary); margin-top: 8px; font-size: 0.9rem; }
+
+/* ── Staged Images Grid ───────────────────────────────────── */
+.staged-grid { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+.staged-item {
+  position: relative; width: 110px;
+  border: 1px solid var(--border); background: var(--bg-card);
+  border-radius: var(--radius-md); padding: 6px; overflow: hidden;
+  animation: stageIn 0.4s var(--ease-spring) both;
+  transition: border-color 0.2s;
+}
+.staged-item:hover { border-color: var(--accent); }
+@keyframes stageIn { from { opacity: 0; transform: scale(0.85) translateY(10px); } }
+.staged-item img, .staged-item canvas {
+  width: 100%; height: 84px; object-fit: contain;
+  background: #fff; display: block; border-radius: var(--radius-sm);
+}
+.staged-item span {
+  display: block; font-size: 0.7rem; overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap; margin-top: 4px;
+  color: var(--text-secondary);
+}
+.staged-item .remove-btn {
+  position: absolute; top: 4px; right: 4px;
+  width: 24px; height: 24px; padding: 0;
+  border: none; border-radius: 50%;
+  background: rgba(239, 68, 68, 0.85); color: white;
+  cursor: pointer; display: grid; place-items: center;
+  font-size: 12px; opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.staged-item:hover .remove-btn { opacity: 1; }
+.staged-item .remove-btn:hover { transform: scale(1.15); background: var(--danger); }
+
+/* Scanning animation */
+.scanning .staged-item { border-color: var(--accent); }
+.scanning .staged-item::after {
+  content: '';
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(110deg, transparent 25%, var(--accent-glow) 50%, transparent 75%);
+  background-size: 250% 100%;
+  animation: shimmer 1.3s linear infinite;
+}
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -100% 0; } }
+
+/* Skeleton loading */
+.staged-skeleton {
+  border-color: var(--border);
+}
+.staged-skeleton .skel-block {
+  display: block; height: 84px; background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+  animation: shimmer 1.3s linear infinite;
+  background: linear-gradient(110deg, var(--bg-tertiary) 25%, var(--bg-card) 50%, var(--bg-tertiary) 75%);
+  background-size: 250% 100%;
+}
+
+/* ── Action Bar ───────────────────────────────────────────── */
+.actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+
+/* ── Status Area ──────────────────────────────────────────── */
+.status-area { margin-top: 16px; min-height: 28px; color: var(--text-secondary); }
+.progress-bar {
+  height: 6px; background: var(--bg-tertiary);
+  border-radius: var(--radius-full); max-width: 480px;
+  margin-top: 8px; overflow: hidden;
+}
+.progress-bar .fill {
+  display: block; height: 100%; width: 0;
+  background: linear-gradient(90deg, var(--accent), var(--accent-light));
+  border-radius: var(--radius-full);
+  transition: width 0.3s var(--ease-smooth);
+}
+
+/* ── Alert / Error ────────────────────────────────────────── */
+.alert {
+  display: flex; align-items: flex-start; gap: 12px;
+  border: 1px solid; border-radius: var(--radius-md);
+  padding: 14px 18px; margin: 14px 0;
+  font-size: 0.92rem;
+  animation: alertIn 0.4s var(--ease-spring);
+}
+@keyframes alertIn { from { opacity: 0; transform: translateY(-8px) scale(0.97); } }
+.alert.error { border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.08); color: var(--danger); }
+.alert.success { border-color: rgba(0, 212, 170, 0.3); background: var(--accent-subtle); color: var(--accent); }
+.alert.warning { border-color: rgba(245, 158, 11, 0.3); background: rgba(245, 158, 11, 0.08); color: var(--warning); }
+.alert svg { flex: none; width: 20px; height: 20px; margin-top: 1px; }
+
+/* ── Analysis Loading Widget ──────────────────────────────── */
+.analysis-loader {
+  display: flex; gap: 20px; align-items: center;
+  border: 1px solid var(--border); background: var(--bg-card);
+  border-radius: var(--radius-lg); padding: 20px;
+  max-width: 640px; backdrop-filter: blur(12px);
+  animation: loaderIn 0.35s var(--ease-spring);
+}
+@keyframes loaderIn { from { opacity: 0; transform: translateY(10px) scale(0.97); } }
+.analysis-thumbnail {
+  position: relative; width: 140px; height: 140px; flex: none;
+  border-radius: var(--radius-md); background: #fff;
+  overflow: hidden; border: 1px solid var(--border);
+  transition: border-color 0.3s;
+}
+.analysis-thumbnail .thumb-canvas canvas { width: 100%; height: 100%; object-fit: contain; display: block; }
+.analysis-thumbnail .grid-overlay {
+  position: absolute; inset: 0; opacity: 0.5;
+  background-image:
+    linear-gradient(var(--accent-glow) 1px, transparent 1px),
+    linear-gradient(90deg, var(--accent-glow) 1px, transparent 1px);
+  background-size: 14px 14px;
+}
+.analysis-thumbnail .scan-beam {
+  position: absolute; left: 0; right: 0; top: -40px; height: 40px;
+  background: linear-gradient(transparent, var(--accent-glow));
+  border-bottom: 2px solid var(--accent);
+  box-shadow: 0 6px 20px var(--accent-glow);
+  animation: scanBeam 1.3s ease-in-out infinite alternate;
+}
+@keyframes scanBeam { to { top: calc(100% - 2px); } }
+.analysis-thumbnail .corner { position: absolute; width: 14px; height: 14px; border: 2.5px solid var(--accent); animation: cornerPulse 1s ease-in-out infinite alternate; }
+.analysis-thumbnail .corner.tl { left: 5px; top: 5px; border-right: 0; border-bottom: 0; }
+.analysis-thumbnail .corner.tr { right: 5px; top: 5px; border-left: 0; border-bottom: 0; }
+.analysis-thumbnail .corner.bl { left: 5px; bottom: 5px; border-right: 0; border-top: 0; }
+.analysis-thumbnail .corner.br { right: 5px; bottom: 5px; border-left: 0; border-top: 0; }
+@keyframes cornerPulse { to { transform: scale(0.8); opacity: 0.5; } }
+.analysis-thumbnail .done-check {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  background: rgba(0, 212, 170, 0.88); color: #fff;
+  opacity: 0; transform: scale(0.5);
+  transition: opacity 0.35s, transform 0.5s var(--ease-spring);
+}
+.analysis-loader.done .done-check { opacity: 1; transform: scale(1); }
+.analysis-loader.done .scan-beam,
+.analysis-loader.done .corner { display: none; }
+.analysis-loader.done .analysis-thumbnail { border-color: var(--accent); }
+
+.analysis-details { flex: 1; min-width: 0; }
+.analysis-details strong { display: block; overflow-wrap: anywhere; font-size: 0.95rem; }
+.step-list { list-style: none; margin: 12px 0; padding: 0; display: grid; gap: 8px; }
+.step-list li {
+  display: flex; gap: 10px; align-items: center;
+  font-size: 0.88rem; color: var(--text-muted);
+  transition: color 0.2s;
+}
+.step-dot {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2px solid var(--border); flex: none;
+  position: relative; transition: all 0.3s;
+}
+.step-list li.active { color: var(--text-primary); }
+.step-list li.active .step-dot {
+  border-color: var(--accent);
+  border-right-color: transparent;
+  animation: spin 0.7s linear infinite;
+}
+.step-list li.complete { color: var(--text-primary); }
+.step-list li.complete .step-dot {
+  background: var(--accent); border-color: var(--accent);
+  animation: checkBounce 0.4s var(--ease-spring);
+}
+.step-list li.complete .step-dot::after {
+  content: ''; position: absolute; left: 4px; top: 1.5px;
+  width: 5px; height: 9px;
+  border: solid white; border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+@keyframes checkBounce { 0% { transform: scale(0.3); } 60% { transform: scale(1.3); } 100% { transform: scale(1); } }
+
+.mini-progress { height: 5px; border-radius: var(--radius-full); background: var(--bg-tertiary); overflow: hidden; }
+.mini-progress .fill {
+  display: block; height: 100%; width: 0;
+  background: linear-gradient(90deg, var(--accent), var(--accent-light));
+  transition: width 0.3s;
+}
+
+/* ── Results ──────────────────────────────────────────────── */
+.results-grid { display: grid; gap: 16px; margin-top: 20px; outline: 0; }
+.result-item {
+  display: grid; grid-template-columns: 108px 1fr; gap: 18px;
+  border: 1px solid var(--border); background: var(--bg-card);
+  border-radius: var(--radius-lg); padding: 18px;
+  backdrop-filter: blur(8px);
+  animation: resultIn 0.4s var(--ease-spring) both;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.result-item:hover { border-color: var(--border-hover); box-shadow: var(--shadow-glow); }
+@keyframes resultIn { from { opacity: 0; transform: translateY(12px); } }
+
+/* Result thumbnails — clickable preview */
+.result-thumb {
+  position: relative; overflow: hidden;
+  border-radius: var(--radius-sm);
+  width: 108px; height: 108px;
+  padding: 0; border: 1px solid var(--border);
+  background: #fff; cursor: zoom-in;
+  display: grid; place-items: center;
+  transition: transform 0.25s var(--ease-smooth), box-shadow 0.25s;
+}
+.result-thumb canvas {
+  width: 108px; height: 108px; object-fit: contain;
+  display: block; transition: transform 0.4s var(--ease-smooth);
+}
+.result-thumb:hover {
+  transform: scale(1.04);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+.result-thumb:hover canvas { transform: scale(1.05); }
+.result-thumb .zoom-hint {
+  position: absolute; right: 6px; bottom: 6px; z-index: 2;
+  width: 28px; height: 28px; display: grid; place-items: center;
+  border: 1px solid rgba(255,255,255,0.5); border-radius: 50%;
+  background: rgba(0,0,0,0.6); color: #fff;
+  opacity: 0; transform: translateY(4px) scale(0.85);
+  transition: all 0.25s var(--ease-smooth); pointer-events: none;
+}
+.result-thumb .zoom-hint svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.result-thumb:hover .zoom-hint { opacity: 1; transform: translateY(0) scale(1); }
+
+.result-header { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center; }
+.result-name { font-weight: 700; overflow-wrap: anywhere; }
+
+/* Status tags */
+.tag {
+  display: inline-flex; gap: 6px; align-items: center;
+  font-weight: 700; font-size: 0.78rem; text-transform: uppercase;
+  letter-spacing: 0.05em; padding: 4px 10px;
+  border: 1px solid; border-radius: var(--radius-full);
+}
+.tag.pass { color: var(--success); border-color: rgba(0, 212, 170, 0.3); background: var(--accent-subtle); }
+.tag.warn { color: var(--warning); border-color: rgba(245, 158, 11, 0.3); background: rgba(245, 158, 11, 0.06); }
+.tag.fail { color: var(--danger); border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.06); }
+
+/* Check list */
+.check-list { list-style: none; margin: 10px 0; padding: 0; }
+.check-list li {
+  display: flex; gap: 8px; padding: 4px 0; font-size: 0.9rem;
+  animation: checkIn 0.3s var(--ease-smooth) both;
+}
+@keyframes checkIn { from { opacity: 0; transform: translateX(-8px); } }
+.check-list svg { flex: none; width: 16px; height: 16px; margin-top: 4px; }
+.check-list .ok svg { color: var(--success); }
+.check-list .warn svg { color: var(--warning); }
+.check-list .bad svg { color: var(--danger); }
+.check-list .info svg { color: var(--info); }
+
+.ico { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* AI Review section */
+.ai-review {
+  border-left: 3px solid var(--accent);
+  background: var(--accent-subtle);
+  padding: 14px 16px; margin-top: 12px;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  animation: reviewIn 0.5s var(--ease-spring);
+}
+@keyframes reviewIn { from { opacity: 0; transform: translateX(-16px); } }
+.ai-review h3 { font-size: 0.92rem; margin-bottom: 6px; }
+.ai-review p { margin: 0; white-space: pre-wrap; font-size: 0.9rem; line-height: 1.65; }
+.ai-review small { display: block; color: var(--text-muted); margin-top: 10px; font-size: 0.8rem; }
+
+/* ── Image Preview Dialog (Fullscreen Lightbox) ───────────── */
+.preview-overlay {
+  position: fixed; inset: 0;
+  display: none;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.96);
+  backdrop-filter: blur(16px);
+}
+.preview-overlay.open {
+  display: flex; align-items: center; justify-content: center;
+  animation: overlayIn 0.35s var(--ease-smooth);
+}
+.preview-overlay.closing { animation: overlayOut 0.25s ease-in forwards; }
+@keyframes overlayIn { from { opacity: 0; } }
+@keyframes overlayOut { to { opacity: 0; } }
+
+.preview-image-container {
+  position: relative;
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  padding: 60px 70px 80px;
+}
+.preview-image {
+  max-width: 100%; max-height: 100%;
+  object-fit: contain; display: block;
+  animation: imageReveal 0.6s 0.05s var(--ease-smooth) both;
+  will-change: transform, opacity;
+}
+.preview-image.switching { opacity: 0; transform: scale(0.98); transition: all 0.15s; }
+@keyframes imageReveal {
+  from { opacity: 0; transform: scale(1.04); filter: blur(8px); }
+  to { opacity: 1; transform: scale(1); filter: blur(0); }
+}
+
+.preview-close, .preview-nav {
+  position: absolute; z-index: 3;
+  display: grid; place-items: center;
+  width: 48px; height: 48px; padding: 0;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50%;
+  background: rgba(24,30,28,0.65);
+  color: #fff; backdrop-filter: blur(12px);
+  cursor: pointer;
+  transition: all 0.25s var(--ease-smooth);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+.preview-close { top: 20px; right: 20px; }
+.preview-nav { top: 50%; transform: translateY(-50%); }
+.preview-prev { left: 20px; }
+.preview-next { right: 20px; }
+.preview-close:hover, .preview-nav:hover {
+  background: rgba(255,255,255,0.2);
+  border-color: rgba(255,255,255,0.5);
+  transform: scale(1.08);
+  box-shadow: 0 0 20px rgba(0,212,170,0.15);
+}
+.preview-nav:hover { transform: translateY(-50%) scale(1.08); }
+.preview-close:active, .preview-nav:active { transform: scale(0.93); }
+.preview-nav:active { transform: translateY(-50%) scale(0.93); }
+.preview-close svg, .preview-nav svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.preview-close[hidden], .preview-nav[hidden] { display: none; }
+
+.preview-meta {
+  position: absolute; z-index: 2;
+  left: 24px; right: 90px; bottom: 20px;
+  display: flex; justify-content: space-between; gap: 16px;
+  color: rgba(255,255,255,0.7);
+  font: 500 0.82rem/1.4 'JetBrains Mono', monospace;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+  pointer-events: none;
+}
+.preview-meta span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.preview-compare {
+  position: absolute; z-index: 3; top: 20px; left: 20px;
+  padding: 10px 18px; border: 1px solid rgba(255,255,255,0.25);
+  border-radius: var(--radius-full);
+  background: rgba(24,30,28,0.7); color: #fff;
+  font-weight: 600; font-size: 0.88rem;
+  backdrop-filter: blur(12px); cursor: pointer;
+  transition: all 0.25s;
+}
+.preview-compare:hover { background: rgba(255,255,255,0.2); transform: translateY(-1px); }
+.preview-compare[hidden] { display: none; }
+
+/* ── Hero Section ─────────────────────────────────────────── */
+.hero { padding: 56px 0 40px; }
+.hero-content { max-width: 680px; }
+.hero-cta { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+.hero-note { margin-bottom: 28px; }
+.hero-features {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px; margin-top: 36px;
+}
+.hero-feature {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 16px; border-radius: var(--radius-md);
+  background: var(--bg-card); border: 1px solid var(--border);
+  transition: all 0.3s;
+}
+.hero-feature:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow-glow); }
+.hero-feature .feat-icon {
+  width: 40px; height: 40px; border-radius: var(--radius-md);
+  background: var(--accent-subtle); display: grid; place-items: center;
+  flex: none;
+}
+.hero-feature .feat-icon svg { width: 20px; height: 20px; color: var(--accent); }
+.hero-feature h3 { font-size: 0.9rem; margin-bottom: 2px; }
+.hero-feature p { font-size: 0.82rem; color: var(--text-muted); margin: 0; }
+
+/* ── SKU Field ────────────────────────────────────────────── */
+.sku-field { max-width: 360px; margin-bottom: 20px; }
+
+/* ── Cols layout ──────────────────────────────────────────── */
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 28px; }
+
+/* ── Pricing ──────────────────────────────────────────────── */
+.pricing-header { text-align: center; margin-bottom: 36px; }
+.billing-toggle {
+  display: inline-flex; background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius-full); padding: 4px;
+}
+.billing-toggle label { margin: 0; position: relative; cursor: pointer; }
+.billing-toggle input { position: absolute; opacity: 0; inset: 0; margin: 0; width: 100%; height: 100%; cursor: pointer; }
+.billing-toggle span {
+  display: flex; gap: 8px; align-items: center; padding: 10px 20px;
+  border-radius: var(--radius-full); font-weight: 600; min-height: 44px;
+  color: var(--text-muted); transition: all 0.3s;
+}
+.billing-toggle input:checked + span { background: var(--accent); color: #fff; }
+.billing-toggle .save-badge {
+  font-style: normal; font-size: 0.72rem; font-weight: 700;
+  background: rgba(255,255,255,0.2); padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.plans-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px; max-width: 820px; margin: 0 auto;
+}
+.plan-card {
+  position: relative; border: 1px solid var(--border);
+  background: var(--bg-card); padding: 28px;
+  border-radius: var(--radius-xl);
+  display: flex; flex-direction: column;
+  backdrop-filter: blur(12px);
+  transition: all 0.3s;
+}
+.plan-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.plan-card.pro {
+  border: 2px solid var(--accent);
+  background: linear-gradient(180deg, var(--accent-subtle), var(--bg-card));
+  box-shadow: var(--shadow-glow);
+}
+.plan-badge {
+  position: absolute; top: -13px; left: 24px;
+  background: linear-gradient(135deg, var(--accent), #00b894);
+  color: #fff; font-size: 0.75rem; font-weight: 700;
+  padding: 4px 14px; border-radius: var(--radius-full);
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+.plan-price { font-size: 2.6rem; font-weight: 800; letter-spacing: -0.03em; margin: 8px 0 4px; }
+.plan-price span { font-size: 0.95rem; color: var(--text-muted); font-weight: 400; margin-left: 4px; }
+.plan-card ul { list-style: none; padding: 0; margin: 18px 0 24px; flex: 1; }
+.plan-card li { display: flex; gap: 8px; padding: 6px 0; font-size: 0.92rem; }
+.plan-card li svg { color: var(--success); flex: none; margin-top: 4px; width: 16px; height: 16px; }
+
+.trust-list {
+  list-style: none; display: flex; gap: 12px 24px; flex-wrap: wrap;
+  justify-content: center; padding: 0; margin: 28px 0 0;
+  color: var(--text-secondary); font-size: 0.88rem;
+}
+.trust-list li { display: flex; gap: 6px; align-items: center; }
+.trust-list svg { color: var(--success); }
+
+/* Compare table */
+.table-wrap { overflow-x: auto; margin-top: 28px; }
+table { border-collapse: collapse; width: 100%; min-width: 480px; }
+th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+th { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
+tbody th { text-transform: none; letter-spacing: 0; font-size: 0.95rem; color: var(--text-primary); font-weight: 500; }
+
+/* ── FAQ ──────────────────────────────────────────────────── */
+.faq-item {
+  border: 1px solid var(--border); border-radius: var(--radius-lg);
+  background: var(--bg-card); margin-bottom: 10px;
+  max-width: 72ch; padding: 0; overflow: hidden;
+  transition: border-color 0.2s;
+}
+.faq-item[open] { border-color: var(--accent); }
+.faq-item summary {
+  list-style: none; cursor: pointer;
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: 16px 20px; min-height: 56px; font-weight: 600;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after {
+  content: ''; width: 10px; height: 10px;
+  border-right: 2px solid var(--text-muted); border-bottom: 2px solid var(--text-muted);
+  transform: rotate(45deg); transition: transform 0.25s; flex: none; margin-top: -4px;
+}
+.faq-item[open] summary::after { transform: rotate(-135deg); margin-top: 4px; }
+.faq-item p { padding: 0 20px 18px; color: var(--text-secondary); line-height: 1.7; }
+
+/* ── Page layout ──────────────────────────────────────────── */
+.page-content { padding: 40px 0 60px; max-width: 760px; margin: 0 auto; }
+.page-content h1 {
+  max-width: none;
+  font-size: clamp(1.7rem, 4vw, 2.4rem);
+}
+.page-content h2 { margin-top: 32px; }
+
+/* ── Auth Card ────────────────────────────────────────────── */
+.auth-card {
+  max-width: 440px; margin: 40px auto;
+  border: 1px solid var(--border); background: var(--bg-card);
+  border-radius: var(--radius-xl); padding: 36px;
+  backdrop-filter: blur(12px);
+}
+.auth-card h1 { font-size: 1.7rem; max-width: none; }
+.pw-wrapper { position: relative; }
+.pw-wrapper input { padding-right: 80px; }
+.pw-wrapper button {
+  position: absolute; right: 4px; top: 4px;
+  min-height: 38px; border: 0; background: none;
+  color: var(--accent); font: inherit; font-weight: 600;
+  cursor: pointer; padding: 0 14px;
+}
+.success-box {
+  border: 1px solid var(--success); color: var(--success);
+  padding: 12px 16px; border-radius: var(--radius-md);
+  margin: 12px 0; background: var(--accent-subtle);
+}
+.lk-btn {
+  background: none; border: 0; padding: 0;
+  font: inherit; color: var(--text-secondary);
+  text-decoration: underline; cursor: pointer;
+}
+.lk-btn[hidden] { display: none; }
+
+/* ── Account summary ──────────────────────────────────────── */
+.summary-card {
+  border: 1px solid var(--border); background: var(--bg-card);
+  border-radius: var(--radius-lg); padding: 24px;
+  backdrop-filter: blur(12px);
+}
+.summary-card dl { margin: 0; }
+.summary-card dt { color: var(--text-muted); font-size: 0.82rem; margin-bottom: 2px; }
+.summary-card dd { margin: 0 0 14px; font-weight: 700; }
+
+/* ── Checkout ─────────────────────────────────────────────── */
+.checkout-grid {
+  display: grid; grid-template-columns: minmax(0,1.3fr) minmax(0,1fr);
+  gap: 28px; align-items: start;
+}
+
+/* ── Footer ───────────────────────────────────────────────── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 32px 0;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+footer .container {
+  display: flex; gap: 16px; flex-wrap: wrap;
+  justify-content: space-between; align-items: center;
+}
+footer a { color: var(--text-muted); margin-right: 14px; transition: color 0.2s; }
+footer a:hover { color: var(--accent); }
+
+/* ── 404 Error Page ───────────────────────────────────────── */
+.error-page { text-align: center; padding: 80px 24px 60px; }
+.error-code {
+  font-size: clamp(6rem, 18vw, 12rem);
+  font-weight: 900; letter-spacing: -0.05em;
+  background: linear-gradient(135deg, var(--accent), var(--info), var(--accent));
+  background-size: 200% 200%;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 4s ease-in-out infinite;
+  line-height: 1;
+  user-select: none;
+}
+@keyframes gradientShift { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+.error-page h1 {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  margin-bottom: 12px;
+}
+.error-page .lead { margin: 0 auto 28px; text-align: center; }
+.error-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+/* Floating particles for 404 */
+.particles {
+  position: fixed; inset: 0; pointer-events: none; z-index: -1;
+}
+.particle {
+  position: absolute;
+  width: 4px; height: 4px;
+  background: var(--accent);
+  border-radius: 50%;
+  opacity: 0;
+  animation: float 6s ease-in-out infinite;
+}
+@keyframes float {
+  0% { opacity: 0; transform: translateY(100vh) scale(0); }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.6; }
+  100% { opacity: 0; transform: translateY(-20vh) scale(1); }
+}
+
+/* ── Cookie banner ────────────────────────────────────────── */
+.cookie-banner {
+  position: fixed; left: 16px; right: 16px; bottom: 16px;
+  max-width: 520px; z-index: 500;
+  background: var(--bg-secondary); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 20px;
+  box-shadow: var(--shadow-lg);
+  animation: slideUp 0.4s var(--ease-spring);
+}
+.cookie-banner[hidden] { display: none; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } }
+.cookie-banner p { margin: 0 0 14px; font-size: 0.92rem; color: var(--text-secondary); }
+.cookie-banner .btn { margin-right: 8px; }
+
+/* ── Sticky Mobile CTA ────────────────────────────────────── */
+.sticky-cta {
+  position: fixed; left: 0; right: 0; bottom: 0;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+  background: var(--bg-glass); backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border); z-index: 50;
+}
+.sticky-cta .btn { width: 100%; }
+.sticky-cta[hidden] { display: none; }
+@media (min-width: 720px) { .sticky-cta { display: none; } }
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .checkout-grid { grid-template-columns: 1fr; }
+  .result-item { grid-template-columns: 1fr; }
+  .result-thumb { width: 100%; height: 180px; }
+  .result-thumb canvas { width: 100%; height: 180px; }
+  .hero-features { grid-template-columns: 1fr; }
+}
+@media (max-width: 540px) {
+  .container { padding: 0 16px; }
+  header .container { justify-content: center; }
+  .an { display: none; }
+  .hero-cta .btn { flex: 1 1 100%; }
+  .auth-card { padding: 24px; }
+  .analysis-loader { flex-direction: column; align-items: stretch; }
+  .analysis-thumbnail { width: 100%; height: 170px; }
+  .marketplace-option { flex: 1 1 100%; max-width: none; }
+  nav a { padding: 8px 10px; font-size: 0.85rem; }
+  .preview-image-container { padding: 58px 12px 76px; }
+  .preview-close, .preview-nav { width: 42px; height: 42px; }
+  .preview-meta { left: 16px; right: 60px; bottom: 16px; font-size: 0.72rem; }
+  footer { padding-bottom: 80px; }
+}
+@media (max-width: 380px) {
+  .hero h1 { font-size: 1.6rem; }
+  .btn.lg { padding: 12px 18px; font-size: 0.92rem; }
+}
+
+/* ── Reduced Motion ───────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .preview-image, .result-thumb canvas { will-change: auto; }
+  .result-thumb:hover { transform: none; }
+  .result-thumb:hover canvas { transform: none; }
+}
+
+/* ── Print ────────────────────────────────────────────────── */
+@media print {
+  header, footer, .sticky-cta, .cookie-banner, .preview-overlay { display: none !important; }
+  body { background: #fff; color: #000; }
+  .card, .result-item { border: 1px solid #ccc; box-shadow: none; }
+}
+
+/* Note at the bottom */
+.note { font-size: 0.85rem; color: var(--text-muted); margin-top: 16px; }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- ═══ HEADER ════════════════════════════════════════════════ -->
+<header id="header">
+  <div class="container">
+    <a class="brand" href="#/" aria-label="ListingPreflight home">
+      <svg width="24" height="24" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="1.5" y="1.5" width="13" height="13" rx="2"/>
+        <path d="M4.5 8.5l2.5 2.5 4.5-5"/>
+      </svg>
+      ListingPreflight
+    </a>
+    <nav aria-label="Main">
+      <a href="#/" data-r="">Checker</a>
+      <a href="#/pricing" data-r="pricing">Pricing</a>
+      <a href="#/rules" data-r="rules">Rules</a>
+      <a href="#/contact" data-r="contact">Contact</a>
+    </nav>
+    <div class="header-actions">
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme" title="Toggle light/dark theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" id="themeIcon">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+      <div class="au" id="au"></div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ MAIN ═════════════════════════════════════════════════ -->
+<main id="main" tabindex="-1"></main>
+
+<!-- ═══ STICKY CTA (mobile) ══════════════════════════════════ -->
+<div class="sticky-cta" id="stickyCta" hidden>
+  <button class="btn primary" id="stickyBtn" type="button">Choose images</button>
+</div>
+
+<!-- ═══ COOKIE BANNER ════════════════════════════════════════ -->
+<div class="cookie-banner" id="cookieBanner" role="dialog" aria-label="Cookie consent" hidden>
+  <p>We use analytics cookies to improve the product. The checker works without them. See our <a href="#/privacy">Privacy Policy</a>.</p>
+  <button class="btn primary sm" id="cookieYes" type="button">Accept</button>
+  <button class="btn sm" id="cookieNo" type="button">Decline</button>
+</div>
+
+<!-- ═══ FOOTER ═══════════════════════════════════════════════ -->
+<footer>
+  <div class="container">
+    <span id="footerBrand"></span>
+    <span>
+      <a href="#/pricing">Pricing</a>
+      <a href="#/privacy">Privacy</a>
+      <a href="#/terms">Terms</a>
+      <a href="#/refunds">Refunds</a>
+      <a href="#/contact">Contact</a>
+      <button class="lk-btn" id="cookieSettings" type="button" hidden>Cookie settings</button>
+    </span>
+  </div>
+</footer>
+
+<!-- ═══ IMAGE PREVIEW OVERLAY ════════════════════════════════ -->
+<div class="preview-overlay" id="previewOverlay" role="dialog" aria-label="Image viewer" aria-modal="true">
+  <div class="preview-image-container">
+    <img class="preview-image" id="previewImage" alt="">
+  </div>
+  <div class="preview-meta" aria-live="polite">
+    <span id="previewFilename"></span>
+    <span id="previewPosition"></span>
+  </div>
+  <button class="preview-compare" id="previewCompare" type="button" hidden>Show original</button>
+  <button class="preview-close" id="previewClose" type="button" aria-label="Close viewer" title="Close">
+    <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  </button>
+  <button class="preview-nav preview-prev" id="previewPrev" type="button" aria-label="Previous" title="Previous">
+    <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>
+  <button class="preview-nav preview-next" id="previewNext" type="button" aria-label="Next" title="Next">
+    <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+  </button>
+</div>
+
+<!-- ═══ HIDDEN FILE INPUT ════════════════════════════════════ -->
+<input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp,image/gif" multiple hidden>
+
+<!-- ═══ JSZip CDN ════════════════════════════════════════════ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<!-- ═══════════════════════════════════════════════════════════
+     JAVASCRIPT — Full Application Logic
+     ═══════════════════════════════════════════════════════════ -->
+<script>
+/* ── Configuration ──────────────────────────────────────────── */
+const CONFIG = {
+  name: 'ListingPreflight',
+  siteUrl: '',
+  operator: 'Praveen',
+  email: 'praveenmanoharan.dev@gmail.com',
+  jurisdiction: '',
+  provider: '',
+  refundDays: 7,
+  contact: { phone: '', address: '', hours: '' },
+  auth: { endpoint: '/api' },
+  portal: '',
+  price: { month: 9, year: 84, currency: 'USD' },
+  checkout: { month: '', year: '' },
+  analytics: { enabled: false, domain: '', src: '', cookieless: true }
+};
+
+const RULES = {
+  amazon: { min: 1000, rec: 2000, fill: 0.85, out: 2000 },
+  etsy: { w: 1500, ratio: 4/3, ow: 2000, oh: 1500 }
+};
+const FREE = 5, MAXMB = 25, REVIEWED = 'October 2026';
+
+/* ── Utilities ──────────────────────────────────────────────── */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const IC = {
+  ok: '<path d="M3 8.5l3.2 3L13 4.5"/>',
+  bad: '<path d="M4 4l8 8M12 4l-8 8"/>',
+  warn: '<path d="M8 3v6M8 12v.5"/>',
+  info: '<circle cx="8" cy="8" r="6"/><path d="M8 7.2v3.6M8 5.2v.2"/>'
+};
+const ico = t => `<svg class="ico" viewBox="0 0 16 16" aria-hidden="true">${IC[t]}</svg>`;
+const WORD = { ok: 'Pass', warn: 'Check', bad: 'Fail', info: 'Note' };
+const cur = n => new Intl.NumberFormat('en-US', { style: 'currency', currency: CONFIG.price.currency, maximumFractionDigits: n % 1 ? 2 : 0 }).format(n);
+const nap = ms => new Promise(r => setTimeout(r, ms));
+
+/* ── State ──────────────────────────────────────────────────── */
+let items = [], staged = [], busy = false, fixing = false, reviewing = false;
+let mkv = 'amazon', sku = '', cycle = 'month', curKey = '';
+
+/* ── Storage ────────────────────────────────────────────────── */
+const MEM = {};
+const ls = {
+  get(k) { try { const v = localStorage.getItem(k); return v === null && k in MEM ? MEM[k] : v; } catch(e) { return k in MEM ? MEM[k] : null; } },
+  set(k, v) { MEM[k] = v; try { localStorage.setItem(k, v); } catch(e) {} },
+  del(k) { delete MEM[k]; try { localStorage.removeItem(k); } catch(e) {} }
+};
+
+/* ── Router ─────────────────────────────────────────────────── */
+let H = location.hash || '';
+function go(h) {
+  H = h;
+  try { history.pushState(null, '', h); } catch(e) { try { location.hash = h; } catch(e) {} }
+  route();
+}
+const EM = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/* ── Auth ───────────────────────────────────────────────────── */
+const U = {
+  get() {
+    if (CONFIG.auth.endpoint) {
+      try { return JSON.parse(MEM['pf-user'] || 'null'); } catch(e) { return null; }
+    }
+    try { return JSON.parse(ls.get('pf-user') || 'null'); } catch(e) { return null; }
+  },
+  set(u) {
+    if (CONFIG.auth.endpoint) { u ? MEM['pf-user'] = JSON.stringify(u) : delete MEM['pf-user']; return; }
+    u ? ls.set('pf-user', JSON.stringify(u)) : ls.del('pf-user');
+  }
+};
+const isPro = () => (U.get() || {}).plan === 'pro';
+const lim = () => isPro() ? 200 : FREE;
+
+async function api(path, body, method = 'POST') {
+  let r;
+  try {
+    r = await fetch(CONFIG.auth.endpoint.replace(/\/$/, '') + path, {
+      method,
+      headers: method === 'GET' ? {} : { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      ...(body === undefined ? {} : { body: JSON.stringify(body) })
+    });
+  } catch(e) {
+    throw new Error('Could not reach the server. Check your connection and try again.');
+  }
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || 'Request failed (' + r.status + ').');
+  return j;
+}
+async function doAuth(mode, v) {
+  if (!CONFIG.auth.endpoint) throw new Error('Account service is not connected. Start the ListingPreflight server and try again.');
+  const j = await api('/' + mode, v);
+  U.set(j.user || { name: v.name || v.email.split('@')[0], email: v.email, plan: 'free' });
+}
+const logout = async () => {
+  if (CONFIG.auth.endpoint) { try { await api('/logout', {}); } catch(e) {} }
+  U.set(null); renderAu(); go('#/');
+};
+
+function renderAu() {
+  const u = U.get(), a = $('au');
+  if (!u) {
+    a.innerHTML = '<a class="lk" href="#/login">Log in</a><a class="btn primary sm" href="#/register">Sign up</a>';
+    return;
+  }
+  a.innerHTML = `<div class="am"><button class="btn sm" id="menuBtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="userMenu">
+    <span class="av" aria-hidden="true">${esc((u.name||'?')[0]).toUpperCase()}</span>
+    <span class="an">${esc(u.name)}</span>
+    <svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg>
+  </button>
+  <div class="menu" id="userMenu" role="menu" aria-label="Account" hidden>
+    <a role="menuitem" href="#/account">Account</a>
+    ${u.role === 'admin' ? '<a role="menuitem" href="#/admin">Admin dashboard</a>' : ''}
+    <a role="menuitem" href="#/pricing">Plans</a>
+    <button role="menuitem" type="button" id="menuLogout">Log out</button>
+  </div></div>`;
+  const b = $('menuBtn'), m = $('userMenu');
+  const shut = () => { m.hidden = true; b.setAttribute('aria-expanded', 'false'); };
+  b.onclick = e => { e.stopPropagation(); const o = m.hidden; m.hidden = !o; b.setAttribute('aria-expanded', String(o)); if (o && m.querySelector('[role=menuitem]')) m.querySelector('[role=menuitem]').focus(); };
+  m.onkeydown = e => {
+    const L = [...m.querySelectorAll('[role=menuitem]')], i = L.indexOf(document.activeElement);
+    if (e.key === 'Escape') { shut(); b.focus(); }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); L[(i+1)%L.length].focus(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); L[(i+L.length-1)%L.length].focus(); }
+  };
+  m.onclick = e => { if (e.target.closest('a')) shut(); };
+  $('menuLogout').onclick = logout;
+}
+document.addEventListener('click', e => {
+  const m = $('userMenu'), b = $('menuBtn');
+  if (m && !m.hidden && !m.contains(e.target)) { m.hidden = true; b.setAttribute('aria-expanded', 'false'); }
+});
+
+/* ── Theme Toggle ───────────────────────────────────────────── */
+const savedTheme = ls.get('pf-theme');
+if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+$('themeToggle').onclick = () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next === 'dark' ? '' : next);
+  if (next === 'dark') document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme', 'light');
+  ls.set('pf-theme', next);
+  updateThemeIcon();
+};
+function updateThemeIcon() {
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  $('themeIcon').innerHTML = isLight
+    ? '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
+    : '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+}
+updateThemeIcon();
+
+/* ── Header Scroll Effect ───────────────────────────────────── */
+let lastScroll = 0;
+window.addEventListener('scroll', () => {
+  const h = $('header');
+  if (window.scrollY > 10) h.classList.add('scrolled');
+  else h.classList.remove('scrolled');
+  lastScroll = window.scrollY;
+}, { passive: true });
+
+/* ── Loading Steps ──────────────────────────────────────────── */
+const STEPS = ['Reading pixels', 'Background colour', 'Product fill', 'Size and ratio', 'File type and colour mode'];
+
+function ldStart() {
+  $('statusArea').innerHTML = `<div class="analysis-loader" id="analysisLoader">
+    <div class="analysis-thumbnail" aria-hidden="true">
+      <div class="thumb-canvas" id="thumbCanvas"></div>
+      <i class="grid-overlay"></i>
+      <i class="scan-beam"></i>
+      <span class="corner tl"></span><span class="corner tr"></span>
+      <span class="corner bl"></span><span class="corner br"></span>
+      <em class="done-check"><svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></em>
+    </div>
+    <div class="analysis-details">
+      <strong id="loaderTitle">Starting analysis...</strong>
+      <ul class="step-list" aria-hidden="true">${STEPS.map(t => `<li><span class="step-dot"></span>${t}</li>`).join('')}</ul>
+      <div class="mini-progress"><i class="fill" id="progressFill"></i></div>
+      <span class="mono" id="progressPct">0%</span>
+    </div>
+  </div>`;
+}
+function ldImg(it, i, n) {
+  const cv = $('thumbCanvas');
+  if (!cv) return;
+  const c = document.createElement('canvas');
+  c.width = it.th.width; c.height = it.th.height;
+  c.getContext('2d').drawImage(it.th, 0, 0);
+  cv.innerHTML = ''; cv.appendChild(c);
+  $('loaderTitle').textContent = `Checking image ${i+1} of ${n}: ${it.f.name}`;
+}
+function ldStep(k, i, n) {
+  const L = document.querySelectorAll('#analysisLoader .step-list li');
+  L.forEach((li, j) => li.className = j < k ? 'complete' : j === k ? 'active' : '');
+  const p = Math.round((i + Math.min(k, 5) / 5) / n * 100);
+  if ($('progressFill')) { $('progressFill').style.width = p + '%'; $('progressPct').textContent = p + '%'; }
+}
+function ldDone(n) {
+  const d = $('analysisLoader');
+  if (!d) return;
+  d.classList.add('done');
+  document.querySelectorAll('#analysisLoader .step-list li').forEach(li => li.className = 'complete');
+  $('progressFill').style.width = '100%';
+  $('progressPct').textContent = '100%';
+  $('loaderTitle').textContent = `Done. ${n} image${n === 1 ? '' : 's'} checked`;
+}
+
+/* ── Analysis Engine ────────────────────────────────────────── */
+function jpegComps(u) {
+  if (u[0] !== 255 || u[1] !== 216) return null;
+  let i = 2;
+  while (i < u.length - 9) {
+    if (u[i] !== 255) { i++; continue; }
+    const m = u[i+1];
+    if (m >= 192 && m <= 207 && m !== 196 && m !== 200 && m !== 204) return u[i+9];
+    i += 2 + ((u[i+2] << 8) | u[i+3]);
+  }
+  return null;
+}
+const loadImg = s => new Promise((a, b) => { const i = new Image(); i.onload = () => a(i); i.onerror = () => b(new Error('decode')); i.src = s; });
+function thumb(img) {
+  const W = img.naturalWidth || img.width, H = img.naturalHeight || img.height;
+  const k = Math.min(1, 240 / Math.max(W, H));
+  const c = document.createElement('canvas');
+  c.width = Math.max(1, Math.round(W * k)); c.height = Math.max(1, Math.round(H * k));
+  const g = c.getContext('2d');
+  g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height);
+  g.drawImage(img, 0, 0, c.width, c.height);
+  return c;
+}
+const safeComps = (u, f) => { try { return f.type === 'image/jpeg' ? jpegComps(u) : null; } catch(e) { return null; } };
+async function decode(f, url) {
+  try { return await loadImg(url); }
+  catch(e) {
+    if (window.createImageBitmap) { const b = await createImageBitmap(f); b.naturalWidth = b.width; b.naturalHeight = b.height; return b; }
+    throw e;
+  }
+}
+async function analyze(f) {
+  const u = new Uint8Array(await f.arrayBuffer()), comps = safeComps(u, f), url = URL.createObjectURL(f);
+  let img; try { img = await decode(f, url); } catch(e) { URL.revokeObjectURL(url); throw e; }
+  const W = img.naturalWidth, H = img.naturalHeight, s = Math.min(1, 800 / Math.max(W, H));
+  const w = Math.max(1, Math.round(W * s)), h = Math.max(1, Math.round(H * s));
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const g = c.getContext('2d', { willReadFrequently: true });
+  g.fillStyle = '#fff'; g.fillRect(0, 0, w, h); g.drawImage(img, 0, 0, w, h);
+  const d = g.getImageData(0, 0, w, h).data;
+  const px = (X, Y) => { const k = (Y * w + X) * 4; return Math.min(d[k], d[k+1], d[k+2]); };
+  let pure = 0, near = 0, n = 0;
+  const ed = (X, Y) => { const m = px(X, Y); n++; if (m >= 253) pure++; if (m >= 235) near++; };
+  for (let X = 0; X < w; X++) { ed(X, 0); ed(X, h-1); }
+  for (let Y = 1; Y < h-1; Y++) { ed(0, Y); ed(w-1, Y); }
+  let x0 = w, y0 = h, x1 = -1, y1 = -1;
+  for (let Y = 0; Y < h; Y++) for (let X = 0; X < w; X++) if (px(X, Y) < 240) { if (X < x0) x0 = X; if (X > x1) x1 = X; if (Y < y0) y0 = Y; if (Y > y1) y1 = Y; }
+  let bbox = null, fill = 0;
+  if (x1 >= 0) { bbox = { x: x0/s, y: y0/s, w: (x1-x0+1)/s, h: (y1-y0+1)/s }; fill = Math.max((x1-x0+1)/w, (y1-y0+1)/h); }
+  return { th: thumb(img), f, url, W, H, type: f.type, comps, pure: pure/n, near: near/n, bbox, fill, size: f.size };
+}
+function check(it) {
+  const r = RULES[mkv], o = [], a = (s, t) => o.push({ s, t });
+  if (it.comps === 4) a('bad', 'CMYK colour mode. Convert to RGB or colours may display wrongly.');
+  if (mkv === 'amazon') {
+    const L = Math.max(it.W, it.H);
+    L >= r.rec ? a('ok', `Size ${it.W} × ${it.H} px.`) : L >= r.min ? a('warn', `Size ${it.W} × ${it.H} px. Allowed, but 2000 px recommended.`) : a('bad', `Size ${it.W} × ${it.H} px is under 1000 px minimum.`);
+    it.fixed && it.backgroundCleaned === false ? a('warn', 'Original background preserved. Replace with pure white manually for Amazon main image.') : it.pure >= 0.98 ? a('ok', 'Background is pure white at edges.') : it.near >= 0.98 ? a('warn', 'Background looks off-white. Main image needs pure white (RGB 255,255,255).') : a('bad', 'Background is not white. Main image needs pure white.');
+    if (it.fixed && it.backgroundCleaned) a('info', 'Review cutout edges and compare with original before using.');
+    it.fixed && it.backgroundCleaned === false ? a('warn', 'Product fill cannot be measured with original background.') : it.near < 0.98 ? a('warn', 'Product fill cannot be estimated against non-white background.') : !it.bbox ? a('warn', 'Product not found. Check manually.') : it.fill >= r.fill ? a('ok', `Product fill ~${Math.round(it.fill*100)}% of frame.`) : it.fill >= 0.75 ? a('warn', `Product fill ~${Math.round(it.fill*100)}%. Aim for 85%+.`) : a('bad', `Product fill ~${Math.round(it.fill*100)}%. Aim for 85%+.`);
+    if (it.fixed && it.sourceUpscale > 1.5) a('warn', `Source enlarged ~${it.sourceUpscale.toFixed(1)}×. Result may look soft.`);
+    const q = it.W / it.H; q > 0.97 && q < 1.03 ? a('ok', 'Square image.') : a('warn', 'Not square. Square is recommended.');
+    ['image/jpeg', 'image/png'].includes(it.type) ? a('ok', 'File type accepted.') : a('warn', 'Convert to JPG or PNG.');
+    a('info', 'Check by eye: no text, logos, borders or extra items on main image.');
+  } else {
+    it.W >= r.w ? a('ok', `Width ${it.W} px is enough.`) : a('warn', `Width ${it.W} px. ~1500 px+ recommended.`);
+    Math.abs(it.W / it.H - r.ratio) < 0.04 ? a('ok', 'Ratio is ~4:3.') : a('warn', 'Not 4:3. Search grids may crop unexpectedly.');
+    if (it.fixed && it.sourceUpscale > 1.5) a('warn', `Source enlarged ~${it.sourceUpscale.toFixed(1)}×. May look soft.`);
+    a('info', 'Avoid watermark overlays. Etsy advises against them.');
+  }
+  return o;
+}
+const worst = c => c.some(x => x.s === 'bad') ? 'bad' : c.some(x => x.s === 'warn') ? 'warn' : 'ok';
+
+async function fix(it) {
+  const r = RULES[mkv], c = document.createElement('canvas');
+  c.width = mkv === 'amazon' ? r.out : r.ow; c.height = mkv === 'amazon' ? r.out : r.oh;
+  const g = c.getContext('2d'); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
+  g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height);
+  let sourceUpscale = 1, productFill = null, backgroundCleaned = null;
+  if (mkv === 'amazon') {
+    const response = await fetch('/api/image/remove-background', { method: 'POST', headers: { 'Content-Type': it.f.type }, body: it.f });
+    if (!response.ok) { let message = 'Background removal failed.'; try { const error = await response.json(); if (error.error) message = error.error; } catch(e) {} throw new Error(message); }
+    const cutout = await response.blob(), cutoutUrl = URL.createObjectURL(cutout);
+    try {
+      const img = await loadImg(cutoutUrl), scale = Math.min(1, 1200/Math.max(img.naturalWidth,img.naturalHeight));
+      const sw = Math.max(1, Math.round(img.naturalWidth*scale)), sh = Math.max(1, Math.round(img.naturalHeight*scale));
+      const sample = document.createElement('canvas'); sample.width = sw; sample.height = sh;
+      const sg = sample.getContext('2d', { willReadFrequently: true }); sg.drawImage(img, 0, 0, sw, sh);
+      const alpha = sg.getImageData(0, 0, sw, sh).data;
+      let x0 = sw, y0 = sh, x1 = -1, y1 = -1;
+      for (let y = 0; y < sh; y++) for (let x = 0; x < sw; x++) if (alpha[(y*sw+x)*4+3] > 8) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+      if (x1 < 0) throw new Error('Background removal returned empty image. Try another source.');
+      const margin = Math.max(2, Math.round(Math.max(x1-x0+1, y1-y0+1)*0.012));
+      const bx = Math.max(0, x0-margin), by = Math.max(0, y0-margin), ex = Math.min(sw, x1+1+margin), ey = Math.min(sh, y1+1+margin);
+      const ratioX = img.naturalWidth/sw, ratioY = img.naturalHeight/sh;
+      const sx = bx*ratioX, sy = by*ratioY, pw = (ex-bx)*ratioX, ph = (ey-by)*ratioY;
+      sourceUpscale = Math.min(c.width*0.88/pw, c.height*0.88/ph);
+      const w = pw*sourceUpscale, h = ph*sourceUpscale;
+      g.drawImage(img, sx, sy, pw, ph, (c.width-w)/2, (c.height-h)/2, w, h);
+      productFill = Math.max(w/c.width, h/c.height); backgroundCleaned = true;
+    } finally { URL.revokeObjectURL(cutoutUrl); }
+  } else {
+    const img = await decode(it.f, it.url);
+    const fitScale = Math.min(c.width*0.88/it.W, c.height*0.88/it.H);
+    const w = it.W*fitScale, h = it.H*fitScale;
+    g.drawImage(img, (c.width-w)/2, (c.height-h)/2, w, h);
+    sourceUpscale = fitScale;
+  }
+  const blob = await new Promise((a, b) => c.toBlob(x => x ? a(x) : b(new Error('export')), 'image/jpeg', 0.95));
+  return { blob, backgroundCleaned, sourceUpscale, productFill };
+}
+const oname = (i, it) => mkv === 'amazon' ? `${sku || 'SKU'}.${i ? 'PT' + String(i).padStart(2, '0') : 'MAIN'}.jpg` : it.f.name.replace(/\.[^.]+$/, '') + '-fixed.jpg';
+
+async function fixedAndChecked(it, i, onProgress = () => {}) {
+  onProgress(mkv === 'amazon' ? 'Removing background with remove.bg' : 'Preparing image resize', 5); await nap(30);
+  const result = await fix(it); onProgress('Rechecking fixed image', 65); await nap(30);
+  const file = new File([result.blob], oname(i, it), { type: 'image/jpeg' });
+  const checked = await analyze(file); onProgress('Preparing download', 94); await nap(16);
+  checked.fixed = true; checked.backgroundCleaned = result.backgroundCleaned;
+  checked.sourceUpscale = result.sourceUpscale;
+  if (result.productFill != null) checked.fill = result.productFill;
+  checked.original = it.original || { url: it.url, name: it.f.name, W: it.W, H: it.H };
+  return checked;
+}
+function dl(b, n) { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = n; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 3000); }
+function freeItem(it) { if (it.url) URL.revokeObjectURL(it.url); if (it.original?.url && it.original.url !== it.url) URL.revokeObjectURL(it.original.url); }
+const skuOk = () => { const e = $('skuInput'); if (!e) return true; const v = e.value.trim(), ok = /^[A-Za-z0-9-]{0,30}$/.test(v); e.setAttribute('aria-invalid', ok ? 'false' : 'true'); $('skuError').textContent = ok ? '' : 'Letters, numbers, hyphens only, max 30 chars.'; if (ok) sku = v; return ok; };
+function showErr(m) { const e = $('errorArea'); if (e) e.innerHTML = m ? `<div class="alert error" role="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg><span>${esc(m)}</span></div>` : ''; }
+function stat(m, pct) {
+  const s = $('statusArea');
+  if (!s) return;
+  if (!m) { s.innerHTML = ''; return; }
+  s.innerHTML = (pct != null ? '<span class="spinner" aria-hidden="true"></span> ' : '') + esc(m)
+    + (pct != null ? `<div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}"><i class="fill" style="width:${pct}%"></i></div>` : '');
+}
+
+/* ── Image Preview ──────────────────────────────────────────── */
+let previewIndex = -1, previewOriginal = false, previewClosing = false;
+let previewSwapTimer = 0, previewSequence = 0, previewFocusReturn = null, previewOverflowSaved = null;
+
+function setPreviewImage(index, animate = false) {
+  if (!items.length) return;
+  const next = (index + items.length) % items.length;
+  if (next !== previewIndex) previewOriginal = false;
+  const img = $('previewImage'), overlay = $('previewOverlay');
+  const sequence = ++previewSequence;
+
+  const apply = () => {
+    if (sequence !== previewSequence || !overlay.classList.contains('open')) return;
+    const it = items[next], showOrig = previewOriginal && it.original;
+    const src = showOrig ? it.original.url : it.url;
+    previewIndex = next;
+    img.src = src;
+    img.alt = `${showOrig ? 'Original' : 'Fixed'} image ${next+1} of ${items.length}: ${showOrig ? it.original.name : it.f.name}`;
+    $('previewFilename').textContent = showOrig ? it.original.name : it.f.name;
+    $('previewPosition').textContent = `${next+1} / ${items.length}`;
+    $('previewCompare').hidden = !it.original;
+    $('previewCompare').textContent = showOrig ? 'Show fixed image' : 'Show original';
+    $('previewPrev').hidden = items.length < 2;
+    $('previewNext').hidden = items.length < 2;
+    img.classList.remove('switching');
+    img.style.animation = 'none'; img.offsetHeight; img.style.animation = '';
+  };
+  clearTimeout(previewSwapTimer);
+  if (animate && overlay.classList.contains('open')) {
+    img.classList.add('switching');
+    const delay = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 140;
+    previewSwapTimer = setTimeout(apply, delay);
+  } else apply();
+}
+
+function openPreview(index) {
+  if (!items[index]) return;
+  const overlay = $('previewOverlay');
+  if (overlay.classList.contains('open')) { setPreviewImage(index, true); return; }
+  previewOriginal = false;
+  previewFocusReturn = document.activeElement;
+  previewOverflowSaved = { body: document.body.style.overflow, root: document.documentElement.style.overflow };
+  document.body.style.overflow = 'hidden';
+  document.documentElement.style.overflow = 'hidden';
+  previewClosing = false;
+  overlay.classList.remove('closing');
+  overlay.classList.add('open');
+  setPreviewImage(index, false);
+  $('previewClose').focus();
+}
+
+function closePreview() {
+  const overlay = $('previewOverlay');
+  if (!overlay.classList.contains('open') || previewClosing) return;
+  previewClosing = true;
+  previewSequence++;
+  clearTimeout(previewSwapTimer);
+  overlay.classList.add('closing');
+  const delay = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 250;
+  setTimeout(() => {
+    overlay.classList.remove('open', 'closing');
+    restorePreviewPage();
+  }, delay);
+}
+
+function restorePreviewPage() {
+  if (previewOverflowSaved) {
+    document.body.style.overflow = previewOverflowSaved.body;
+    document.documentElement.style.overflow = previewOverflowSaved.root;
+    previewOverflowSaved = null;
+  }
+  previewClosing = false;
+  const target = previewFocusReturn;
+  previewFocusReturn = null;
+  if (target && target.isConnected && !target.disabled) target.focus({ preventScroll: true });
+}
+
+$('previewClose').onclick = closePreview;
+$('previewCompare').onclick = () => { if (previewIndex >= 0 && items[previewIndex].original) { previewOriginal = !previewOriginal; setPreviewImage(previewIndex, true); } };
+$('previewPrev').onclick = () => setPreviewImage(previewIndex - 1, true);
+$('previewNext').onclick = () => setPreviewImage(previewIndex + 1, true);
+$('previewOverlay').addEventListener('click', e => { if (e.target === $('previewOverlay') || e.target.classList.contains('preview-image-container')) closePreview(); });
+$('previewOverlay').addEventListener('keydown', e => {
+  if (e.key === 'Escape') { e.preventDefault(); closePreview(); }
+  else if (e.key === 'ArrowLeft' && items.length > 1) { e.preventDefault(); setPreviewImage(previewIndex - 1, true); }
+  else if (e.key === 'ArrowRight' && items.length > 1) { e.preventDefault(); setPreviewImage(previewIndex + 1, true); }
+});
+
+/* ── Pricing HTML ───────────────────────────────────────────── */
+function priceHTML() {
+  const P = CONFIG.price, y = cycle === 'year', amt = y ? P.year : P.month;
+  const save = Math.round((1 - P.year / (P.month * 12)) * 100);
+  const li = t => `<li>${ico('ok')}<span>${t}</span></li>`;
+  const yes = `<span style="color:var(--success)">${ico('ok')}<span class="sr-only">Included</span></span>`;
+  const no = '<span style="color:var(--text-muted)" aria-hidden="true">&ndash;</span><span class="sr-only">Not included</span>';
+  return `<section class="container section" id="pricing" aria-labelledby="pricingTitle">
+    <div class="pricing-header">
+      <span class="badge">Pricing</span>
+      <h2 id="pricingTitle" style="margin-top:12px">Start free. Upgrade for big batches.</h2>
+      <p class="lead" style="margin:0 auto 20px;text-align:center">Check ${FREE} images free with no card. Pro raises the limit and adds reports.</p>
+      <div class="billing-toggle" role="radiogroup" aria-label="Billing period">
+        <label><input type="radio" name="billingCycle" value="month" ${y ? '' : 'checked'}><span>Monthly</span></label>
+        <label><input type="radio" name="billingCycle" value="year" ${y ? 'checked' : ''}><span>Yearly <em class="save-badge">Save ${save}%</em></span></label>
+      </div>
+    </div>
+    <div class="plans-grid">
+      <article class="plan-card card">
+        <h3>Free</h3><p class="mono" style="margin:0">To try it out</p>
+        <p class="plan-price">${cur(0)}<span>forever</span></p>
+        <ul>${li(`${FREE} images per check`)}${li('Amazon & Etsy rule checks')}${li('Auto-fix & ZIP download')}${li('Runs in your browser')}</ul>
+        <a class="btn" href="#/">Start checking</a>
+      </article>
+      <article class="plan-card pro card card-glow">
+        <span class="plan-badge">Most popular</span>
+        <h3>Pro</h3><p class="mono" style="margin:0">For active sellers</p>
+        <p class="plan-price">${cur(amt)}<span>per ${y ? 'year' : 'month'}</span></p>
+        <p class="mono" style="margin:0;min-height:1.5em">${y ? cur(Math.round(P.year/12*100)/100) + '/month, billed yearly' : 'Yearly saves ' + save + '%'}</p>
+        <ul>${li('Up to 200 images per check')}${li('CSV report of every check')}${li('Email support')}${li('Everything in Free')}</ul>
+        <a class="btn primary" href="#/checkout?plan=pro&cycle=${cycle}">Get Pro</a>
+      </article>
+    </div>
+    <ul class="trust-list"><li>${ico('ok')}Cancel any time</li><li>${ico('ok')}${CONFIG.refundDays}-day refund</li><li>${ico('ok')}Card details never touch this site</li></ul>
+    <h3 style="margin-top:40px;text-align:center">Compare plans</h3>
+    <div class="table-wrap"><table><thead><tr><th>Feature</th><th>Free</th><th>Pro</th></tr></thead><tbody>
+    <tr><th>Images per check</th><td>${FREE}</td><td>200</td></tr>
+    <tr><th>Amazon & Etsy checks</th><td>${yes}</td><td>${yes}</td></tr>
+    <tr><th>Auto-fix & ZIP</th><td>${yes}</td><td>${yes}</td></tr>
+    <tr><th>CSV report</th><td>${no}</td><td>${yes}</td></tr>
+    <tr><th>Email support</th><td>${no}</td><td>${yes}</td></tr>
+    </tbody></table></div>
+    <p class="note" style="text-align:center">Prices in ${esc(P.currency)}. Taxes may be added at checkout. Read the <a href="#/refunds">refund policy</a>.</p>
+  </section>`;
+}
+function bindPrice() {
+  document.querySelectorAll('input[name=billingCycle]').forEach(r => r.onchange = () => {
+    cycle = r.value; $('pricing').outerHTML = priceHTML(); bindPrice();
+    document.querySelector('input[name=billingCycle]:checked').focus();
+  });
+}
+const FAQ_HTML = `<section class="container section" aria-labelledby="faqTitle">
+  <h2 id="faqTitle">Questions</h2>
+  <details class="faq-item"><summary>Are my images uploaded?</summary><p>Image checks run in your browser. Etsy fixes also run locally. For Amazon Fix, the image goes through our server to remove.bg for background removal. Gemini review is separate and optional. Review <a href="https://www.remove.bg/privacy" target="_blank" rel="noopener noreferrer">remove.bg's privacy policy</a> and <a href="https://ai.google.dev/gemini-api/terms" target="_blank" rel="noopener noreferrer">Google's Gemini API terms</a>.</p></details>
+  <details class="faq-item"><summary>Does a pass mean Amazon/Etsy will accept it?</summary><p>No. It means the image is likely to meet the rules we test. Text, logos and watermarks are not tested, and marketplace rules change.</p></details>
+  <details class="faq-item"><summary>Can I cancel Pro?</summary><p>Yes, any time. Access continues until the end of the period you paid for.</p></details>
+  <details class="faq-item"><summary>How do refunds work?</summary><p>See the <a href="#/refunds">refund policy</a>.</p></details>
+</section>`;
+
+/* ── All Pages ──────────────────────────────────────────────── */
+const op = () => CONFIG.operator || 'the site operator';
+const qs = () => new URLSearchParams((H.split('?')[1]) || '');
+
+const PAGES = {
+  '': {
+    t: 'Amazon & Etsy Image Checker',
+    d: 'Check product photos against Amazon and Etsy image rules before you upload. See what will likely fail, fix it, and download.',
+    h: () => `
+      <section class="container hero">
+        <div class="hero-content">
+          <span class="badge">E-commerce Image Tool</span>
+          <h1>Check your Amazon & Etsy photos before you upload.</h1>
+          <p class="lead">Add your product images and press Check. Get a result for each rule, then fix, resize and download. Amazon background removal uses remove.bg; other checks run in your browser.</p>
+          <div class="hero-cta"><button class="btn primary lg" type="button" id="heroCta">Check my images free</button><a class="btn lg" href="#/rules">See what it checks</a></div>
+          <p class="mono hero-note">No sign-up needed. Amazon fixes send images to remove.bg. Gemini review is optional.</p>
+        </div>
+        <div class="hero-features">
+          <div class="hero-feature"><div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg></div><div><h3>Instant Checks</h3><p>Background, size, fill, ratio — all in your browser.</p></div></div>
+          <div class="hero-feature"><div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div><div><h3>Auto Fix</h3><p>One-click fix with background removal and resize.</p></div></div>
+          <div class="hero-feature"><div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></div><div><h3>ZIP Download</h3><p>Fix all images and download as a ZIP archive.</p></div></div>
+        </div>
+      </section>
+      <section class="container section-sm">
+        <fieldset style="border:0;padding:0"><legend class="label">Marketplace</legend>
+        <div class="marketplace-selector">
+          <label class="marketplace-option"><input type="radio" name="marketplace" value="amazon"><span class="option-content"><b>Amazon</b><small>Main image rules</small></span></label>
+          <label class="marketplace-option"><input type="radio" name="marketplace" value="etsy"><span class="option-content"><b>Etsy</b><small>Listing photo rules</small></span></label>
+        </div></fieldset>
+        <div class="sku-field" id="skuWrap"><label for="skuInput">SKU or ASIN (used in file names)</label><input type="text" id="skuInput" autocomplete="off" aria-describedby="skuError"><p class="field-error" id="skuError" role="alert"></p></div>
+        <div class="dropzone" id="dropzone">
+          <div class="dz-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg></div>
+          <button class="btn" type="button" id="pickBtn">Choose images</button>
+          <p>or drop JPG, PNG or WebP files here. Up to ${lim()} images, ${MAXMB} MB each.</p>
+        </div>
+        <div class="staged-grid" id="stagedGrid" aria-label="Images ready to check"></div>
+        <div class="actions"><button class="btn primary" id="checkBtn" type="button" disabled>Check images</button><button class="btn" id="clearBtn" type="button">Clear</button></div>
+        <div class="status-area" id="statusArea" role="status" aria-live="polite"></div>
+        <div id="errorArea"></div>
+        <div class="actions" id="actionBar" style="display:none">
+          <button class="btn primary" id="fixAllBtn" type="button">Fix all images</button>
+          <button class="btn" id="zipBtn" type="button">Fix all & download ZIP</button>
+          <button class="btn" id="csvBtn" type="button">Download CSV report${isPro() ? '' : ' (Pro)'}</button>
+        </div>
+        <div class="results-grid" id="resultsGrid" tabindex="-1"></div>
+      </section>
+      <section class="container section"><div class="cols">
+        <div><h2>What it checks</h2><p style="color:var(--text-secondary)">Background colour, product fill, pixel size, aspect ratio, file type and colour mode. See the <a href="#/rules">full rule list</a>.</p></div>
+        <div><h2>What it cannot check</h2><p style="color:var(--text-secondary)">Text, logos, borders and watermarks are not detected reliably. A pass means likely to pass, not approved. Confirm in your seller dashboard.</p></div>
+      </div></section>
+      ${priceHTML()}`
+  },
+  'pricing': {
+    t: 'Pricing',
+    d: 'ListingPreflight pricing. Check 5 images free, or choose Pro for larger batches.',
+    h: () => `<div style="padding-top:28px">${priceHTML()}</div>${FAQ_HTML}`
+  },
+  'rules': {
+    t: 'Amazon & Etsy Image Rules Checklist',
+    d: 'Image rules checked for Amazon main images and Etsy listing photos.',
+    h: () => `<div class="container page-content">
+      <span class="badge">Reference</span>
+      <h1>Image rules checked</h1>
+      <p class="lead">Taken from public seller guides, last reviewed ${REVIEWED}. Confirm in your seller dashboard.</p>
+      <h2>Amazon main image</h2>
+      <div class="table-wrap"><table><thead><tr><th>Rule</th><th>Requirement</th><th>Auto-fix</th></tr></thead><tbody>
+      <tr><td>Background</td><td>Pure white, RGB 255,255,255</td><td>remove.bg cutout on white canvas</td></tr>
+      <tr><td>Product fill</td><td>85%+ of the frame</td><td>Cutout scaled to ~88%</td></tr>
+      <tr><td>Size</td><td>1000 px min, 2000 px recommended</td><td>Exported at 2000×2000</td></tr>
+      <tr><td>Content</td><td>No text, logos, borders</td><td>Manual check</td></tr>
+      <tr><td>File type</td><td>JPG or PNG</td><td>Exported as JPG</td></tr>
+      </tbody></table></div>
+      <h2>Etsy listing photo</h2>
+      <div class="table-wrap"><table><thead><tr><th>Rule</th><th>Guidance</th><th>Auto-fix</th></tr></thead><tbody>
+      <tr><td>Width</td><td>~1500 px+</td><td>Exported at 2000×1500</td></tr>
+      <tr><td>Ratio</td><td>~4:3 avoids cropping</td><td>Padded to 4:3</td></tr>
+      <tr><td>Colour mode</td><td>RGB, not CMYK</td><td>Detected, flagged</td></tr>
+      <tr><td>Watermarks</td><td>Etsy advises against</td><td>Manual check</td></tr>
+      </tbody></table></div>
+      <p style="margin-top:24px"><a class="btn primary" href="#/">Check your images</a></p>
+    </div>`
+  },
+  'checkout': {
+    t: 'Checkout',
+    d: 'Review your ListingPreflight Pro order.',
+    h: () => { const P = CONFIG.price, y = qs().get('cycle') === 'year', amt = y ? P.year : P.month; return `<div class="container page-content" style="max-width:940px"><h1>Checkout</h1>${U.get() ? '' : '<p class="note" style="margin:0 0 14px">Have an account? <a href="#/login?next=checkout">Log in</a> first.</p>'}<div class="checkout-grid"><form id="checkoutForm" novalidate><div class="field"><label for="checkoutEmail">Email for receipt</label><input type="email" id="checkoutEmail" autocomplete="email" value="${esc((U.get()||{}).email||'')}" aria-describedby="checkoutEmailErr"><p class="field-error" id="checkoutEmailErr"></p></div><div class="field"><label style="display:flex;font-size:1rem;font-weight:400"><input type="checkbox" id="checkoutTerms" aria-describedby="checkoutTermsErr">I agree to the <a href="#/terms">Terms</a> and <a href="#/refunds">Refund Policy</a>.</label><p class="field-error" id="checkoutTermsErr"></p></div><button class="btn primary" type="submit" id="checkoutSubmit">Continue to secure payment</button><div id="checkoutStatus" role="status" aria-live="polite" style="margin-top:12px"></div><p class="note">Card details go to the payment provider, never this site.</p><ul class="trust-list" style="justify-content:flex-start"><li>${ico('ok')}Secure checkout</li><li>${ico('ok')}${CONFIG.refundDays}-day refund</li></ul></form><aside class="summary-card" aria-label="Order summary"><h2 style="font-size:1.1rem">Order summary</h2><dl><dt>Plan</dt><dd>ListingPreflight Pro</dd><dt>Billing</dt><dd>${y?'Yearly':'Monthly'}</dd><dt>Price</dt><dd>${cur(amt)} per ${y?'year':'month'}</dd></dl><p class="note" style="margin:0">Renews until cancelled. <a href="#/pricing">Change plan</a></p></aside></div></div>`; }
+  },
+  'success': { t: 'Payment complete', d: 'Thanks for your purchase.', h: () => `<div class="container page-content"><span class="badge">Payment</span><h1>Thank you.</h1><p class="lead">Receipt is sent to your email by the payment provider. Keep it for your records.</p><p>If Pro features are not active in a few minutes, <a href="#/contact">contact us</a>.</p><a class="btn primary" href="#/">Back to the checker</a></div>` },
+  'payment-failed': { t: 'Payment not completed', d: 'Payment was cancelled or failed.', h: () => `<div class="container page-content"><span class="badge">Payment</span><h1>Payment not completed.</h1><p class="lead">The payment was cancelled or declined. Nothing was charged.</p><div class="actions"><a class="btn primary" href="#/checkout?plan=pro&cycle=${cycle}">Try again</a><a class="btn" href="#/contact">Contact us</a></div></div>` },
+  'payment-cancelled': { t: 'Checkout cancelled', d: 'Checkout was cancelled.', h: () => `<div class="container page-content"><span class="badge">Payment</span><h1>Checkout cancelled.</h1><p class="lead">You were not charged. Your plan has not changed.</p><div class="actions"><a class="btn primary" href="#/pricing">Back to pricing</a><a class="btn" href="#/contact">Ask a question</a></div></div>` },
+  'refunds': { t: 'Refund Policy', d: 'ListingPreflight refund and cancellation policy.', h: () => `<div class="container page-content"><h1>Refund Policy</h1><p class="mono">Last updated October 2026</p><h2>Refunds</h2><p style="color:var(--text-secondary)">Ask for a refund within ${CONFIG.refundDays} days of your first payment.</p><h2>Cancelling</h2><p style="color:var(--text-secondary)">Cancel any time. Pro stays active until the end of the paid period.</p><h2>Renewals</h2><p style="color:var(--text-secondary)">Renewal payments are not refunded after the ${CONFIG.refundDays}-day window unless required by law.</p><h2>How to ask</h2><p style="color:var(--text-secondary)">${CONFIG.email ? `Email <a href="mailto:${esc(CONFIG.email)}">${esc(CONFIG.email)}</a>` : 'Use the <a href="#/contact">contact page</a>'} with your payment email.</p></div>` },
+  'privacy': { t: 'Privacy Policy', d: 'How ListingPreflight handles your images and data.', h: () => `<div class="container page-content"><h1>Privacy Policy</h1><p class="mono">Last updated October 2026</p><h2>Your images</h2><p style="color:var(--text-secondary)">Image checks run in your browser. Amazon Fix sends images to remove.bg. Gemini review is separate and optional.</p><h2>Data we collect</h2><p style="color:var(--text-secondary)">The checker collects no personal data. Accounts store name and email. Passwords are never stored in plain text.</p><h2>Payments</h2><p style="color:var(--text-secondary)">Handled by a payment provider. We never see or store card numbers.</p><h2>Third parties</h2><p style="color:var(--text-secondary)">Fonts from Google Fonts, ZIP library from cdnjs. These services receive your IP when the page loads.</p><h2>Your rights</h2><p style="color:var(--text-secondary)">Contact ${CONFIG.email ? `<a href="mailto:${esc(CONFIG.email)}">${esc(CONFIG.email)}</a>` : 'us'} to access, correct or delete personal data.</p><h2>Operator</h2><p style="color:var(--text-secondary)">${esc(op())}.</p></div>` },
+  'terms': { t: 'Terms of Service', d: 'Terms for using ListingPreflight.', h: () => `<div class="container page-content"><h1>Terms of Service</h1><p class="mono">Last updated October 2026</p><h2>The service</h2><p style="color:var(--text-secondary)">ListingPreflight checks images against marketplace guidance. Provided as is, without warranty.</p><h2>No approval guarantee</h2><p style="color:var(--text-secondary)">A pass means likely to meet tested rules, not guaranteed acceptance by any marketplace.</p><h2>Subscriptions</h2><p style="color:var(--text-secondary)">Pro renews automatically until cancelled. See the <a href="#/refunds">Refund Policy</a>.</p><h2>Your content</h2><p style="color:var(--text-secondary)">You are responsible for image rights and marketplace policies.</p><h2>Liability</h2><p style="color:var(--text-secondary)">To the extent allowed, ${esc(op())} is not liable for rejected listings or lost sales.</p></div>` },
+  'contact': {
+    t: 'Contact',
+    d: 'Contact ListingPreflight with questions or feedback.',
+    h: () => `<div class="container page-content"><h1>Contact</h1><p class="lead">Found a wrong rule, a bug or billing problem? Tell us.</p>
+    <form id="contactForm" novalidate><div class="field"><label for="contactName">Name</label><input type="text" id="contactName" autocomplete="name" aria-describedby="contactNameErr"><p class="field-error" id="contactNameErr"></p></div>
+    <div class="field"><label for="contactEmail">Email</label><input type="email" id="contactEmail" autocomplete="email" aria-describedby="contactEmailErr"><p class="field-error" id="contactEmailErr"></p></div>
+    <div class="field"><label for="contactMsg">Message</label><textarea id="contactMsg" rows="5" aria-describedby="contactMsgErr"></textarea><p class="field-error" id="contactMsgErr"></p></div>
+    <button class="btn primary" type="submit">Send message</button><div id="contactStatus" role="status" aria-live="polite" style="margin-top:12px"></div></form>
+    ${contactInfoHTML()}</div>`
+  },
+  'login': { t: 'Log in', d: 'Log in to your ListingPreflight account.', h: () => authShell('Log in', 'Welcome back to ListingPreflight.', `<form id="authForm" novalidate data-m="login">${authField('authEmail','Email','email','email')}${authField('authPass','Password','password','current-password')}<p style="margin:0 0 14px"><a href="#/forgot">Forgot your password?</a></p><button class="btn primary" id="authSubmit" type="submit" style="width:100%">Log in</button></form>`, 'New here? <a href="#/register">Create an account</a>') },
+  'register': { t: 'Create account', d: 'Create a free ListingPreflight account.', h: () => authShell('Create your account', 'Free to start. No card needed.', `<form id="authForm" novalidate data-m="register">${authField('authName','Name','text','name')}${authField('authEmail','Email','email','email')}${authField('authPass','Password','password','new-password','At least 8 characters.')}<div class="field"><label style="display:flex;font-size:.95rem;font-weight:400"><input type="checkbox" id="authTerms" aria-describedby="authTermsErr">I agree to the <a href="#/terms">Terms</a> and <a href="#/privacy">Privacy Policy</a>.</label><p class="field-error" id="authTermsErr"></p></div><button class="btn primary" id="authSubmit" type="submit" style="width:100%">Create account</button></form>`, 'Already registered? <a href="#/login">Log in</a>') },
+  'forgot': { t: 'Reset password', d: 'Reset your ListingPreflight password.', h: () => authShell('Reset password', 'Enter your email for a reset link.', `<form id="authForm" novalidate data-m="forgot">${authField('authEmail','Email','email','email')}<button class="btn primary" id="authSubmit" type="submit" style="width:100%">Send reset link</button></form>`, '<a href="#/login">Back to log in</a>') },
+  'account': { t: 'Your account', d: 'Manage your ListingPreflight account.', h: () => { const u = U.get() || {}; return `<div class="container page-content"><h1>Your account</h1><div class="summary-card"><dl><dt>Name</dt><dd>${esc(u.name)}</dd><dt>Email</dt><dd>${esc(u.email)}</dd><dt>Plan</dt><dd>${u.plan==='pro'?'Pro':'Free'}</dd><dt>Role</dt><dd>${u.role==='admin'?'Admin':'User'}</dd></dl></div><div class="actions">${u.plan==='pro'?`<a class="btn primary" href="${CONFIG.portal?esc(CONFIG.portal):'#/contact'}">Manage billing</a>`:'<a class="btn primary" href="#/pricing">Upgrade to Pro</a>'}${u.role==='admin'?'<a class="btn" href="#/admin">Admin dashboard</a>':''}<button class="btn" id="accountLogout" type="button">Log out</button></div></div>`; } },
+  'admin': { t: 'Admin dashboard', d: 'ListingPreflight owner dashboard.', h: () => `<div class="container page-content"><span class="badge">Owner Tools</span><h1>Admin dashboard</h1><p class="lead">Account and plan totals for this instance.</p><div id="adminMsg" role="status" aria-live="polite">Loading admin summary...</div><div class="summary-card"><dl><dt>Total accounts</dt><dd id="adminUsers">—</dd><dt>Pro accounts</dt><dd id="adminPro">—</dd><dt>Active sessions</dt><dd id="adminSessions">—</dd></dl></div><div class="actions"><a class="btn" href="#/account">Account</a><a class="btn" href="#/">Image checker</a></div></div>` },
+  '404': {
+    t: 'Page not found',
+    d: 'This page does not exist.',
+    h: () => `<div class="container error-page">
+      <div class="particles" id="particles"></div>
+      <div class="error-code" aria-hidden="true">404</div>
+      <h1>This page does not exist.</h1>
+      <p class="lead">The link may be old or mistyped. Try one of these instead.</p>
+      <div class="error-actions">
+        <a class="btn primary lg" href="#/">Go to the checker</a>
+        <a class="btn lg" href="#/pricing">Pricing</a>
+        <a class="btn lg" href="#/rules">Rules</a>
+        <a class="btn lg" href="#/contact">Contact</a>
+      </div>
+    </div>`
+  }
+};
+
+/* Auth helpers */
+const authField = (id, l, type, ac, hint = '') => `<div class="field"><label for="${id}">${l}</label>${type === 'password' ? `<div class="pw-wrapper"><input type="password" id="${id}" autocomplete="${ac}" aria-describedby="${id}Err"><button type="button" data-show="${id}" aria-label="Show password">Show</button></div>` : `<input type="${type}" id="${id}" autocomplete="${ac}" aria-describedby="${id}Err">`}${hint ? `<p class="note" style="margin:4px 0 0">${hint}</p>` : ''}<p class="field-error" id="${id}Err"></p></div>`;
+const authShell = (h, sub, body, foot) => `<div class="container section"><div class="auth-card card"><h1>${h}</h1><p class="lead" style="font-size:1rem">${sub}</p>${body}<div id="authFeedback"></div><p class="note" style="text-align:center">${foot}</p></div></div>`;
+function contactInfoHTML() {
+  const C = CONFIG.contact, r = [];
+  if (CONFIG.email) r.push(['Email', `<a href="mailto:${esc(CONFIG.email)}">${esc(CONFIG.email)}</a>`]);
+  if (C.phone) r.push(['Phone', `<a href="tel:${esc(C.phone.replace(/[^\d+]/g, ''))}">${esc(C.phone)}</a>`]);
+  if (C.address) r.push(['Address', esc(C.address)]);
+  if (C.hours) r.push(['Hours', esc(C.hours)]);
+  return r.length ? `<div class="summary-card" style="margin-top:24px"><dl>${r.map(x => `<dt>${x[0]}</dt><dd>${x[1]}</dd>`).join('')}</dl></div>` : '<p class="mono" style="margin-top:24px">Contact details are being set up.</p>';
+}
+
+/* ── Router ─────────────────────────────────────────────────── */
+const NOINDEX = ['checkout', 'success', 'payment-failed', 'payment-cancelled', 'login', 'register', 'forgot', 'account', 'admin'];
+function meta(k, v, attr = 'name') { let e = document.head.querySelector(`meta[${attr}="${k}"]`); if (!e) { e = document.createElement('meta'); e.setAttribute(attr, k); document.head.appendChild(e); } e.setAttribute('content', v); }
+const STICKY = {
+  '': ['Choose images', () => $('fileInput').click()],
+  rules: ['Check your images', () => go('#/')],
+  pricing: ['Get Pro', () => go('#/checkout?plan=pro&cycle=' + cycle)]
+};
+
+function route() {
+  const key = H.replace(/^#\/?/, '').split('?')[0];
+  if (key === 'account' && !U.get()) { go('#/login?next=account'); return; }
+  if (key === 'admin' && !U.get()) { go('#/login?next=admin'); return; }
+  if (key === 'admin' && U.get().role !== 'admin') { go('#/account'); return; }
+  if ((key === 'login' || key === 'register') && U.get()) { go('#/account'); return; }
+  const p = PAGES[key] || PAGES['404'], bad = !PAGES[key]; curKey = bad ? '404' : key;
+  const ti = p.t + ' | ' + CONFIG.name;
+  document.title = ti;
+  meta('description', p.d);
+  meta('robots', bad || NOINDEX.includes(key) ? 'noindex,follow' : 'index,follow');
+  meta('og:title', ti, 'property'); meta('og:description', p.d, 'property');
+  meta('twitter:title', ti); meta('twitter:description', p.d);
+
+  try { $('main').innerHTML = p.h(); } catch(e) { $('main').innerHTML = '<div class="container page-content"><h1>Something went wrong.</h1><p><a href="#/">Go to the checker</a> or reload.</p></div>'; }
+  document.querySelectorAll('nav a').forEach(a => a.dataset.r === key && !bad ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current'));
+  const s = STICKY[key]; $('stickyCta').hidden = !s; if (s) { $('stickyBtn').textContent = s[0]; $('stickyBtn').disabled = false; $('stickyBtn').onclick = s[1]; }
+  window.scrollTo(0, 0); $('main').focus({ preventScroll: true });
+  try {
+    if (key === '') { bindHome(); bindPrice(); }
+    if (key === 'pricing') bindPrice();
+    if (key === 'contact') bindContact();
+    if (key === 'checkout') bindCheckout();
+    if (['login', 'register', 'forgot'].includes(key)) bindAuth();
+    if (key === 'account') $('accountLogout').onclick = logout;
+    if (key === 'admin') bindAdmin();
+    if (key === '404') createParticles();
+  } catch(e) { showErr('Part of this page did not load. Reload and try again.'); }
+  wireForms();
+}
+
+function wireForms() {
+  document.querySelectorAll('main form').forEach(f => {
+    const run = e => { if (e && e.preventDefault) e.preventDefault(); if (f.onsubmit) f.onsubmit({ preventDefault() {} }); };
+    f.querySelectorAll('button[type=submit]').forEach(b => { b.type = 'button'; b.onclick = run; });
+    f.onkeydown = e => { if (e.key === 'Enter' && e.target.tagName === 'INPUT' && e.target.type !== 'checkbox') { e.preventDefault(); run(); } };
+  });
+}
+
+/* ── 404 Particles ──────────────────────────────────────────── */
+function createParticles() {
+  const container = $('particles');
+  if (!container) return;
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement('span');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.animationDelay = Math.random() * 6 + 's';
+    p.style.animationDuration = (4 + Math.random() * 4) + 's';
+    p.style.width = p.style.height = (2 + Math.random() * 4) + 'px';
+    container.appendChild(p);
+  }
+}
+
+/* ── Auth Form Binding ──────────────────────────────────────── */
+function bindAuth() {
+  document.querySelectorAll('[data-show]').forEach(b => b.onclick = () => {
+    const i = $(b.dataset.show), sh = i.type === 'password';
+    i.type = sh ? 'text' : 'password';
+    b.textContent = sh ? 'Hide' : 'Show';
+  });
+  const f = $('authForm'), m = f.dataset.m;
+  const set = (id, msg) => { const el = $(id); if (!el) return true; $(id + 'Err').textContent = msg; el.setAttribute('aria-invalid', msg ? 'true' : 'false'); return !msg; };
+  f.onsubmit = async e => {
+    e.preventDefault(); $('authFeedback').innerHTML = '';
+    const reg = m === 'register';
+    set('authName', reg && $('authName').value.trim().length < 2 ? 'Enter your name.' : '');
+    set('authEmail', EM.test($('authEmail').value.trim()) ? '' : 'Enter a valid email.');
+    if (m !== 'forgot') set('authPass', $('authPass').value.length >= (reg ? 8 : 1) ? '' : (reg ? '8 characters minimum.' : 'Enter your password.'));
+    if (reg) set('authTerms', $('authTerms').checked ? '' : 'You need to agree.');
+    const first = ['authName', 'authEmail', 'authPass', 'authTerms'].map($).find(el => el && el.getAttribute('aria-invalid') === 'true');
+    if (first) { first.focus(); return; }
+    const b = $('authSubmit'), t = b.textContent;
+    b.disabled = true; b.innerHTML = '<span class="spinner"></span> Please wait...';
+    try {
+      const d = { name: reg ? $('authName').value.trim() : '', email: $('authEmail').value.trim(), password: m === 'forgot' ? '' : $('authPass').value };
+      if (m === 'forgot') { await api('/forgot', { email: d.email }); $('authFeedback').innerHTML = '<div class="success-box" role="status">If an account exists, a reset link is on its way.</div>'; }
+      else { await doAuth(m, d); renderAu(); go('#/' + (decodeURIComponent(qs().get('next') || '') || 'account')); }
+    } catch(err) { $('authFeedback').innerHTML = `<div class="alert error" role="alert"><span>${esc(err.message || 'Something went wrong.')}</span></div>`; }
+    b.disabled = false; b.textContent = t;
+  };
+}
+
+async function bindAdmin() {
+  try { const data = await api('/admin/summary', undefined, 'GET'); $('adminUsers').textContent = data.users; $('adminPro').textContent = data.pro_users; $('adminSessions').textContent = data.active_sessions; $('adminMsg').textContent = 'Admin summary loaded.'; }
+  catch(e) { $('adminMsg').textContent = e.message || 'Could not load admin summary.'; }
+}
+
+/* ── Checker Flow ───────────────────────────────────────────── */
+function updSticky() {
+  if (curKey !== '') return;
+  const n = staged.length, b = $('stickyBtn');
+  if (busy) { b.textContent = 'Checking...'; b.disabled = true; return; }
+  b.disabled = false;
+  if (n) { b.textContent = `Check ${n} image${n > 1 ? 's' : ''}`; b.onclick = runCheck; }
+  else { b.textContent = 'Choose images'; b.onclick = () => $('fileInput').click(); }
+}
+
+const loading = () => staged.some(s => s.ld);
+
+function renderStaged() {
+  const g = $('stagedGrid');
+  if (!g) return;
+  g.className = 'staged-grid' + (busy ? ' scanning' : '');
+  g.innerHTML = staged.map((s, i) => s.ld
+    ? '<div class="staged-item staged-skeleton" aria-hidden="true"><span class="skel-block"></span><span>&nbsp;</span></div>'
+    : `<div class="staged-item" style="animation-delay:${i*50}ms"><div data-thumb="${i}"></div><span>${esc(s.f.name)}</span>${busy ? '' : `<button class="remove-btn" type="button" data-remove="${i}" aria-label="Remove ${esc(s.f.name)}">✕</button>`}</div>`
+  ).join('');
+  g.querySelectorAll('[data-thumb]').forEach(d => { const t = staged[+d.dataset.thumb]; if (t && t.th) d.appendChild(t.th); });
+  g.querySelectorAll('button[data-remove]').forEach(b => b.onclick = () => {
+    URL.revokeObjectURL(staged[+b.dataset.remove].url);
+    staged.splice(+b.dataset.remove, 1);
+    renderStaged(); stat(staged.length ? `${staged.length} ready to check.` : '');
+  });
+  const c = $('checkBtn');
+  c.disabled = !staged.length || busy || loading();
+  c.innerHTML = busy ? '<span class="spinner"></span> Checking' : 'Check images';
+  updSticky();
+}
+
+async function stage(files) {
+  if (busy || fixing || reviewing || loading()) return;
+  showErr(''); const bad = [];
+  let ok = [...files].filter(f => {
+    if (!/^image\/(jpeg|png|webp|gif)$/.test(f.type)) { bad.push(`${f.name}: unsupported type. Use JPG, PNG or WebP.`); return false; }
+    if (f.size > MAXMB * 1048576) { bad.push(`${f.name}: larger than ${MAXMB} MB.`); return false; }
+    return true;
+  });
+  const room = Math.max(lim() - staged.length, 0);
+  if (ok.length > room) { bad.push(`Limit is ${lim()} images${isPro() ? '' : '. Pro raises it to 200'}. ${ok.length - room} skipped.`); ok = ok.slice(0, room); }
+  const adds = ok.map(f => ({ f, url: URL.createObjectURL(f), ld: true }));
+  if (adds.length) {
+    staged.push(...adds); renderStaged(); let n = 0;
+    stat(`Loading ${adds.length} image${adds.length > 1 ? 's' : ''}`, 0);
+    await Promise.all(adds.map(async a => {
+      try { a.th = thumb(await decode(a.f, a.url)); }
+      catch(e) { bad.push(`${a.f.name}: could not be opened. Re-save as JPG or PNG.`); a.bad = true; }
+      n++; stat(`Loading ${adds.length} image${adds.length > 1 ? 's' : ''}`, Math.round(n / adds.length * 100));
+    }));
+    await nap(400);
+    adds.forEach(a => { a.ld = false; if (a.bad) { URL.revokeObjectURL(a.url); staged.splice(staged.indexOf(a), 1); } });
+  }
+  renderStaged(); stat(staged.length ? `${staged.length} ready to check. Press Check images.` : '');
+  if (bad.length) showErr(bad.join(' '));
+}
+
+async function runCheck() {
+  if (busy || fixing || reviewing || loading() || !staged.length || !skuOk()) return;
+  busy = true; showErr(''); renderStaged();
+  $('actionBar').style.display = 'none'; $('resultsGrid').innerHTML = '';
+  const list = staged.slice(), out = [], bad = [];
+  const per = Math.max(550, Math.min(1900, 2400 / list.length));
+  ldStart();
+  for (let i = 0; i < list.length; i++) {
+    ldImg(list[i], i, list.length);
+    const pr = analyze(list[i].f).then(r => out.push(r), () => bad.push(`${list[i].f.name}: could not be opened.`));
+    for (let k = 0; k < STEPS.length; k++) { ldStep(k, i, list.length); await nap(per / STEPS.length); }
+    await pr; ldStep(STEPS.length, i, list.length);
+  }
+  ldDone(out.length); await nap(700);
+  items.forEach(freeItem); items = out;
+  staged.forEach(s => URL.revokeObjectURL(s.url)); staged = [];
+  busy = false; renderStaged(); renderRes();
+  stat(out.length ? `Done. ${out.length} image${out.length === 1 ? '' : 's'} checked.` : '');
+  if (bad.length) showErr(bad.join(' '));
+  if (out.length) $('resultsGrid').focus();
+}
+
+function renderRes() {
+  const rs = $('resultsGrid'); if (!rs) return;
+  $('actionBar').style.display = items.length ? 'flex' : 'none';
+  $('fixAllBtn').disabled = items.length > 0 && items.every(it => it.fixed);
+  $('fixAllBtn').textContent = $('fixAllBtn').disabled ? 'All images fixed' : 'Fix all images';
+  rs.innerHTML = '';
+  items.forEach((it, i) => {
+    const cs = check(it), w = worst(cs);
+    const d = document.createElement('article');
+    d.className = 'result-item';
+    d.style.animationDelay = i * 80 + 'ms';
+    const tagClass = w === 'ok' ? 'pass' : w === 'warn' ? 'warn' : 'fail';
+    const tagText = w === 'ok' ? 'Likely to pass' : w === 'warn' ? 'Needs a look' : 'Likely to fail';
+    d.innerHTML = `<button class="result-thumb" type="button" data-preview="${i}" aria-label="Preview ${esc(it.f.name)}">
+      <span class="zoom-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></span>
+    </button>
+    <div>
+      <div class="result-header"><span class="result-name">${esc(it.f.name)}</span><span class="tag ${tagClass}">${ico(w)}${tagText}</span></div>
+      <div class="mono">${it.W} × ${it.H} px, ${(it.size/1048576).toFixed(2)} MB</div>
+      <ul class="check-list">${cs.map((x, ci) => `<li class="${x.s}" style="animation-delay:${ci*60}ms">${ico(x.s)}<span><span class="sr-only">${WORD[x.s]}: </span>${esc(x.t)}</span></li>`).join('')}</ul>
+      ${it.fixed ? '' : `<button class="btn sm" type="button" data-fix="${i}">Fix</button> `}<button class="btn sm" type="button" data-dl="${i}">${it.fixed ? 'Download fixed' : 'Fix & download'}</button> <button class="btn sm" type="button" data-review="${i}" aria-label="Review with Gemini">Review with Gemini</button>
+      ${it.aiReview ? `<section class="ai-review"><h3>AI Visual Feedback</h3><p>${esc(it.aiReview).replace(/\n/g, '<br>')}</p><small>Guidance only, not marketplace approval.</small></section>` : ''}
+      <div class="ai-review" data-review-status="${i}" role="status" aria-live="polite" hidden></div>
+    </div>`;
+    d.querySelector('.result-thumb').appendChild(it.th);
+    rs.appendChild(d);
+  });
+
+  rs.querySelectorAll('button[data-preview]').forEach(b => b.onclick = () => openPreview(+b.dataset.preview));
+
+  const reviewItem = async b => {
+    if (busy || fixing || reviewing) return;
+    const i = +b.dataset.review, it = items[i]; if (!it) return;
+    reviewing = true;
+    rs.querySelectorAll('button[data-review],button[data-fix],button[data-dl]').forEach(c => c.disabled = true);
+    b.innerHTML = '<span class="spinner"></span> Reviewing...'; showErr('');
+    const status = rs.querySelector(`[data-review-status="${i}"]`);
+    if (status) { status.hidden = false; status.innerHTML = '<span class="spinner"></span> Reviewing image with Gemini...'; }
+    try {
+      const response = await fetch('/api/image/review', { method: 'POST', headers: { 'Content-Type': it.f.type, 'X-Marketplace': mkv }, body: it.f });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || `Gemini review failed (${response.status}).`);
+      if (typeof result.review !== 'string' || !result.review.trim()) throw new Error('Gemini returned an empty review.');
+      it.aiReview = result.review.trim(); renderRes(); stat(`Gemini review ready for ${it.f.name}.`);
+    } catch(e) { if (status) { status.hidden = true; } showErr(e.message || 'Could not review this image.'); }
+    finally { reviewing = false; rs.querySelectorAll('button[data-review],button[data-fix],button[data-dl]').forEach(c => c.disabled = false); if (b.isConnected) b.textContent = 'Review with Gemini'; }
+  };
+
+  const fixItem = async (b, downloadAfter) => {
+    if (busy || fixing || reviewing || !skuOk()) return;
+    const i = +(b.dataset.fix ?? b.dataset.dl);
+    if (items[i].fixed && downloadAfter) { dl(items[i].f, items[i].f.name); stat('Fixed image downloaded.'); return; }
+    fixing = true; b.disabled = true; b.innerHTML = '<span class="spinner"></span> Fixing...';
+    try {
+      const old = items[i];
+      const fixed = await fixedAndChecked(old, i, (msg, pct) => stat(`${old.f.name}: ${msg}`, pct));
+      if (downloadAfter) dl(fixed.f, fixed.f.name);
+      items[i] = fixed; renderRes();
+      const left = check(fixed).filter(x => x.s === 'bad' || x.s === 'warn').length;
+      stat(downloadAfter
+        ? (left ? `Fixed & downloaded. ${left} check${left===1?'':'s'} need attention.` : 'Fixed & downloaded. All measurable checks pass.')
+        : (left ? `Fixed. ${left} check${left===1?'':'s'} need attention.` : 'Fixed. All measurable checks pass.'));
+    } catch(e) { showErr(e.message || 'Could not fix this image.'); }
+    finally { fixing = false; if (b.isConnected) { b.disabled = false; b.textContent = downloadAfter ? 'Fix & download' : 'Fix'; } }
+  };
+
+  rs.querySelectorAll('button[data-fix]').forEach(b => b.onclick = () => fixItem(b, false));
+  rs.querySelectorAll('button[data-dl]').forEach(b => b.onclick = () => fixItem(b, true));
+  rs.querySelectorAll('button[data-review]').forEach(b => b.onclick = () => reviewItem(b));
+}
+
+function bindHome() {
+  document.querySelectorAll('input[name=marketplace]').forEach(r => {
+    r.checked = r.value === mkv;
+    r.onchange = () => { mkv = r.value; $('skuWrap').style.display = mkv === 'amazon' ? '' : 'none'; renderRes(); };
+  });
+  $('skuWrap').style.display = mkv === 'amazon' ? '' : 'none';
+  $('skuInput').value = sku; $('skuInput').oninput = skuOk;
+  $('pickBtn').onclick = () => $('fileInput').click();
+  $('fileInput').onchange = e => { stage(e.target.files); e.target.value = ''; };
+  const dz = $('dropzone');
+  ['dragenter', 'dragover'].forEach(v => dz.addEventListener(v, e => { e.preventDefault(); dz.classList.add('active'); }));
+  ['dragleave', 'drop'].forEach(v => dz.addEventListener(v, e => { e.preventDefault(); dz.classList.remove('active'); }));
+  dz.addEventListener('drop', e => stage(e.dataTransfer.files));
+  dz.onclick = e => { if (e.target === dz || e.target.closest('.dz-icon') || e.target.tagName === 'P') $('fileInput').click(); };
+  $('checkBtn').onclick = runCheck;
+  $('heroCta').onclick = () => $('fileInput').click();
+  $('clearBtn').onclick = () => {
+    if (busy || fixing || reviewing) return;
+    items.forEach(freeItem); staged.forEach(i => URL.revokeObjectURL(i.url));
+    items = []; staged = []; stat(''); showErr(''); renderStaged(); renderRes();
+  };
+  $('fixAllBtn').onclick = async () => {
+    if (busy || fixing || reviewing || !skuOk()) return;
+    const b = $('fixAllBtn'), total = items.filter(it => !it.fixed).length;
+    if (!total) { stat('All images already fixed.'); return; }
+    fixing = true; b.disabled = true; b.innerHTML = '<span class="spinner"></span> Fixing...'; showErr(''); let done = 0;
+    try {
+      for (let i = 0; i < items.length; i++) {
+        const old = items[i]; if (old.fixed) continue;
+        const fixed = await fixedAndChecked(old, i, (msg, pct) => stat(`Image ${i+1}: ${msg}`, Math.round((done + pct/100) / total * 100)));
+        items[i] = fixed; done++; stat(`Fixed ${done} of ${total}.`);
+      }
+      renderRes(); stat('All images fixed. Review results before downloading.');
+    } catch(e) { renderRes(); showErr(e.message || 'Could not fix all images.'); }
+    finally { fixing = false; if (b.isConnected) { b.disabled = items.every(it => it.fixed); b.textContent = b.disabled ? 'All images fixed' : 'Fix all images'; } }
+  };
+  $('zipBtn').onclick = async () => {
+    if (busy || fixing || reviewing || !skuOk()) return;
+    if (typeof JSZip === 'undefined') { showErr('ZIP tool did not load. Check connection and reload.'); return; }
+    fixing = true; const b = $('zipBtn'), total = items.length;
+    b.disabled = true; b.innerHTML = '<span class="spinner"></span> Building ZIP...'; showErr('');
+    try {
+      const z = new JSZip(), fixed = [];
+      stat('Starting fixes...', 0); await nap(30);
+      for (let i = 0; i < total; i++) {
+        const old = items[i];
+        const result = old.fixed ? old : await fixedAndChecked(old, i, (msg, pct) => stat(`Image ${i+1}: ${msg}`, Math.round((i + pct/100) / total * 100)));
+        fixed.push(result); z.file(result.f.name, result.f);
+      }
+      stat('Building ZIP archive...', 98);
+      const archive = await z.generateAsync({ type: 'blob' }, p => stat(`Building ZIP: ${Math.round(p.percent)}%`, 98 + Math.round(p.percent * 0.02)));
+      dl(archive, `${mkv}-ready.zip`);
+      items = fixed; renderRes(); stat('ZIP downloaded.');
+    } catch(e) { stat(''); showErr(e.message || 'Could not create ZIP.'); }
+    finally { fixing = false; if (b.isConnected) { b.disabled = false; b.textContent = 'Fix all & download ZIP'; } }
+  };
+  $('csvBtn').onclick = () => {
+    if (!isPro()) { go('#/pricing'); return; }
+    const q = v => '"' + String(v).replace(/"/g, '""') + '"';
+    const rows = [['file', 'marketplace', 'width', 'height', 'status', 'notes'], ...items.map(it => { const c = check(it); return [it.f.name, mkv, it.W, it.H, worst(c), c.map(x => x.t).join(' | ')]; })];
+    dl(new Blob([rows.map(r => r.map(q).join(',')).join('\n')], { type: 'text/csv' }), 'preflight-report.csv');
+  };
+  renderStaged(); renderRes();
+}
+
+function bindContact() {
+  $('contactForm').onsubmit = e => {
+    e.preventDefault();
+    const n = $('contactName'), m = $('contactEmail'), g = $('contactMsg');
+    const set = (id, el, msg) => { $(id).textContent = msg; el.setAttribute('aria-invalid', msg ? 'true' : 'false'); return !msg; };
+    const a = set('contactNameErr', n, n.value.trim() ? '' : 'Enter your name.');
+    const b = set('contactEmailErr', m, EM.test(m.value.trim()) ? '' : 'Enter a valid email.');
+    const c = set('contactMsgErr', g, g.value.trim().length >= 10 ? '' : 'Write at least 10 characters.');
+    if (!(a && b && c)) { (!a ? n : !b ? m : g).focus(); return; }
+    if (!CONFIG.email) { $('contactStatus').innerHTML = '<div class="alert error">No contact email configured.</div>'; return; }
+    location.href = `mailto:${CONFIG.email}?subject=${encodeURIComponent('ListingPreflight message from ' + n.value.trim())}&body=${encodeURIComponent(g.value.trim() + '\n\nReply to: ' + m.value.trim())}`;
+    $('contactStatus').textContent = 'Your email app should open with the message.';
+  };
+}
+
+function bindCheckout() {
+  $('checkoutForm').onsubmit = e => {
+    e.preventDefault();
+    const m = $('checkoutEmail'), t = $('checkoutTerms');
+    const set = (id, el, msg) => { $(id).textContent = msg; el.setAttribute('aria-invalid', msg ? 'true' : 'false'); return !msg; };
+    const a = set('checkoutEmailErr', m, EM.test(m.value.trim()) ? '' : 'Enter a valid email.');
+    const b = set('checkoutTermsErr', t, t.checked ? '' : 'You need to agree.');
+    if (!(a && b)) { (!a ? m : t).focus(); return; }
+    const link = CONFIG.checkout[qs().get('cycle') === 'year' ? 'year' : 'month'];
+    const btn = $('checkoutSubmit');
+    if (!link) { $('checkoutStatus').innerHTML = '<div class="alert error">Payments not connected. Contact us to buy Pro.</div>'; return; }
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Redirecting...';
+    $('checkoutStatus').textContent = 'Opening payment page.';
+    setTimeout(() => { location.href = link; }, 400);
+  };
+}
+
+/* ── Global Event Handlers ──────────────────────────────────── */
+window.addEventListener('error', () => showErr('Something went wrong. Reload and try again.'));
+window.addEventListener('unhandledrejection', () => { busy = false; stat(''); showErr('Something went wrong. Reload and try again.'); });
+window.addEventListener('hashchange', () => { if (location.hash !== H) { H = location.hash; route(); } });
+window.addEventListener('popstate', () => { H = location.hash; route(); });
+document.addEventListener('click', e => {
+  const a = e.target.closest && e.target.closest('a[href^="#/"]');
+  if (a && e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey) { e.preventDefault(); go(a.getAttribute('href')); }
+});
+
+/* ── Footer ─────────────────────────────────────────────────── */
+$('footerBrand').innerHTML = `© ${new Date().getFullYear()} <strong>Praveen</strong> — ${CONFIG.name}` + (CONFIG.email ? ` · ${CONFIG.email}` : '');
+
+/* ── Init ───────────────────────────────────────────────────── */
+if (CONFIG.auth.endpoint) {
+  api('/me', undefined, 'GET').then(j => U.set(j.user || null)).catch(() => U.set(null)).finally(() => { renderAu(); route(); });
+} else { renderAu(); route(); }
+</script>
+</body>
+</html>

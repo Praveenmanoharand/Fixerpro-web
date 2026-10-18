@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Amazon and Etsy Image Checker | ListingPreflight</title>
+<meta name="description" content="Check product photos against Amazon and Etsy image rules before you upload. See what will likely fail, fix it, and download. Runs in your browser.">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#f5f3ee">
+<link rel="canonical" href="">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ListingPreflight">
+<meta property="og:title" content="Amazon and Etsy Image Checker | ListingPreflight">
+<meta property="og:description" content="Check product photos against Amazon and Etsy image rules before you upload. Runs in your browser.">
+<meta property="og:image" content="og.png">
+<meta property="og:url" content="">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="ListingPreflight: check Amazon and Etsy product photos before you upload">
+<meta property="og:locale" content="en_US"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Amazon and Etsy Image Checker | ListingPreflight"><meta name="twitter:description" content="Check product photos against Amazon and Etsy image rules before you upload."><meta name="twitter:image" content="og.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a6c4a'/%3E%3Cpath d='M9 16.5l5 5 9-10' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{color-scheme:light;--bg:#f5f3ee;--sf:#fffdf8;--tx:#14181b;--mu:#585f63;--ru:#d8d3c6;--ac:#0a6c4a;--acx:#fff;--ok:#0a6c4a;--wa:#7d5200;--er:#b3261e;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0f1412;--sf:#171e1b;--tx:#e8ece9;--mu:#a3aca7;--ru:#2e3833;--ac:#45cf93;--acx:#07140e;--ok:#45cf93;--wa:#e5a93e;--er:#ff8a80}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0f1412;--sf:#171e1b;--tx:#e8ece9;--mu:#a3aca7;--ru:#2e3833;--ac:#45cf93;--acx:#07140e;--ok:#45cf93;--wa:#e5a93e;--er:#ff8a80}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.6 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.w{max-width:1040px;margin:0 auto;padding:0 20px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip{position:absolute;left:12px;top:-60px;background:var(--tx);color:var(--bg);padding:10px 14px;z-index:50;border-radius:4px}.skip:focus{top:8px}
+:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+header{border-bottom:1px solid var(--ru)}header .w{display:flex;justify-content:space-between;align-items:center;min-height:60px;gap:12px}
+.brand{display:flex;align-items:center;gap:8px;font-weight:600;color:var(--tx);text-decoration:none}
+nav{display:flex;gap:2px}nav a{color:var(--mu);text-decoration:none;padding:10px;border-radius:4px;font-size:.95rem}nav a:hover,nav a[aria-current]{color:var(--tx)}nav a[aria-current]{text-decoration:underline;text-underline-offset:6px}
+h1{font-size:clamp(1.9rem,5vw,3rem);line-height:1.12;margin:0 0 14px;letter-spacing:-.02em;max-width:18ch}
+h2{font-size:1.4rem;margin:0 0 10px}h3{font-size:1.05rem;margin:0 0 6px}
+.lead{font-size:1.1rem;color:var(--mu);max-width:56ch;margin:0 0 22px}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.82rem;color:var(--mu)}
+a{color:var(--ac)}.hero{padding:40px 0 24px}.sec{padding:44px 0}
+label,.lb{display:block;font-size:.85rem;font-weight:500;margin-bottom:4px}
+select,input[type=text],input[type=email],input[type=password],textarea{font:inherit;color:var(--tx);background:var(--sf);border:1px solid var(--mu);border-radius:6px;padding:10px 12px;min-height:44px;width:100%}
+input[type=checkbox]{width:20px;height:20px;accent-color:var(--ac);margin:2px 8px 0 0;flex:none}
+.f{min-width:200px;flex:1 1 200px;max-width:340px}.fw{margin-bottom:14px}
+.err{color:var(--er);font-size:.85rem;margin:4px 0 0}[aria-invalid="true"]{border-color:var(--er);border-width:2px}
+.btn{font:inherit;font-weight:600;min-height:44px;padding:10px 18px;border-radius:6px;border:1px solid var(--tx);background:transparent;color:var(--tx);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn.p{background:var(--ac);border-color:var(--ac);color:var(--acx)}.btn:disabled{opacity:.5;cursor:default}
+fieldset{border:0;margin:0 0 14px;padding:0}legend{font-size:.85rem;font-weight:500;padding:0;margin-bottom:6px}
+.seg{display:flex;gap:10px;flex-wrap:wrap}.seg label{position:relative;flex:1 1 200px;max-width:320px;margin:0;font-size:1rem}
+.seg input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}
+.seg span{display:block;border:1px solid var(--ru);background:var(--sf);padding:12px 14px 12px 42px;border-radius:6px;min-height:52px;position:relative}
+.seg span::before{content:"";position:absolute;left:14px;top:16px;width:16px;height:16px;border:2px solid var(--mu);border-radius:50%}
+.seg b{display:block;font-weight:600}.seg small{color:var(--mu);font-size:.82rem}
+.seg input:checked+span{border:2px solid var(--ac);padding:11px 13px 11px 41px;background:color-mix(in srgb,var(--ac) 9%,var(--sf))}
+.seg input:checked+span::before{border-color:var(--ac);background:radial-gradient(circle,var(--ac) 45%,transparent 50%)}
+.seg input:focus-visible+span{outline:3px solid var(--ac);outline-offset:2px}
+.seg.sm label{flex:0 1 auto}.seg.sm span{min-height:44px;padding:9px 14px 9px 40px}.seg.sm span::before{top:13px}
+.dz{position:relative;border:1px solid var(--tx);background:var(--sf);padding:30px 18px;text-align:center;margin:18px 6px 0}
+.dz::before,.dz::after{content:"";position:absolute;width:18px;height:18px;border:2px solid var(--ac)}
+.dz::before{left:-7px;top:-7px;border-right:0;border-bottom:0}.dz::after{right:-7px;bottom:-7px;border-left:0;border-top:0}
+.dz.on{background:var(--bg);outline:2px dashed var(--ac)}.dz p{margin:8px 0 0}
+.sg{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.sgi{position:relative;width:108px;border:1px solid var(--ru);background:var(--sf);padding:6px;overflow:hidden}
+.sgi img{width:100%;height:84px;object-fit:contain;background:#fff;display:block}
+.sgi span{display:block;font-size:.72rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:4px}
+.sgi button{position:absolute;top:3px;right:3px;width:28px;height:28px;padding:0;border:1px solid var(--ru);background:var(--sf);color:var(--tx);cursor:pointer;display:grid;place-items:center}
+.acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+#st{margin-top:14px;min-height:24px;color:var(--mu)}.pb{height:6px;background:var(--ru);max-width:420px;margin-top:8px}.pb i{display:block;height:100%;background:var(--ac);transition:width .25s}
+.sp{width:16px;height:16px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;display:inline-block;vertical-align:-3px;margin-right:8px;animation:s .8s linear infinite}@keyframes s{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}}
+.al{border:1px solid var(--er);background:var(--sf);padding:10px 14px;margin:10px 0;color:var(--er)}
+.res{display:grid;gap:14px;margin-top:18px;outline:0}
+.it{display:grid;grid-template-columns:96px 1fr;gap:16px;border:1px solid var(--ru);background:var(--sf);padding:14px;animation:fi .35s both}@keyframes fi{from{opacity:0;transform:translateY(6px)}}
+.it img{width:96px;height:96px;object-fit:contain;background:#fff;border:1px solid var(--ru)}
+.ai-review{border-left:3px solid var(--ac);background:var(--sf);padding:12px 14px;margin-top:10px}
+.ai-review h3{font-size:.95rem;margin:0 0 6px}.ai-review p{margin:0;white-space:normal}.ai-review small{display:block;color:var(--mu);margin-top:8px}
+.hd{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}.nm{font-weight:600;overflow-wrap:anywhere}
+.tag{display:inline-flex;gap:6px;align-items:center;font-weight:600;font-size:.82rem;padding:2px 8px;border:1px solid currentColor;border-radius:3px}
+.ok{color:var(--ok)}.warn{color:var(--wa)}.bad{color:var(--er)}.info{color:var(--mu)}
+ul.ck{list-style:none;margin:10px 0;padding:0}ul.ck li{display:flex;gap:8px;padding:3px 0;font-size:.93rem}ul.ck svg{flex:none;margin-top:4px}
+.ico{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px}
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-top:14px;max-width:760px}
+.plan{position:relative;border:1px solid var(--ru);background:var(--sf);padding:24px;display:flex;flex-direction:column}
+.plan.pro{border:2px solid var(--ac)}.rec{position:absolute;top:-13px;left:20px;background:var(--ac);color:var(--acx);font-size:.75rem;font-weight:600;padding:2px 10px;border-radius:3px}
+.amt{font-size:2.4rem;font-weight:600;margin:6px 0 2px;letter-spacing:-.02em}.amt span{font-size:.95rem;color:var(--mu);font-weight:400;margin-left:6px}
+.plan ul{list-style:none;padding:0;margin:16px 0 22px;flex:1}.plan li{display:flex;gap:8px;padding:5px 0}.plan li svg{color:var(--ok);flex:none;margin-top:5px}
+.note{font-size:.85rem;color:var(--mu);margin-top:14px}
+details{border-bottom:1px solid var(--ru);padding:12px 0;max-width:70ch}summary{cursor:pointer;font-weight:600}details p{margin:8px 0 0;color:var(--mu)}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:480px}th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--ru);vertical-align:top}th{font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--mu)}
+.pg{padding:36px 20px 64px;max-width:760px}.pg h1{max-width:none;font-size:clamp(1.7rem,4vw,2.3rem)}.pg h2{margin-top:30px}
+.co{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:28px;align-items:start}.sum{border:1px solid var(--ru);background:var(--sf);padding:20px}.sum dl{margin:0}.sum dt{color:var(--mu);font-size:.85rem}.sum dd{margin:0 0 10px;font-weight:600}
+footer{border-top:1px solid var(--ru);padding:28px 0 90px;color:var(--mu);font-size:.9rem}footer .w{display:flex;gap:18px;flex-wrap:wrap;justify-content:space-between}footer a{color:var(--mu);margin-right:12px}
+#sc{position:fixed;left:0;right:0;bottom:0;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:1px solid var(--ru);z-index:20}#sc .btn{width:100%}
+#ck{position:fixed;left:12px;right:12px;bottom:12px;max-width:520px;background:var(--sf);border:1px solid var(--tx);padding:16px;z-index:40}#ck[hidden],#sc[hidden]{display:none}
+@media all and (min-width:720px){#sc{display:none}footer{padding-bottom:28px}}
+@media all and (max-width:760px){.co{grid-template-columns:1fr}}
+@media all and (max-width:540px){.it{grid-template-columns:1fr}.it img{width:100%;height:160px}nav a{padding:10px 6px;font-size:.88rem}.seg label,.seg.sm label{flex:1 1 100%;max-width:none}}
+
+/* v2 */
+.btn{transition:filter .15s,transform .1s,background .15s}.btn:hover:not(:disabled){filter:brightness(1.08)}.btn:active:not(:disabled){transform:translateY(1px)}
+.btn.lg{min-height:50px;padding:12px 24px;font-size:1.02rem}.btn.sm{padding:6px 14px}
+.hero-cta{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 8px}.hero-note{margin:0 0 24px}
+header .w{flex-wrap:wrap;padding-top:6px;padding-bottom:6px}.au{display:flex;align-items:center;gap:6px}.au .lk{color:var(--mu);text-decoration:none;padding:10px;font-size:.95rem}.au .lk:hover{color:var(--tx)}
+.am{position:relative}.av{width:26px;height:26px;border-radius:50%;background:var(--ac);color:var(--acx);display:grid;place-items:center;font-size:.8rem}.an{max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.menu{position:absolute;right:0;top:calc(100% + 8px);min-width:210px;background:var(--sf);border:1px solid var(--ru);border-radius:12px;padding:6px;box-shadow:0 14px 34px rgba(0,0,0,.18);z-index:30;animation:pop .14s ease-out}.menu[hidden]{display:none}
+@keyframes pop{from{opacity:0;transform:translateY(-4px)}}
+.menu a,.menu button{display:flex;width:100%;align-items:center;padding:10px 12px;border:0;background:none;color:var(--tx);font:inherit;border-radius:8px;cursor:pointer;text-decoration:none;text-align:left;min-height:44px}.menu a:hover,.menu button:hover,.menu a:focus-visible,.menu button:focus-visible{background:color-mix(in srgb,var(--ac) 12%,transparent)}
+.lkb{background:none;border:0;padding:0;font:inherit;color:var(--mu);text-decoration:underline;cursor:pointer}.lkb[hidden]{display:none}
+details.ac{border:1px solid var(--ru);border-radius:12px;background:var(--sf);margin:0 0 10px;padding:0;max-width:72ch;transition:border-color .2s}details.ac[open]{border-color:var(--ac)}
+details.ac summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;min-height:56px}details.ac summary::-webkit-details-marker{display:none}
+details.ac summary::after{content:"";width:9px;height:9px;border-right:2px solid var(--mu);border-bottom:2px solid var(--mu);transform:rotate(45deg);transition:transform .2s;flex:none;margin-top:-4px}details.ac[open] summary::after{transform:rotate(-135deg);margin-top:4px}
+details.ac p{padding:0 18px 16px}
+.sgi{border-radius:8px}.scan .sgi{border-color:var(--ac)}.scan .sgi img{filter:saturate(.75)}
+.scan .sgi::before,.sk::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(105deg,transparent 30%,color-mix(in srgb,var(--ac) 38%,transparent) 50%,transparent 70%);background-size:250% 100%;animation:sh 1.2s linear infinite}
+@keyframes sh{from{background-position:150% 0}to{background-position:-100% 0}}.sk i{display:block;height:84px;background:var(--ru);border-radius:4px}
+.ldp{display:flex;gap:16px;align-items:center;border:1px solid var(--ru);background:var(--sf);border-radius:14px;padding:14px 18px;max-width:480px;color:var(--tx)}
+.ring{position:relative;width:64px;height:64px;flex:none}.ring svg{width:100%;height:100%;transform:rotate(-90deg)}.ring circle{fill:none;stroke-width:4}.rb{stroke:var(--ru)}.rf{stroke:var(--ac);stroke-linecap:round;stroke-dasharray:113.1;stroke-dashoffset:113.1;transition:stroke-dashoffset .35s}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font:500 .8rem "IBM Plex Mono",monospace}
+.steps{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.steps span{font-size:.75rem;padding:2px 9px;border-radius:999px;border:1px solid var(--ru);color:var(--mu);animation:stp 2.4s infinite}
+.steps span:nth-child(2){animation-delay:.6s}.steps span:nth-child(3){animation-delay:1.2s}.steps span:nth-child(4){animation-delay:1.8s}
+@keyframes stp{0%,24%{background:var(--ac);color:var(--acx);border-color:var(--ac)}25%,100%{background:transparent;color:var(--mu);border-color:var(--ru)}}
+.phd{text-align:center}.phd h2{font-size:clamp(1.6rem,4vw,2.2rem);letter-spacing:-.02em}
+.tg{display:inline-flex;background:var(--sf);border:1px solid var(--ru);border-radius:999px;padding:4px}.tg label{margin:0;position:relative}.tg input{position:absolute;opacity:0;inset:0;margin:0;width:100%;height:100%;cursor:pointer}
+.tg span{display:flex;gap:8px;align-items:center;padding:8px 18px;border-radius:999px;font-weight:600;min-height:44px;color:var(--mu)}.tg input:checked+span{background:var(--ac);color:var(--acx)}.tg input:focus-visible+span{outline:3px solid var(--tx);outline-offset:2px}
+.tg em{font-style:normal;font-size:.72rem;background:color-mix(in srgb,var(--ac) 20%,transparent);padding:1px 8px;border-radius:999px}.tg input:checked+span em{background:color-mix(in srgb,var(--acx) 25%,transparent)}
+.plans2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px;max-width:820px;margin:34px auto 0}.plans2 .plan{border-radius:18px;padding:28px}
+.plans2 .pro{background:linear-gradient(180deg,color-mix(in srgb,var(--ac) 9%,var(--sf)),var(--sf));box-shadow:0 22px 44px -24px color-mix(in srgb,var(--ac) 60%,transparent)}.plans2 .rec{border-radius:999px;left:24px}
+.trust{list-style:none;display:flex;gap:10px 22px;flex-wrap:wrap;justify-content:center;padding:0;margin:26px 0 0;color:var(--mu);font-size:.9rem}.trust li{display:flex;gap:6px;align-items:center}.trust .ico{color:var(--ok)}
+table.cmp{min-width:0}table.cmp th,table.cmp td{padding:10px 8px}tbody th{text-transform:none;letter-spacing:0;font-size:1rem;color:var(--tx);font-weight:500}td .ico{vertical-align:-3px}
+.card{max-width:440px;margin:0 auto;border:1px solid var(--ru);background:var(--sf);border-radius:18px;padding:30px}
+.pw{position:relative}.pw input{padding-right:76px}.pw button{position:absolute;right:4px;top:4px;min-height:36px;border:0;background:none;color:var(--ac);font:inherit;font-weight:600;cursor:pointer;padding:0 12px}
+.okb{border:1px solid var(--ok);color:var(--ok);padding:10px 14px;border-radius:8px;margin:10px 0}
+@media all and (max-width:540px){.an{display:none}header .w{justify-content:center}.hero-cta .btn{flex:1 1 100%}.card{padding:22px}.ldp{padding:12px}}
+.thw canvas{width:100%;height:84px;object-fit:contain;background:#fff;display:block}.thr{width:96px;height:96px;padding:0;border:0;background:transparent;color:inherit;cursor:zoom-in;display:grid;place-items:center;transition:transform .16s}.thr:hover{transform:scale(1.04)}.thr canvas{width:96px;height:96px;object-fit:contain;background:#fff;border:1px solid var(--ru);display:block}.preview-dialog{width:min(96vw,1100px);max-width:none;max-height:94dvh;margin:auto;padding:0;border:1px solid #525b56;border-radius:6px;background:#101512;color:#f4f6f4;box-shadow:0 24px 80px rgba(0,0,0,.45)}.preview-dialog::backdrop{background:rgba(4,8,6,.82);backdrop-filter:blur(3px);animation:preview-backdrop-in .3s ease-out both}.preview-dialog[open]{animation:preview-panel-in .48s cubic-bezier(.2,.85,.25,1) both}.preview-frame{padding:12px}.preview-bar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:10px}.preview-bar strong{display:block;overflow-wrap:anywhere}.preview-bar span{display:block;color:#c6d0ca;font-size:.85rem}.preview-close{flex:none;min-height:42px;padding:8px 14px;border:1px solid #aab3ad;border-radius:4px;background:transparent;color:#fff;font:inherit;cursor:pointer}.preview-close:hover{background:#26312b}.preview-image{display:block;max-width:100%;max-height:calc(94dvh - 88px);margin:auto;object-fit:contain;background:#fff;animation:preview-image-reveal .72s .08s cubic-bezier(.2,.85,.25,1) both;transform-origin:center;will-change:transform,opacity,filter,clip-path}@keyframes preview-backdrop-in{from{opacity:0}to{opacity:1}}@keyframes preview-panel-in{0%{opacity:0;transform:scale(.88) translateY(28px);filter:blur(8px)}65%{opacity:1;filter:blur(0);transform:scale(1.015) translateY(-2px)}100%{opacity:1;transform:scale(1) translateY(0);filter:blur(0)}}@keyframes preview-image-reveal{0%{opacity:0;clip-path:inset(9% 9% 9% 9% round 8px);filter:blur(14px) brightness(.78);transform:scale(1.08)}55%{opacity:1;filter:blur(0) brightness(1)}100%{opacity:1;clip-path:inset(0 round 0);filter:blur(0) brightness(1)}}@media all and (max-width:540px){.thr{width:100%;height:160px}.thr canvas{width:100%;height:160px}.preview-frame{padding:8px}.preview-image{max-height:calc(94dvh - 78px)}}@media (prefers-reduced-motion:reduce){.preview-frame,.preview-image,.preview-dialog,.preview-dialog::backdrop{animation:none!important}.preview-image{will-change:auto}.thr{transition:none}}
+.ld2{display:flex;gap:20px;align-items:center;border:1px solid var(--ru);background:var(--sf);border-radius:16px;padding:16px;max-width:640px;color:var(--tx);animation:pop .25s ease-out}
+.stg{position:relative;width:150px;height:150px;flex:none;border-radius:10px;background:#fff;overflow:hidden;border:1px solid var(--ru);transition:border-color .3s}.stg .cv canvas{width:100%;height:100%;object-fit:contain;display:block}
+.gr{position:absolute;inset:0;background-image:linear-gradient(color-mix(in srgb,var(--ac) 22%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--ac) 22%,transparent) 1px,transparent 1px);background-size:15px 15px;opacity:.7}
+.beam{position:absolute;left:0;right:0;top:-40px;height:40px;background:linear-gradient(transparent,color-mix(in srgb,var(--ac) 50%,transparent));border-bottom:2px solid var(--ac);box-shadow:0 6px 18px var(--ac);animation:bm 1.3s ease-in-out infinite alternate}@keyframes bm{to{top:calc(100% - 2px)}}
+.cn{position:absolute;width:16px;height:16px;border:3px solid var(--ac);animation:cp 1s ease-in-out infinite alternate}.cn.a{left:6px;top:6px;border-right:0;border-bottom:0}.cn.b{right:6px;top:6px;border-left:0;border-bottom:0}.cn.c{left:6px;bottom:6px;border-right:0;border-top:0}.cn.d{right:6px;bottom:6px;border-left:0;border-top:0}@keyframes cp{to{transform:scale(.8);opacity:.6}}
+.bg{position:absolute;inset:0;display:grid;place-items:center;background:color-mix(in srgb,var(--ac) 88%,transparent);color:var(--acx);opacity:0;transform:scale(.6);transition:opacity .25s,transform .45s cubic-bezier(.2,1.5,.4,1)}.ld2.done .bg{opacity:1;transform:scale(1)}.ld2.done .beam,.ld2.done .cn{display:none}.ld2.done .stg{border-color:var(--ac)}
+.ldr{flex:1;min-width:0}.ldr strong{display:block;overflow-wrap:anywhere}.stl{list-style:none;margin:10px 0;padding:0;display:grid;gap:7px}.stl li{display:flex;gap:10px;align-items:center;font-size:.88rem;color:var(--mu);transition:color .2s}
+.dt{width:16px;height:16px;border-radius:50%;border:2px solid var(--ru);flex:none;position:relative;transition:background .2s,border-color .2s}.stl li.run{color:var(--tx)}.stl li.run .dt{border-color:var(--ac);border-right-color:transparent;animation:s .7s linear infinite}
+.stl li.ok{color:var(--tx)}.stl li.ok .dt{background:var(--ac);border-color:var(--ac);animation:tk .35s}.stl li.ok .dt::after{content:"";position:absolute;left:4px;top:1px;width:4px;height:8px;border:solid var(--acx);border-width:0 2px 2px 0;transform:rotate(45deg)}@keyframes tk{from{transform:scale(.4)}60%{transform:scale(1.3)}}
+.pb2{height:6px;border-radius:99px;background:var(--ru);overflow:hidden}.pb2 i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--ac),color-mix(in srgb,var(--ac) 55%,#fff));transition:width .3s}
+@media all and (max-width:480px){.ld2{flex-direction:column;align-items:stretch}.stg{width:100%;height:170px}}
+.thr{position:relative;overflow:hidden;border-radius:3px}.thr canvas{transition:transform .38s cubic-bezier(.2,.8,.2,1),box-shadow .38s cubic-bezier(.2,.8,.2,1);animation:thumb-arrive .48s cubic-bezier(.2,.8,.2,1) both;will-change:transform}.thr:hover canvas,.thr:focus-visible canvas{transform:scale(1.045);box-shadow:0 8px 22px rgba(0,0,0,.22)}.thr:focus-visible{outline:3px solid var(--ac);outline-offset:3px}.thumb-cue{position:absolute;right:8px;bottom:8px;z-index:2;width:30px;height:30px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.52);border-radius:50%;background:rgba(8,13,10,.72);color:#fff;opacity:0;transform:translateY(4px) scale(.88);transition:opacity .22s ease,transform .3s cubic-bezier(.2,.8,.2,1);pointer-events:none}.thumb-cue svg,.viewer-close svg,.viewer-nav svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.thr:hover .thumb-cue,.thr:focus-visible .thumb-cue{opacity:1;transform:translateY(0) scale(1)}
+.preview-dialog{position:fixed;inset:0;display:none;width:100vw;height:100vh;height:100dvh;max-width:none;max-height:none;margin:0;padding:0;border:0;border-radius:0;overflow:hidden;background:rgba(5,7,7,.985);color:#f5f7f5;box-sizing:border-box}.preview-dialog[open]{display:flex;align-items:center;justify-content:center;animation:viewer-enter .42s cubic-bezier(.2,.85,.25,1) both}.preview-dialog.is-closing{animation:viewer-exit .23s cubic-bezier(.4,0,1,1) both}.preview-dialog::backdrop{background:rgba(0,0,0,.94);backdrop-filter:blur(8px);animation:viewer-backdrop-in .32s ease-out both}.preview-dialog.is-closing::backdrop{animation:viewer-backdrop-out .23s ease-in both}.preview-full-image{display:block;width:100%;height:100%;max-width:100%;max-height:100%;padding:max(58px,calc(42px + env(safe-area-inset-top))) 62px max(68px,calc(48px + env(safe-area-inset-bottom)));object-fit:contain;object-position:center;background:transparent;opacity:1;transform:scale(1);transition:opacity .18s ease,transform .28s cubic-bezier(.2,.8,.2,1);will-change:opacity,transform}.preview-full-image.is-entering{animation:viewer-image-enter .52s .04s cubic-bezier(.2,.85,.25,1) both}.preview-full-image.is-switching{opacity:0;transform:scale(.985)}.viewer-close,.viewer-nav{position:absolute;z-index:3;display:grid;place-items:center;width:48px;height:48px;padding:0;border:1px solid rgba(255,255,255,.24);border-radius:50%;background:rgba(24,29,27,.68);color:#fff;backdrop-filter:blur(12px);cursor:pointer;transition:background .2s ease,border-color .2s ease,transform .22s cubic-bezier(.2,.8,.2,1);box-shadow:0 4px 20px rgba(0,0,0,.2)}.viewer-close{top:max(18px,env(safe-area-inset-top));right:max(18px,env(safe-area-inset-right))}.viewer-close svg{width:21px;height:21px}.viewer-close:hover,.viewer-nav:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.55);transform:scale(1.06)}.viewer-close:active,.viewer-nav:active{transform:scale(.94)}.viewer-close:focus-visible,.viewer-nav:focus-visible{outline:3px solid #fff;outline-offset:3px}.viewer-nav{top:50%;transform:translateY(-50%)}.viewer-nav:hover{transform:translateY(-50%) scale(1.06)}.viewer-nav:active{transform:translateY(-50%) scale(.94)}.viewer-prev{left:max(16px,env(safe-area-inset-left))}.viewer-next{right:max(16px,env(safe-area-inset-right))}.viewer-nav[hidden]{display:none}.viewer-meta{position:absolute;z-index:2;left:max(20px,env(safe-area-inset-left));right:max(84px,calc(56px + env(safe-area-inset-right)));bottom:max(16px,env(safe-area-inset-bottom));display:flex;justify-content:space-between;gap:16px;color:rgba(255,255,255,.78);font:500 .82rem/1.4 "IBM Plex Mono",monospace;text-shadow:0 2px 8px rgba(0,0,0,.8);pointer-events:none}.viewer-meta span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.viewer-meta span:last-child{flex:none}@keyframes thumb-arrive{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}@keyframes viewer-enter{0%{opacity:0;transform:scale(.965) translateY(12px)}100%{opacity:1;transform:scale(1) translateY(0)}}@keyframes viewer-exit{to{opacity:0;transform:scale(.985) translateY(8px)}}@keyframes viewer-backdrop-in{from{opacity:0}to{opacity:1}}@keyframes viewer-backdrop-out{to{opacity:0}}@keyframes viewer-image-enter{from{opacity:0;transform:scale(1.025)}to{opacity:1;transform:scale(1)}}
+@media all and (max-width:540px){.preview-full-image{padding:max(66px,calc(52px + env(safe-area-inset-top))) 46px max(72px,calc(54px + env(safe-area-inset-bottom)))}.viewer-close,.viewer-nav{width:44px;height:44px}.viewer-meta{font-size:.72rem;left:max(14px,env(safe-area-inset-left));right:74px;bottom:max(12px,env(safe-area-inset-bottom))}}
+@media(prefers-reduced-motion:reduce){.thr canvas,.thumb-cue,.preview-dialog,.preview-dialog::backdrop,.preview-full-image{animation:none!important;transition:none!important;will-change:auto}.thr:hover canvas,.thr:focus-visible canvas{transform:none}}
+</style>
+<style>
+.preview-full-image{box-sizing:border-box;min-width:0;min-height:0;flex:0 1 100%}
+.viewer-compare{position:absolute;z-index:3;top:max(18px,env(safe-area-inset-top));left:max(18px,env(safe-area-inset-left));min-height:44px;padding:9px 16px;border:1px solid rgba(255,255,255,.28);border-radius:999px;background:rgba(24,29,27,.72);color:#fff;font:600 .9rem "IBM Plex Sans",system-ui,sans-serif;backdrop-filter:blur(12px);cursor:pointer;transition:background .2s ease,transform .22s cubic-bezier(.2,.8,.2,1)}
+.viewer-compare:hover{background:rgba(255,255,255,.2);transform:translateY(-1px)}
+.viewer-compare:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.viewer-compare[hidden]{display:none}
+@media all and (max-width:540px){.viewer-compare{top:max(14px,env(safe-area-inset-top));left:max(14px,env(safe-area-inset-left));min-height:42px;padding:8px 13px}}
+@media(prefers-reduced-motion:reduce){.viewer-compare{transition:none}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header><div class="w">
+<a class="brand" href="#/" aria-label="ListingPreflight home"><svg class="ico" viewBox="0 0 16 16" width="22" height="22" aria-hidden="true"><rect x="1.5" y="1.5" width="13" height="13" rx="1"/><path d="M4.5 8.5l2.5 2.5 4.5-5"/></svg>ListingPreflight</a>
+<nav aria-label="Main"><a href="#/" data-r="">Checker</a><a href="#/pricing" data-r="pricing">Pricing</a><a href="#/rules" data-r="rules">Rules</a><a href="#/contact" data-r="contact">Contact</a></nav>
+<div class="au" id="au"></div>
+</div></header>
+<main id="main" tabindex="-1"></main>
+<div id="sc"><button class="btn p" id="scb" type="button">Choose images</button></div>
+<div id="ck" role="dialog" aria-label="Cookie consent" hidden><p style="margin:0 0 10px">We would like to use analytics cookies to see which pages are used. The checker works without them. See our <a href="#/privacy">Privacy Policy</a>.</p><button class="btn p" id="cy" type="button">Accept</button> <button class="btn" id="cn" type="button">Decline</button></div>
+<footer><div class="w"><span id="fo"></span><span><a href="#/pricing">Pricing</a><a href="#/privacy">Privacy</a><a href="#/terms">Terms</a><a href="#/refunds">Refunds</a><a href="#/contact">Contact</a><button class="lkb" id="cs" type="button" hidden>Cookie settings</button></span></div></footer>
+<dialog id="previewDialog" class="preview-dialog" aria-labelledby="previewTitle" aria-describedby="previewStatus"><h2 class="sr" id="previewTitle">Fullscreen image viewer</h2><p class="sr" id="previewStatus"></p><img class="preview-full-image" id="previewImage" alt=""><div class="viewer-meta" aria-live="polite"><span id="previewFilename"></span><span id="previewPosition"></span></div><button class="viewer-compare" id="previewCompare" type="button" hidden>Show original</button><button class="viewer-close" id="previewClose" type="button" aria-label="Close full-screen image viewer" title="Close viewer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button><button class="viewer-nav viewer-prev" id="previewPrev" type="button" aria-label="Previous image" title="Previous image"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><button class="viewer-nav viewer-next" id="previewNext" type="button" aria-label="Next image" title="Next image"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg></button></dialog>
+<input type="file" id="fi" accept="image/jpeg,image/png,image/webp,image/gif" multiple hidden>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+const CONFIG={name:'ListingPreflight',siteUrl:'',operator:'',email:'',jurisdiction:'',provider:'',refundDays:7,
+ contact:{phone:'',address:'',hours:''},auth:{endpoint:'/api'},portal:'',
+ price:{month:9,year:84,currency:'USD'},checkout:{month:'',year:''},
+ analytics:{enabled:true,domain:'',src:'https://plausible.io/js/script.hash.js',cookieless:true}};
+const RULES={amazon:{min:1000,rec:2000,fill:.85,out:2000},etsy:{w:1500,ratio:4/3,ow:2000,oh:1500}};
+const FREE=5,MAXMB=25,REVIEWED='October 2026';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const IC={ok:'<path d="M3 8.5l3.2 3L13 4.5"/>',bad:'<path d="M4 4l8 8M12 4l-8 8"/>',warn:'<path d="M8 3v6M8 12v.5"/>',info:'<circle cx="8" cy="8" r="6"/><path d="M8 7.2v3.6M8 5.2v.2"/>'};
+const ico=t=>`<svg class="ico" viewBox="0 0 16 16" aria-hidden="true">${IC[t]}</svg>`;
+const WORD={ok:'Pass',warn:'Check',bad:'Fail',info:'Note'};
+const cur=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:CONFIG.price.currency,maximumFractionDigits:n%1?2:0}).format(n);
+let items=[],staged=[],busy=false,fixing=false,reviewing=false,mkv='amazon',sku='',cycle='month',curKey='';
+
+/* helpers, auth, loading */
+const MEM={},ls={get(k){try{const v=localStorage.getItem(k);return v===null&&k in MEM?MEM[k]:v}catch(e){return k in MEM?MEM[k]:null}},set(k,v){MEM[k]=v;try{localStorage.setItem(k,v)}catch(e){}},del(k){delete MEM[k];try{localStorage.removeItem(k)}catch(e){}}};
+let H=location.hash||'';
+function go(h){H=h;let ok=false;try{history.pushState(null,'',h);ok=true}catch(e){}if(!ok){try{location.hash=h}catch(e){}}route()}
+const trk=(n,p)=>{try{window.plausible&&window.plausible(n,p?{props:p}:undefined)}catch(e){}};
+const EM=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const U={get(){if(CONFIG.auth.endpoint){try{return JSON.parse(MEM['pf-user']||'null')}catch(e){return null}}try{return JSON.parse(ls.get('pf-user')||'null')}catch(e){return null}},set(u){if(CONFIG.auth.endpoint){u?MEM['pf-user']=JSON.stringify(u):delete MEM['pf-user'];return}u?ls.set('pf-user',JSON.stringify(u)):ls.del('pf-user')}};
+const isPro=()=>(U.get()||{}).plan==='pro',lim=()=>isPro()?200:FREE;
+async function pwHash(p,salt){if(!window.crypto||!crypto.subtle){let a=5381,b=52711;const t=salt+p;for(let i=0;i<t.length*3;i++){const c=t.charCodeAt(i%t.length);a=(a*33)^c;b=(b*31+c+i)|0}return String(a>>>0)+'.'+String(b>>>0)}const k=await crypto.subtle.importKey('raw',new TextEncoder().encode(p),'PBKDF2',false,['deriveBits']);const b=await crypto.subtle.deriveBits({name:'PBKDF2',salt:new TextEncoder().encode(salt),iterations:150000,hash:'SHA-256'},k,256);return btoa(String.fromCharCode(...new Uint8Array(b)))}
+async function api(path,body,method='POST'){let r;try{r=await fetch(CONFIG.auth.endpoint.replace(/\/$/,'')+path,{method,headers:method==='GET'?{}:{'Content-Type':'application/json'},credentials:'include',...(body===undefined?{}:{body:JSON.stringify(body)})})}catch(e){throw new Error('Could not reach the server. Check your connection and try again.')}const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Request failed ('+r.status+').');return j}
+async function doAuth(mode,v){
+ if(!CONFIG.auth.endpoint)throw new Error('Account service is not connected. Start the ListingPreflight server and try again.');
+ const j=await api('/'+mode,v);U.set(j.user||{name:v.name||v.email.split('@')[0],email:v.email,plan:'free'});
+}
+const logout=async()=>{if(CONFIG.auth.endpoint){try{await api('/logout',{})}catch(e){}}U.set(null);renderAu();go('#/')};
+function renderAu(){
+ const u=U.get(),a=$('au');if(!u){a.innerHTML='<a class="lk" href="#/login">Log in</a><a class="btn p sm" href="#/register">Sign up</a>';return}
+ a.innerHTML=`<div class="am"><button class="btn sm" id="amb" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="amm"><span class="av" aria-hidden="true">${esc((u.name||'?')[0]).toUpperCase()}</span><span class="an">${esc(u.name)}</span><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg></button><div class="menu" id="amm" role="menu" aria-label="Account" hidden><a role="menuitem" href="#/account">Account</a>${u.role==='admin'?'<a role="menuitem" href="#/admin">Admin dashboard</a>':''}<a role="menuitem" href="#/pricing">Plans</a><button role="menuitem" type="button" id="lo">Log out</button></div></div>`;
+ const b=$('amb'),m=$('amm'),shut=()=>{m.hidden=true;b.setAttribute('aria-expanded','false')};
+ b.onclick=e=>{e.stopPropagation();const o=m.hidden;m.hidden=!o;b.setAttribute('aria-expanded',String(o));if(o)m.querySelector('[role=menuitem]').focus()};
+ m.onkeydown=e=>{const L=[...m.querySelectorAll('[role=menuitem]')],i=L.indexOf(document.activeElement);if(e.key==='Escape'){shut();b.focus()}else if(e.key==='ArrowDown'){e.preventDefault();L[(i+1)%L.length].focus()}else if(e.key==='ArrowUp'){e.preventDefault();L[(i+L.length-1)%L.length].focus()}};
+ m.onclick=e=>{if(e.target.closest('a'))shut()};$('lo').onclick=logout;
+}
+document.addEventListener('click',e=>{const m=$('amm'),b=$('amb');if(m&&!m.hidden&&!m.contains(e.target)){m.hidden=true;b.setAttribute('aria-expanded','false')}});
+const STEPS=['Reading pixels','Background colour','Product fill','Size and ratio','File type and colour mode'],nap=ms=>new Promise(r=>setTimeout(r,ms));
+function ldStart(){$('st').innerHTML=`<div class="ld2" id="ld2"><div class="stg" aria-hidden="true"><div class="cv" id="cv"></div><i class="gr"></i><i class="beam"></i><b class="cn a"></b><b class="cn b"></b><b class="cn c"></b><b class="cn d"></b><em class="bg"><svg viewBox="0 0 24 24" width="46" height="46" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></em></div><div class="ldr"><strong id="rt">Starting</strong><ul class="stl" aria-hidden="true">${STEPS.map(t=>`<li><span class="dt"></span>${t}</li>`).join('')}</ul><div class="pb2" aria-hidden="true"><i id="pf"></i></div><span class="mono" id="rp">0%</span></div></div>`}
+function ldImg(it,i,n){const cv=$('cv');if(!cv)return;const c=document.createElement('canvas');c.width=it.th.width;c.height=it.th.height;c.getContext('2d').drawImage(it.th,0,0);cv.innerHTML='';cv.appendChild(c);$('rt').textContent=`Checking image ${i+1} of ${n}: ${it.f.name}`}
+function ldStep(k,i,n){const L=document.querySelectorAll('#ld2 .stl li');L.forEach((li,j)=>li.className=j<k?'ok':j===k?'run':'');const p=Math.round((i+Math.min(k,5)/5)/n*100);if($('pf')){$('pf').style.width=p+'%';$('rp').textContent=p+'%'}}
+function ldDone(n){const d=$('ld2');if(!d)return;d.classList.add('done');document.querySelectorAll('#ld2 .stl li').forEach(li=>li.className='ok');$('pf').style.width='100%';$('rp').textContent='100%';$('rt').textContent=`Done. ${n} image${n===1?'':'s'} checked`}
+
+/* analysis */
+function jpegComps(u){if(u[0]!==255||u[1]!==216)return null;let i=2;while(i<u.length-9){if(u[i]!==255){i++;continue}const m=u[i+1];if(m>=192&&m<=207&&m!==196&&m!==200&&m!==204)return u[i+9];i+=2+((u[i+2]<<8)|u[i+3])}return null}
+const loadImg=s=>new Promise((a,b)=>{const i=new Image();i.onload=()=>a(i);i.onerror=()=>b(new Error('decode'));i.src=s});
+function thumb(img){const W=img.naturalWidth||img.width,H=img.naturalHeight||img.height,k=Math.min(1,240/Math.max(W,H)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(W*k));c.height=Math.max(1,Math.round(H*k));const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.drawImage(img,0,0,c.width,c.height);return c}
+const safeComps=(u,f)=>{try{return f.type==='image/jpeg'?jpegComps(u):null}catch(e){return null}};
+async function decode(f,url){try{return await loadImg(url)}catch(e){if(window.createImageBitmap){const b=await createImageBitmap(f);b.naturalWidth=b.width;b.naturalHeight=b.height;return b}throw e}}
+async function analyze(f){
+ const u=new Uint8Array(await f.arrayBuffer()),comps=safeComps(u,f),url=URL.createObjectURL(f);
+ let img;try{img=await decode(f,url)}catch(e){URL.revokeObjectURL(url);throw e}
+ const W=img.naturalWidth,H=img.naturalHeight,s=Math.min(1,800/Math.max(W,H)),w=Math.max(1,Math.round(W*s)),h=Math.max(1,Math.round(H*s));
+ const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d',{willReadFrequently:true});g.fillStyle='#fff';g.fillRect(0,0,w,h);g.drawImage(img,0,0,w,h);
+ const d=g.getImageData(0,0,w,h).data,px=(X,Y)=>{const k=(Y*w+X)*4;return Math.min(d[k],d[k+1],d[k+2])};
+ let pure=0,near=0,n=0;const ed=(X,Y)=>{const m=px(X,Y);n++;if(m>=253)pure++;if(m>=235)near++};
+ for(let X=0;X<w;X++){ed(X,0);ed(X,h-1)}for(let Y=1;Y<h-1;Y++){ed(0,Y);ed(w-1,Y)}
+ let x0=w,y0=h,x1=-1,y1=-1;for(let Y=0;Y<h;Y++)for(let X=0;X<w;X++)if(px(X,Y)<240){if(X<x0)x0=X;if(X>x1)x1=X;if(Y<y0)y0=Y;if(Y>y1)y1=Y}
+ let bbox=null,fill=0;if(x1>=0){bbox={x:x0/s,y:y0/s,w:(x1-x0+1)/s,h:(y1-y0+1)/s};fill=Math.max((x1-x0+1)/w,(y1-y0+1)/h)}
+ return{th:thumb(img),f,url,W,H,type:f.type,comps,pure:pure/n,near:near/n,bbox,fill,size:f.size};
+}
+function check(it){
+ const r=RULES[mkv],o=[],a=(s,t)=>o.push({s,t});
+ if(it.comps===4)a('bad','CMYK colour mode. Convert to RGB or colours may display wrongly.');
+ if(mkv==='amazon'){
+  const L=Math.max(it.W,it.H);
+  L>=r.rec?a('ok',`Size ${it.W} by ${it.H} px.`):L>=r.min?a('warn',`Size ${it.W} by ${it.H} px. Allowed, but 2000 px on the longest side is recommended.`):a('bad',`Size ${it.W} by ${it.H} px is under the 1000 px minimum.`);
+  it.fixed&&it.backgroundCleaned===false?a('warn','The original background was preserved to avoid altering product pixels. Replace it with pure white manually if this is an Amazon main image.'):it.pure>=.98?a('ok','Background is pure white at the edges.'):it.near>=.98?a('warn','Background looks off-white. The main image needs pure white (RGB 255,255,255).'):a('bad','Background is not white. The main image needs pure white.');
+  if(it.fixed&&it.backgroundCleaned)a('info','Review the cutout edges and compare the fixed image with the original before using it.');
+  it.fixed&&it.backgroundCleaned===false?a('warn','Product fill cannot be measured reliably while the original background is preserved.'):it.near<.98?a('warn','Product fill cannot be estimated reliably against a non-white or complex background.'):!it.bbox?a('warn','Product not found against the white background. Check the image manually.'):it.fill>=r.fill?a('ok',`Estimated product fill is about ${Math.round(it.fill*100)}% of the frame.`):it.fill>=.75?a('warn',`Estimated product fill is about ${Math.round(it.fill*100)}%. Aim for 85% or more; check by eye.`):a('bad',`Estimated product fill is about ${Math.round(it.fill*100)}%. Aim for 85% or more; check by eye.`);
+  if(it.fixed&&it.sourceUpscale>1.5)a('warn',`The source was enlarged about ${it.sourceUpscale.toFixed(1)} times; the result may look soft. Use a higher-resolution original if available.`);
+  const q=it.W/it.H;q>.97&&q<1.03?a('ok','Square image.'):a('warn','Not square. Square is recommended.');
+  ['image/jpeg','image/png'].includes(it.type)?a('ok','File type is accepted.'):a('warn','Convert to JPG or PNG before upload.');
+  a('info','Check by eye: no text, logos, borders or extra items on the main image.');
+ }else{
+  it.W>=r.w?a('ok',`Width ${it.W} px is enough.`):a('warn',`Width ${it.W} px. About 1500 px or more is better.`);
+  Math.abs(it.W/it.H-r.ratio)<.04?a('ok','Ratio is about 4:3.'):a('warn','Not 4:3. Search grids may crop it unexpectedly.');
+  if(it.fixed&&it.sourceUpscale>1.5)a('warn',`The source was enlarged about ${it.sourceUpscale.toFixed(1)} times; the result may look soft. Use a higher-resolution original if available.`);
+  a('info','Avoid watermark overlays. Etsy advises against them.');
+ }return o;
+}
+const worst=c=>c.some(x=>x.s==='bad')?'bad':c.some(x=>x.s==='warn')?'warn':'ok';
+async function fix(it){
+ const r=RULES[mkv],c=document.createElement('canvas');
+ c.width=mkv==='amazon'?r.out:r.ow;c.height=mkv==='amazon'?r.out:r.oh;
+ const g=c.getContext('2d');g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);
+ let sourceUpscale=1,productFill=null,backgroundCleaned=null;
+ if(mkv==='amazon'){
+  const response=await fetch('/api/image/remove-background',{method:'POST',headers:{'Content-Type':it.f.type},body:it.f});
+  if(!response.ok){let message='Background removal failed.';try{const error=await response.json();if(error.error)message=error.error}catch(e){}throw new Error(message)}
+  const cutout=await response.blob(),cutoutUrl=URL.createObjectURL(cutout);
+  try{
+   const img=await loadImg(cutoutUrl),scale=Math.min(1,1200/Math.max(img.naturalWidth,img.naturalHeight)),sw=Math.max(1,Math.round(img.naturalWidth*scale)),sh=Math.max(1,Math.round(img.naturalHeight*scale)),sample=document.createElement('canvas');
+   sample.width=sw;sample.height=sh;const sg=sample.getContext('2d',{willReadFrequently:true});sg.drawImage(img,0,0,sw,sh);
+   const alpha=sg.getImageData(0,0,sw,sh).data;let x0=sw,y0=sh,x1=-1,y1=-1;
+   for(let y=0;y<sh;y++)for(let x=0;x<sw;x++)if(alpha[(y*sw+x)*4+3]>8){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
+   if(x1<0)throw new Error('The background-removal service returned an empty image. Try another source image.');
+   const margin=Math.max(2,Math.round(Math.max(x1-x0+1,y1-y0+1)*.012)),bx=Math.max(0,x0-margin),by=Math.max(0,y0-margin),ex=Math.min(sw,x1+1+margin),ey=Math.min(sh,y1+1+margin);
+   const ratioX=img.naturalWidth/sw,ratioY=img.naturalHeight/sh,sx=bx*ratioX,sy=by*ratioY,pw=(ex-bx)*ratioX,ph=(ey-by)*ratioY;
+   sourceUpscale=Math.min(c.width*.88/pw,c.height*.88/ph);const w=pw*sourceUpscale,h=ph*sourceUpscale;
+   g.drawImage(img,sx,sy,pw,ph,(c.width-w)/2,(c.height-h)/2,w,h);productFill=Math.max(w/c.width,h/c.height);backgroundCleaned=true;
+  }finally{URL.revokeObjectURL(cutoutUrl)}
+ }else{
+  const img=await decode(it.f,it.url),fit=Math.min(c.width*.88/it.W,c.height*.88/it.H),w=it.W*fit,h=it.H*fit;
+  g.drawImage(img,(c.width-w)/2,(c.height-h)/2,w,h);sourceUpscale=fit;
+ }
+ const blob=await new Promise((a,b)=>c.toBlob(x=>x?a(x):b(new Error('export')),'image/jpeg',.95));
+ return{blob,backgroundCleaned,sourceUpscale,productFill};
+}
+async function fixedAndChecked(it,i,onProgress=()=>{}){
+ onProgress(mkv==='amazon'?'Removing background with remove.bg':'Preparing image resize',5);await nap(30);
+ const result=await fix(it);onProgress('Rechecking fixed image',65);await nap(30);
+ const file=new File([result.blob],oname(i,it),{type:'image/jpeg'}),checked=await analyze(file);onProgress('Preparing download',94);await nap(16);checked.fixed=true;checked.backgroundCleaned=result.backgroundCleaned;checked.sourceUpscale=result.sourceUpscale;if(result.productFill!=null)checked.fill=result.productFill;checked.original=it.original||{url:it.url,name:it.f.name,W:it.W,H:it.H};return checked;
+}
+const oname=(i,it)=>mkv==='amazon'?`${sku||'SKU'}.${i?'PT'+String(i).padStart(2,'0'):'MAIN'}.jpg`:it.f.name.replace(/\.[^.]+$/,'')+'-fixed.jpg';
+function dl(b,n){const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=n;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),3000)}
+function freeItem(it){if(it.url)URL.revokeObjectURL(it.url);if(it.original?.url&&it.original.url!==it.url)URL.revokeObjectURL(it.original.url)}
+const skuOk=()=>{const e=$('sku');if(!e)return true;const v=e.value.trim(),ok=/^[A-Za-z0-9-]{0,30}$/.test(v);e.setAttribute('aria-invalid',ok?'false':'true');$('skue').textContent=ok?'':'Use letters, numbers and hyphens only, up to 30 characters.';if(ok)sku=v;return ok};
+function showErr(m){const e=$('er');if(e)e.innerHTML=m?`<div class="al" role="alert">${esc(m)}</div>`:''}
+function stat(m,pct){const s=$('st');if(!s)return;s.innerHTML=m?(pct!=null?'<span class="sp" aria-hidden="true"></span>':'')+esc(m)+(pct!=null?`<div class="pb" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}"><i style="width:${pct}%"></i></div>`:''):''}
+let previewIndex=-1,previewOriginal=false,previewClosing=false,previewCloseTimer=0,previewSwapTimer=0,previewSequence=0,previewFocusReturn=null,previewOverflow=null;
+function setPreviewImage(index,animate=false){
+ if(!items.length)return;const next=(index+items.length)%items.length;if(next!==previewIndex)previewOriginal=false;const img=$('previewImage'),dialog=$('previewDialog'),sequence=++previewSequence;
+ const apply=()=>{if(sequence!==previewSequence||!dialog.open)return;const it=items[next],showingOriginal=previewOriginal&&it.original,src=showingOriginal?it.original.url:it.url;previewIndex=next;img.src=src;img.alt=`${showingOriginal?'Original':'Fixed'} image ${next+1} of ${items.length}: ${showingOriginal?it.original.name:it.f.name}`;$('previewFilename').textContent=showingOriginal?it.original.name:it.f.name;$('previewPosition').textContent=`${next+1} / ${items.length}`;$('previewStatus').textContent=`${showingOriginal?'Original':'Fixed'} image shown at full resolution.`;$('previewCompare').hidden=!it.original;$('previewCompare').textContent=showingOriginal?'Show fixed image':'Show original image';$('previewCompare').setAttribute('aria-pressed',String(Boolean(showingOriginal)));$('previewPrev').hidden=items.length<2;$('previewNext').hidden=items.length<2;img.classList.remove('is-switching','is-entering');void img.offsetWidth;img.classList.add('is-entering')};
+ clearTimeout(previewSwapTimer);if(animate&&dialog.open){img.classList.remove('is-entering');img.classList.add('is-switching');const delay=matchMedia('(prefers-reduced-motion: reduce)').matches?0:130;previewSwapTimer=setTimeout(apply,delay)}else apply();
+}
+function openPreview(index){if(!items[index])return;const modal=$('previewDialog');if(modal.open){setPreviewImage(index,true);return}previewOriginal=false;previewFocusReturn=document.activeElement;previewOverflow={body:document.body.style.overflow,root:document.documentElement.style.overflow};document.body.style.overflow='hidden';document.documentElement.style.overflow='hidden';previewClosing=false;modal.classList.remove('is-closing');modal.showModal();setPreviewImage(index,false)}
+function togglePreviewVersion(){if(previewIndex<0||!items[previewIndex].original)return;previewOriginal=!previewOriginal;setPreviewImage(previewIndex,true)}
+function closePreview(){const modal=$('previewDialog');if(!modal.open||previewClosing)return;previewClosing=true;previewSequence++;clearTimeout(previewSwapTimer);modal.classList.add('is-closing');clearTimeout(previewCloseTimer);const delay=matchMedia('(prefers-reduced-motion: reduce)').matches?0:230;previewCloseTimer=setTimeout(()=>{if(modal.open)modal.close();restorePreviewPage()},delay)}
+function restorePreviewPage(){if(previewOverflow){document.body.style.overflow=previewOverflow.body;document.documentElement.style.overflow=previewOverflow.root;previewOverflow=null}previewClosing=false;previewDialog.classList.remove('is-closing');const target=previewFocusReturn;previewFocusReturn=null;if(target&&target.isConnected&&!target.disabled)target.focus({preventScroll:true})}
+
+/* pricing */
+function priceHTML(){
+ const P=CONFIG.price,y=cycle==='year',amt=y?P.year:P.month,save=Math.round((1-P.year/(P.month*12))*100),li=t=>`<li>${ico('ok')}<span>${t}</span></li>`,
+ yes=`<span class="ok">${ico('ok')}<span class="sr">Included</span></span>`,no='<span class="info" aria-hidden="true">&ndash;</span><span class="sr">Not included</span>';
+ return `<section class="w sec" id="pricing" aria-labelledby="ph"><div class="phd"><p class="mono">Pricing</p><h2 id="ph">Start free. Upgrade for big batches.</h2><p class="lead" style="margin:0 auto 18px">Check ${FREE} images free with no card. Pro raises the limit and adds reports.</p>
+ <div class="tg" role="radiogroup" aria-label="Billing period"><label><input type="radio" name="cy" value="month" ${y?'':'checked'}><span>Monthly</span></label><label><input type="radio" name="cy" value="year" ${y?'checked':''}><span>Yearly <em>Save ${save}%</em></span></label></div></div>
+ <div class="plans2"><article class="plan"><h3>Free</h3><p class="mono" style="margin:0">To try it out</p><p class="amt">${cur(0)}<span>forever</span></p><ul>${li(`${FREE} images per check`)}${li('Amazon and Etsy rule checks')}${li('Auto-fix and ZIP download')}${li('Runs in your browser')}</ul><a class="btn" href="#/">Start checking</a></article>
+ <article class="plan pro"><span class="rec">Most popular</span><h3>Pro</h3><p class="mono" style="margin:0">For active sellers</p><p class="amt">${cur(amt)}<span>per ${y?'year':'month'}</span></p><p class="mono" style="margin:0;min-height:1.5em">${y?cur(Math.round(P.year/12*100)/100)+' a month, billed yearly':'Yearly saves '+save+'%'}</p><ul>${li('Up to 200 images per check')}${li('CSV report of every check')}${li('Email support')}${li('Everything in Free')}</ul><a class="btn p" href="#/checkout?plan=pro&cycle=${cycle}">Get Pro</a></article></div>
+ <ul class="trust"><li>${ico('ok')}Cancel any time</li><li>${ico('ok')}${CONFIG.refundDays}-day refund</li><li>${ico('ok')}Card details never touch this site</li></ul>
+ <h3 style="margin-top:38px">Compare plans</h3><div class="tw"><table class="cmp"><thead><tr><th scope="col">Feature</th><th scope="col">Free</th><th scope="col">Pro</th></tr></thead><tbody>
+ <tr><th scope="row">Images per check</th><td>${FREE}</td><td>200</td></tr><tr><th scope="row">Amazon and Etsy checks</th><td>${yes}</td><td>${yes}</td></tr><tr><th scope="row">Auto-fix and ZIP</th><td>${yes}</td><td>${yes}</td></tr><tr><th scope="row">CSV report</th><td>${no}</td><td>${yes}</td></tr><tr><th scope="row">Email support</th><td>${no}</td><td>${yes}</td></tr></tbody></table></div>
+ <p class="note">Prices in ${esc(P.currency)}. Taxes may be added at checkout. Read the <a href="#/refunds">refund policy</a>.</p></section>`;
+}
+function bindPrice(){document.querySelectorAll('input[name=cy]').forEach(r=>r.onchange=()=>{cycle=r.value;$('pricing').outerHTML=priceHTML();bindPrice();document.querySelector('input[name=cy]:checked').focus()})}
+const FAQ=`<section class="w sec" aria-labelledby="fq"><h2 id="fq">Questions</h2>
+<details class="ac"><summary>Are my images uploaded?</summary><p>Image checks run in your browser. Etsy resize fixes also run locally. When you choose Fix for an Amazon image, that image is sent through this server to remove.bg for background removal; our server forwards it for processing and does not save the image. Gemini review is separate and optional: only when you click Review with Gemini is that result image sent to Google for feedback. The review does not edit the image and is not marketplace approval. Review <a href="https://www.remove.bg/privacy" target="_blank" rel="noopener noreferrer">remove.bg's privacy policy</a> and <a href="https://ai.google.dev/gemini-api/terms" target="_blank" rel="noopener noreferrer">Google's Gemini API terms</a> before using these features.</p></details>
+<details class="ac"><summary>Does a pass mean Amazon or Etsy will accept the image?</summary><p>No. It means the image is likely to meet the rules we test. Text, logos and watermarks are not tested, and marketplace rules change.</p></details>
+<details class="ac"><summary>Can I cancel Pro?</summary><p>Yes, any time. Access continues until the end of the period you paid for.</p></details>
+<details class="ac"><summary>How do refunds work?</summary><p>See the <a href="#/refunds">refund policy</a>.</p></details></section>`;
+
+/* pages */
+const op=()=>CONFIG.operator||'the site operator';
+const qs=()=>new URLSearchParams((H.split('?')[1])||'');
+const PAGES={
+'':{t:'Amazon and Etsy Image Checker',d:'Check product photos against Amazon and Etsy image rules before you upload. See what will likely fail, fix it, and download. Runs in your browser.',h:()=>`
+<section class="w hero"><h1>Check your Amazon and Etsy photos before you upload.</h1>
+<p class="lead">Add your product images and press Check. You get a result for each rule, then resize and download. Amazon background removal is processed by remove.bg only when you choose Fix; other image checks run in your browser.</p>
+<div class="hero-cta"><button class="btn p lg" type="button" id="hcta">Check my images free</button><a class="btn lg" href="#/rules">See what it checks</a></div><p class="mono hero-note">No sign-up needed. Amazon fixes send images to remove.bg. Gemini review is optional; it sends the selected image to Google for feedback only and never edits it.</p>
+<fieldset><legend>Marketplace</legend><div class="seg"><label><input type="radio" name="mk" value="amazon"><span><b>Amazon</b><small>Main image rules</small></span></label><label><input type="radio" name="mk" value="etsy"><span><b>Etsy</b><small>Listing photo rules</small></span></label></div></fieldset>
+<div class="f fw" id="skuw"><label for="sku">SKU or ASIN, used in file names</label><input type="text" id="sku" autocomplete="off" aria-describedby="skue"><p class="err" id="skue" role="alert"></p></div>
+<div class="dz" id="dz"><button class="btn" type="button" id="pick">Choose images</button><p>or drop JPG, PNG or WebP files here. Up to ${lim()} images per check, ${MAXMB} MB each.</p></div>
+<div class="sg" id="sg" aria-label="Images ready to check"></div>
+<div class="acts"><button class="btn p" id="chk" type="button" disabled>Check images</button><button class="btn" id="clr" type="button">Clear</button></div>
+<div id="st" role="status" aria-live="polite"></div><div id="er"></div>
+<div class="acts" id="bar" style="display:none"><button class="btn p" id="fixAll" type="button">Fix all images</button><button class="btn" id="zip" type="button">Fix all and download ZIP</button><button class="btn" id="csv" type="button">Download CSV report${isPro()?'':' (Pro)'}</button></div>
+<div class="res" id="rs" tabindex="-1"></div></section>
+<section class="w"><div class="cols"><div><h2>What it checks</h2><p>Background colour, how much of the frame the product fills, pixel size, aspect ratio, file type and colour mode. See the <a href="#/rules">full rule list</a>.</p></div>
+<div><h2>What it cannot check</h2><p>Text, logos, borders and watermarks are not detected reliably, so look at those yourself. A pass means likely to pass, not approved. Rules change, so confirm in your seller dashboard.</p></div></div></section>${priceHTML()}`},
+'pricing':{t:'Pricing',d:'ListingPreflight pricing. Check 5 images free, or choose Pro for larger batches and CSV reports. Monthly or yearly billing.',h:()=>`<div style="padding-top:28px">${priceHTML()}</div>${FAQ}`},
+'rules':{t:'Amazon and Etsy Image Rules Checklist',d:'The image rules this checker tests for Amazon main images and Etsy listing photos, with what each rule means and how it is fixed.',h:()=>`<div class="w pg"><h1>Image rules checked</h1><p class="lead">Taken from public seller guides, last reviewed ${REVIEWED}. Marketplaces change rules, so confirm in your seller dashboard before relying on this.</p>
+<h2>Amazon main image</h2><div class="tw"><table><thead><tr><th>Rule</th><th>Requirement</th><th>Auto-fix</th></tr></thead><tbody>
+<tr><td>Background</td><td>Pure white, RGB 255,255,255</td><td>remove.bg cutout placed on a white canvas</td></tr><tr><td>Product fill</td><td>85% or more of the frame</td><td>Cutout scaled to about 88% of the canvas</td></tr>
+<tr><td>Size</td><td>1000 px minimum, 2000 px recommended</td><td>Exported at 2000 by 2000</td></tr><tr><td>Content</td><td>No text, logos, borders or extra items</td><td>Manual check</td></tr>
+<tr><td>File type</td><td>JPG or PNG</td><td>Exported as JPG</td></tr></tbody></table></div>
+<h2>Etsy listing photo</h2><div class="tw"><table><thead><tr><th>Rule</th><th>Guidance</th><th>Auto-fix</th></tr></thead><tbody>
+<tr><td>Width</td><td>About 1500 px or more</td><td>Exported at 2000 by 1500</td></tr><tr><td>Ratio</td><td>About 4:3 avoids odd cropping in search</td><td>Padded to 4:3</td></tr>
+<tr><td>Colour mode</td><td>RGB, not CMYK</td><td>Detected, flagged</td></tr><tr><td>Watermarks</td><td>Etsy advises against overlays</td><td>Manual check</td></tr></tbody></table></div>
+<p style="margin-top:22px"><a class="btn p" href="#/">Check your images</a></p></div>`},
+'checkout':{t:'Checkout',d:'Review your ListingPreflight Pro order and continue to secure payment.',h:()=>{const P=CONFIG.price,y=qs().get('cycle')==='year',amt=y?P.year:P.month;return `<div class="w pg" style="max-width:940px"><h1>Checkout</h1>${U.get()?'':'<p class="note" style="margin:0 0 14px">Have an account? <a href="#/login?next=checkout">Log in</a> so Pro is linked to it.</p>'}<div class="co">
+<form id="pf" novalidate><div class="f fw" style="max-width:none"><label for="pe">Email for your receipt</label><input type="email" id="pe" autocomplete="email" value="${esc((U.get()||{}).email||'')}" aria-describedby="pe-e"><p class="err" id="pe-e"></p></div>
+<div class="fw"><label style="display:flex;font-size:1rem;font-weight:400"><input type="checkbox" id="pt" aria-describedby="pt-e">I agree to the <a href="#/terms">Terms</a> and the <a href="#/refunds">Refund Policy</a>.</label><p class="err" id="pt-e"></p></div>
+<button class="btn p" type="submit" id="pb">Continue to secure payment</button><div id="pr" role="status" aria-live="polite" style="margin-top:12px"></div>
+<p class="note">You enter card details on the payment provider's page${CONFIG.provider?' ('+esc(CONFIG.provider)+')':''}, never on this site.</p><ul class="trust" style="justify-content:flex-start"><li>${ico('ok')}Secure checkout</li><li>${ico('ok')}${CONFIG.refundDays}-day refund</li></ul></form>
+<aside class="sum" aria-label="Order summary"><h2 style="font-size:1.1rem">Order summary</h2><dl><dt>Plan</dt><dd>ListingPreflight Pro</dd><dt>Billing</dt><dd>${y?'Yearly':'Monthly'}</dd><dt>Price</dt><dd>${cur(amt)} per ${y?'year':'month'}</dd></dl><p class="note" style="margin:0">Renews every ${y?'year':'month'} until cancelled. Taxes may be added. <a href="#/pricing">Change plan</a></p></aside></div></div>`}},
+'success':{t:'Payment complete',d:'Thanks for your purchase. Your receipt is sent by email from the payment provider.',h:()=>`<div class="w pg"><p class="mono">Payment</p><h1>Thank you.</h1><p class="lead">If you just completed checkout, your receipt is sent to your email by the payment provider${CONFIG.provider?' ('+esc(CONFIG.provider)+')':''}. Keep it for your records.</p><p>If Pro features are not active within a few minutes, <a href="#/contact">contact us</a> with your receipt.</p><a class="btn p" href="#/">Back to the checker</a></div>`},
+'payment-failed':{t:'Payment not completed',d:'Your ListingPreflight payment was cancelled or did not go through. You can try again or contact us.',h:()=>`<div class="w pg"><p class="mono">Payment</p><h1>Payment not completed.</h1><p class="lead">The payment was cancelled or declined. Nothing was bought through this page. Check with your bank or provider if you see a charge.</p><div class="acts"><a class="btn p" href="#/checkout?plan=pro&cycle=${cycle}">Try again</a><a class="btn" href="#/contact">Contact us</a></div></div>`},
+'refunds':{t:'Refund Policy',d:'ListingPreflight refund and cancellation policy for Pro subscriptions.',h:()=>`<div class="w pg"><h1>Refund Policy</h1><p class="mono">Last updated October 2026</p>
+<h2>Refunds</h2><p>If Pro does not work for you, ask for a refund within ${CONFIG.refundDays} days of your first payment and we will refund that payment.</p>
+<h2>Cancelling</h2><p>You can cancel at any time. Pro stays active until the end of the period you already paid for, and you are not charged again.</p>
+<h2>Renewals</h2><p>Renewal payments are not refunded after the ${CONFIG.refundDays}-day window unless the law where you live says otherwise.</p>
+<h2>How to ask</h2><p>${CONFIG.email?`Email <a href="mailto:${esc(CONFIG.email)}">${esc(CONFIG.email)}</a>`:'Use the <a href="#/contact">contact page</a>'} with the email you paid with.</p></div>`},
+'privacy':{t:'Privacy Policy',d:'How ListingPreflight handles your images, account, and data.',h:()=>`<div class="w pg"><h1>Privacy Policy</h1><p class="mono">Last updated October 2026</p>
+<h2>Your images</h2><p>Image checks and Etsy resize fixes are processed in your browser. When you choose Fix for an Amazon image, the image is sent to this server and forwarded to remove.bg for background removal. This server does not save the image, but remove.bg processes it under its <a href="https://www.remove.bg/privacy" target="_blank" rel="noopener noreferrer">privacy policy</a>. Do not use Amazon background removal for images you need to keep entirely on your device.</p>
+<h2>Data we collect</h2><p>The checker itself collects no personal data. If you create an account we store your name and email${CONFIG.auth.endpoint?' on our account server':' on this device only'}, and passwords are never stored in plain text. ${CONFIG.analytics.domain?`We use ${CONFIG.analytics.cookieless?'cookieless ':''}analytics to count page views.`:'Analytics is currently switched off.'} The contact form opens your email app, so we only receive what you choose to send.</p>
+<h2>Payments</h2><p>Purchases are handled by a payment provider. Your email and card details go to that provider. We never see or store card numbers.</p>
+<h2>Third parties</h2><p>Page fonts load from Google Fonts and the ZIP library loads from cdnjs. Those services receive your IP address and browser details when the page loads.</p>
+<h2>Your rights</h2><p>Depending on where you live you may have rights to access, correct or delete personal data. Write to ${CONFIG.email?`<a href="mailto:${esc(CONFIG.email)}">${esc(CONFIG.email)}</a>`:'the contact address once it is published on the <a href="#/contact">contact page</a>'}.</p>
+<h2>Operator</h2><p>${esc(op())}.</p></div>`},
+'terms':{t:'Terms of Service',d:'Terms for using the ListingPreflight image checker and Pro subscription, including limits on what a pass result means.',h:()=>`<div class="w pg"><h1>Terms of Service</h1><p class="mono">Last updated October 2026</p>
+<h2>The service</h2><p>ListingPreflight checks images against published marketplace guidance and can resize them. It is provided as is, without warranty.</p>
+<h2>No approval guarantee</h2><p>A pass means the image is likely to meet the rules we test. It does not mean Amazon, Etsy or any marketplace will accept it. Rules change and some cannot be tested here.</p>
+<h2>Subscriptions</h2><p>Pro renews automatically each billing period until you cancel. Prices are shown before you pay. See the <a href="#/refunds">Refund Policy</a>.</p>
+<h2>Your content</h2><p>You are responsible for owning or licensing the images you use and for following each marketplace's policies.</p>
+<h2>Liability</h2><p>To the extent the law allows, ${esc(op())} is not liable for rejected listings, lost sales or other indirect losses from using the service.</p>
+<h2>Changes and law</h2><p>We may update these terms and the service. ${CONFIG.jurisdiction?`These terms are governed by the law of ${esc(CONFIG.jurisdiction)}.`:'The governing law is not yet specified.'}</p></div>`},
+'contact':{t:'Contact',d:'Contact ListingPreflight with questions, rule corrections, billing help or feedback about the image checker.',h:()=>`<div class="w pg"><h1>Contact</h1><p class="lead">Found a wrong rule, a bug or a billing problem? Tell us what happened.</p>
+<form id="cf" novalidate><div class="f fw" style="max-width:none"><label for="cn2">Name</label><input type="text" id="cn2" autocomplete="name" aria-describedby="e1"><p class="err" id="e1"></p></div>
+<div class="f fw" style="max-width:none"><label for="ce">Email</label><input type="email" id="ce" autocomplete="email" aria-describedby="e2"><p class="err" id="e2"></p></div>
+<div class="f fw" style="max-width:none"><label for="cm">Message</label><textarea id="cm" rows="5" aria-describedby="e3"></textarea><p class="err" id="e3"></p></div>
+<button class="btn p" type="submit">Send message</button><div id="cr" role="status" aria-live="polite" style="margin-top:12px"></div></form>
+${cinfo()}</div>`},
+
+'login':{t:'Log in',d:'Log in to your ListingPreflight account to manage your plan and billing.',h:()=>shell('Log in','Welcome back to ListingPreflight.',`<form id="af" novalidate data-m="login">${fld('ae','Email','email','email')}${fld('ap','Password','password','current-password')}<p style="margin:0 0 14px"><a href="#/forgot">Forgot your password?</a></p><button class="btn p" id="ab" type="submit" style="width:100%">Log in</button></form>`,'New here? <a href="#/register">Create an account</a>')},
+'register':{t:'Create account',d:'Create a free ListingPreflight account. Check images free, upgrade to Pro for bigger batches.',h:()=>shell('Create your account','Free to start. No card needed.',`<form id="af" novalidate data-m="register">${fld('an','Name','text','name')}${fld('ae','Email','email','email')}${fld('ap','Password','password','new-password','At least 8 characters.')}<div class="fw"><label style="display:flex;font-size:.95rem;font-weight:400"><input type="checkbox" id="at" aria-describedby="at-e">I agree to the <a href="#/terms">Terms</a> and <a href="#/privacy">Privacy Policy</a>.</label><p class="err" id="at-e"></p></div><button class="btn p" id="ab" type="submit" style="width:100%">Create account</button></form>`,'Already registered? <a href="#/login">Log in</a>')},
+'forgot':{t:'Reset password',d:'Request a link to reset your ListingPreflight password.',h:()=>shell('Reset password','Enter your email and we will send a reset link.',`<form id="af" novalidate data-m="forgot">${fld('ae','Email','email','email')}<button class="btn p" id="ab" type="submit" style="width:100%">Send reset link</button></form>`,'<a href="#/login">Back to log in</a>')},
+'account':{t:'Your account',d:'Manage your ListingPreflight account and plan.',h:()=>{const u=U.get()||{};return `<div class="w pg"><h1>Your account</h1><div class="sum"><dl><dt>Name</dt><dd>${esc(u.name)}</dd><dt>Email</dt><dd>${esc(u.email)}</dd><dt>Plan</dt><dd>${u.plan==='pro'?'Pro':'Free'}</dd><dt>Role</dt><dd>${u.role==='admin'?'Admin':'User'}</dd></dl></div><div class="acts">${u.plan==='pro'?`<a class="btn p" href="${CONFIG.portal?esc(CONFIG.portal):'#/contact'}">Manage billing</a>`:'<a class="btn p" href="#/pricing">Upgrade to Pro</a>'}${u.role==='admin'?'<a class="btn" href="#/admin">Admin dashboard</a>':''}<button class="btn" id="lo2" type="button">Log out</button></div>${CONFIG.auth.endpoint?'':'<p class="note">Accounts are stored on this device only until an account server is connected.</p>'}</div>`}},
+'admin':{t:'Admin dashboard',d:'ListingPreflight owner dashboard and account totals.',h:()=>`<div class="w pg"><p class="mono">Owner tools</p><h1>Admin dashboard</h1><p class="lead">Account and plan totals for this ListingPreflight instance.</p><div id="admsg" role="status" aria-live="polite">Loading admin summary…</div><div class="sum"><dl><dt>Total accounts</dt><dd id="adusers">—</dd><dt>Pro accounts</dt><dd id="adpro">—</dd><dt>Active sessions</dt><dd id="adsessions">—</dd></dl></div><div class="acts"><a class="btn" href="#/account">Account</a><a class="btn" href="#/">Image checker</a></div></div>`},
+'payment-cancelled':{t:'Checkout cancelled',d:'You left checkout before paying. Nothing was charged. You can pick a plan again any time.',h:()=>`<div class="w pg"><p class="mono">Payment</p><h1>Checkout cancelled.</h1><p class="lead">You were not charged. Your plan has not changed.</p><div class="acts"><a class="btn p" href="#/pricing">Back to pricing</a><a class="btn" href="#/contact">Ask a question</a></div></div>`},
+'404':{t:'Page not found',d:'This page does not exist. Go back to the ListingPreflight image checker.',h:()=>`<div class="w pg" style="padding-top:60px"><p class="mono">Error 404</p><h1>This page does not exist.</h1><p class="lead">The link may be old or mistyped. Try one of these instead.</p><div class="acts"><a class="btn p lg" href="#/">Go to the checker</a><a class="btn lg" href="#/pricing">Pricing</a><a class="btn lg" href="#/rules">Rules</a><a class="btn lg" href="#/contact">Contact</a></div></div>`}};
+const fld=(id,l,type,ac,hint='')=>`<div class="fw"><label for="${id}">${l}</label>${type==='password'?`<div class="pw"><input type="password" id="${id}" autocomplete="${ac}" aria-describedby="${id}-e"><button type="button" data-show="${id}" aria-label="Show password" aria-pressed="false">Show</button></div>`:`<input type="${type}" id="${id}" autocomplete="${ac}" aria-describedby="${id}-e">`}${hint?`<p class="note" style="margin:4px 0 0">${hint}</p>`:''}<p class="err" id="${id}-e"></p></div>`;
+const shell=(h,sub,body,foot)=>`<div class="w sec"><div class="card"><h1 style="font-size:1.7rem;max-width:none">${h}</h1><p class="lead" style="font-size:1rem">${sub}</p>${body}<div id="fe"></div><p class="note" style="text-align:center">${foot}</p></div></div>`;
+function cinfo(){const C=CONFIG.contact,r=[];if(CONFIG.email)r.push(['Email',`<a href="mailto:${esc(CONFIG.email)}">${esc(CONFIG.email)}</a>`]);if(C.phone)r.push(['Phone',`<a href="tel:${esc(C.phone.replace(/[^\d+]/g,''))}">${esc(C.phone)}</a>`]);if(C.address)r.push(['Address',esc(C.address)]);if(C.hours)r.push(['Hours',esc(C.hours)]);
+ return r.length?`<div class="sum" style="margin-top:22px"><dl>${r.map(x=>`<dt>${x[0]}</dt><dd>${x[1]}</dd>`).join('')}</dl></div>`:'<p class="mono" style="margin-top:22px">Contact details are being set up. Use the form above.</p>'}
+const NOINDEX=['checkout','success','payment-failed','payment-cancelled','login','register','forgot','account','admin'];
+function meta(k,v,attr='name'){let e=document.head.querySelector(`meta[${attr}="${k}"]`);if(!e){e=document.createElement('meta');e.setAttribute(attr,k);document.head.appendChild(e)}e.setAttribute('content',v)}
+const previewDialog=$('previewDialog');
+$('previewClose').onclick=closePreview;
+$('previewCompare').onclick=togglePreviewVersion;
+$('previewPrev').onclick=()=>setPreviewImage(previewIndex-1,true);
+$('previewNext').onclick=()=>setPreviewImage(previewIndex+1,true);
+previewDialog.addEventListener('cancel',e=>{e.preventDefault();closePreview()});
+previewDialog.addEventListener('close',restorePreviewPage);
+previewDialog.addEventListener('click',e=>{if(e.target===previewDialog)closePreview()});
+previewDialog.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();closePreview()}else if(e.key==='ArrowLeft'&&items.length>1){e.preventDefault();setPreviewImage(previewIndex-1,true)}else if(e.key==='ArrowRight'&&items.length>1){e.preventDefault();setPreviewImage(previewIndex+1,true)}});
+const STICKY={'':['Choose images',()=>$('fi').click()],rules:['Check your images',()=>go('#/')],pricing:['Get Pro',()=>go('#/checkout?plan=pro&cycle='+cycle)]};
+function route(){
+ const key=H.replace(/^#\/?/,'').split('?')[0];
+ if(key==='account'&&!U.get()){go('#/login?next=account');return}
+ if(key==='admin'&&!U.get()){go('#/login?next=admin');return}
+ if(key==='admin'&&U.get().role!=='admin'){go('#/account');return}
+ if((key==='login'||key==='register')&&U.get()){go('#/account');return}
+ const p=PAGES[key]||PAGES['404'],bad=!PAGES[key];curKey=bad?'404':key;
+ const ti=p.t+' | '+CONFIG.name,base=CONFIG.siteUrl.replace(/\/$/,''),url=base?base+'/'+H:'',img=(base?base+'/':'')+'og.png';
+ document.title=ti;meta('description',p.d);meta('robots',bad||NOINDEX.includes(key)?'noindex,follow':'index,follow');meta('og:title',ti,'property');meta('og:description',p.d,'property');meta('og:url',url,'property');meta('og:image',img,'property');meta('twitter:title',ti);meta('twitter:description',p.d);meta('twitter:image',img);
+ document.head.querySelector('link[rel=canonical]').href=url;
+ try{$('main').innerHTML=p.h()}catch(e){$('main').innerHTML='<div class="w pg"><h1>Something went wrong.</h1><p>This page could not load. <a href="#/">Go to the checker</a> or reload.</p></div>'}
+ document.querySelectorAll('nav a').forEach(a=>a.dataset.r===key&&!bad?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current'));
+ const s=STICKY[key];$('sc').hidden=!s;if(s){$('scb').textContent=s[0];$('scb').disabled=false;$('scb').onclick=s[1]}
+ window.scrollTo(0,0);$('main').focus({preventScroll:true});
+ try{if(key===''){bindHome();bindPrice()}if(key==='pricing')bindPrice();if(key==='contact')bindContact();if(key==='checkout')bindCheckout();if(['login','register','forgot'].includes(key))bindAuth();if(key==='account')$('lo2').onclick=logout;if(key==='admin')bindAdmin()}catch(e){showErr('Part of this page did not load. Reload and try again.')}
+ wireForms();
+}
+function wireForms(){document.querySelectorAll('main form').forEach(f=>{const run=e=>{if(e&&e.preventDefault)e.preventDefault();if(f.onsubmit)f.onsubmit({preventDefault(){}})};f.querySelectorAll('button[type=submit]').forEach(b=>{b.type='button';b.onclick=run});f.onkeydown=e=>{if(e.key==='Enter'&&e.target.tagName==='INPUT'&&e.target.type!=='checkbox'){e.preventDefault();run()}}})}
+function bindAuth(){
+ document.querySelectorAll('[data-show]').forEach(b=>b.onclick=()=>{const i=$(b.dataset.show),sh=i.type==='password';i.type=sh?'text':'password';b.textContent=sh?'Hide':'Show';b.setAttribute('aria-pressed',String(sh));b.setAttribute('aria-label',sh?'Hide password':'Show password')});
+ const f=$('af'),m=f.dataset.m,set=(id,msg)=>{const el=$(id);if(!el)return true;$(id+'-e').textContent=msg;el.setAttribute('aria-invalid',msg?'true':'false');return!msg};
+ f.onsubmit=async e=>{e.preventDefault();$('fe').innerHTML='';
+  const reg=m==='register';
+  set('an',reg&&$('an').value.trim().length<2?'Enter your name.':'');set('ae',EM.test($('ae').value.trim())?'':'Enter a valid email address.');
+  if(m!=='forgot')set('ap',$('ap').value.length>=(reg?8:1)?'':(reg?'Use at least 8 characters.':'Enter your password.'));
+  if(reg)set('at',$('at').checked?'':'You need to agree to continue.');
+  const first=['an','ae','ap','at'].map($).find(el=>el&&el.getAttribute('aria-invalid')==='true');if(first){first.focus();return}
+  const b=$('ab'),t=b.textContent;b.disabled=true;b.innerHTML='<span class="sp" aria-hidden="true"></span>Please wait';
+  try{
+   const d={name:reg?$('an').value.trim():'',email:$('ae').value.trim(),password:m==='forgot'?'':$('ap').value};
+   if(m==='forgot'){if(!CONFIG.auth.endpoint)throw new Error('Password reset by email needs the account server, which is not connected yet. Contact us and we will help.');await api('/forgot',{email:d.email});$('fe').innerHTML='<div class="okb" role="status">If an account exists for that email, a reset link is on its way.</div>'}
+   else{await doAuth(m,d);trk(reg?'Signup':'Login');renderAu();go('#/'+(decodeURIComponent(qs().get('next')||'')||'account'))}
+  }catch(err){$('fe').innerHTML=`<div class="al" role="alert">${esc(err.message||'Something went wrong. Try again.')}</div>`}
+  b.disabled=false;b.textContent=t;
+ };
+}
+async function bindAdmin(){
+ try{const data=await api('/admin/summary',undefined,'GET');$('adusers').textContent=data.users;$('adpro').textContent=data.pro_users;$('adsessions').textContent=data.active_sessions;$('admsg').textContent='Admin summary loaded.'}
+ catch(e){$('admsg').textContent=e.message||'Could not load the admin summary.'}
+}
+
+/* checker flow */
+function updSticky(){if(curKey!=='')return;const n=staged.length,b=$('scb');if(busy){b.textContent='Checking...';b.disabled=true;return}b.disabled=false;if(n){b.textContent=`Check ${n} image${n>1?'s':''}`;b.onclick=runCheck}else{b.textContent='Choose images';b.onclick=()=>$('fi').click()}}
+const loading=()=>staged.some(s=>s.ld);
+function renderStaged(){
+ const g=$('sg');if(!g)return;g.className='sg'+(busy?' scan':'');
+ g.innerHTML=staged.map((s,i)=>s.ld?'<div class="sgi sk" aria-hidden="true"><i></i><span>&nbsp;</span></div>':`<div class="sgi"><div class="thw" data-t="${i}"></div><span>${esc(s.f.name)}</span>${busy?'':`<button type="button" data-x="${i}" aria-label="Remove ${esc(s.f.name)}">${ico('bad')}</button>`}</div>`).join('');
+ g.querySelectorAll('[data-t]').forEach(d=>{const t=staged[+d.dataset.t];if(t&&t.th)d.appendChild(t.th)});
+ g.querySelectorAll('button[data-x]').forEach(b=>b.onclick=()=>{URL.revokeObjectURL(staged[+b.dataset.x].url);staged.splice(+b.dataset.x,1);renderStaged();stat(staged.length?`${staged.length} ready to check.`:'')});
+ const c=$('chk');c.disabled=!staged.length||busy||loading();c.innerHTML=busy?'<span class="sp" aria-hidden="true"></span>Checking':'Check images';c.setAttribute('aria-busy',String(busy||loading()));updSticky();
+}
+async function stage(files){
+ if(busy||fixing||reviewing||loading())return;showErr('');const bad=[];let ok=[...files].filter(f=>{if(!/^image\/(jpeg|png|webp|gif)$/.test(f.type)){bad.push(`${f.name}: unsupported type. Use JPG, PNG or WebP. Export HEIC to JPG first.`);return false}if(f.size>MAXMB*1048576){bad.push(`${f.name}: larger than ${MAXMB} MB.`);return false}return true});
+ const room=Math.max(lim()-staged.length,0);if(ok.length>room){bad.push(`Limit is ${lim()} images per check${isPro()?'':'. Pro raises it to 200'}. ${ok.length-room} skipped.`);ok=ok.slice(0,room)}
+ const adds=ok.map(f=>({f,url:URL.createObjectURL(f),ld:true}));
+ if(adds.length){staged.push(...adds);renderStaged();let n=0;stat(`Loading ${adds.length} image${adds.length>1?'s':''}`,0);
+  await Promise.all(adds.map(async a=>{try{a.th=thumb(await decode(a.f,a.url))}catch(e){bad.push(`${a.f.name}: could not be opened by this browser. Re-save it as JPG or PNG and try again.`);a.bad=true}n++;stat(`Loading ${adds.length} image${adds.length>1?'s':''}`,Math.round(n/adds.length*100))}));
+  await new Promise(r=>setTimeout(r,500));
+  adds.forEach(a=>{a.ld=false;if(a.bad){URL.revokeObjectURL(a.url);staged.splice(staged.indexOf(a),1)}});}
+ renderStaged();stat(staged.length?`${staged.length} ready to check. Press Check images.`:'');if(bad.length)showErr(bad.join(' '));
+}
+async function runCheck(){
+ if(busy||fixing||reviewing||loading()||!staged.length||!skuOk())return;busy=true;showErr('');renderStaged();$('bar').style.display='none';$('rs').innerHTML='';trk('Check',{images:staged.length}); 
+ const list=staged.slice(),out=[],bad=[],per=Math.max(550,Math.min(1900,2400/list.length));ldStart();
+ for(let i=0;i<list.length;i++){ldImg(list[i],i,list.length);const pr=analyze(list[i].f).then(r=>{out.push(r)},()=>{bad.push(`${list[i].f.name}: could not be opened by this browser. Re-save it as JPG or PNG and try again.`)});
+  for(let k=0;k<STEPS.length;k++){ldStep(k,i,list.length);await nap(per/STEPS.length)}
+  await pr;ldStep(STEPS.length,i,list.length)}
+ ldDone(out.length);await nap(700);
+ items.forEach(freeItem);items=out;staged.forEach(s=>URL.revokeObjectURL(s.url));staged=[];busy=false;renderStaged();renderRes();
+ stat(out.length?`Done. ${out.length} image${out.length===1?'':'s'} checked.`:'');if(bad.length)showErr(bad.join(' '));if(out.length)$('rs').focus();
+}
+function renderRes(){
+ const rs=$('rs');if(!rs)return;$('bar').style.display=items.length?'flex':'none';$('fixAll').disabled=items.length>0&&items.every(it=>it.fixed);$('fixAll').textContent=$('fixAll').disabled?'All images fixed':'Fix all images';rs.innerHTML='';
+ items.forEach((it,i)=>{const cs=check(it),w=worst(cs),d=document.createElement('article');d.className='it';d.style.animationDelay=i*70+'ms';
+  d.innerHTML=`<button class="thr" type="button" data-preview="${i}" aria-label="Open full-size preview of ${esc(it.f.name)}"><span class="thumb-cue" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></span></button><div><div class="hd"><span class="nm">${esc(it.f.name)}</span><span class="tag ${w}">${ico(w)}${w==='ok'?'Likely to pass':w==='warn'?'Needs a look':'Likely to fail'}</span></div>
+  <div class="mono">${it.W} by ${it.H} px, ${(it.size/1048576).toFixed(2)} MB</div><ul class="ck">${cs.map(x=>`<li class="${x.s}">${ico(x.s)}<span><span class="sr">${WORD[x.s]}: </span>${esc(x.t)}</span></li>`).join('')}</ul>
+  ${it.fixed?'':'<button class="btn" type="button" data-fix="'+i+'">Fix</button> '}<button class="btn" type="button" data-i="${i}">${it.fixed?'Download fixed image':'Fix and download'}</button> <button class="btn" type="button" data-ai-review="${i}" aria-label="Review ${esc(it.f.name)} with Gemini; sends the image to Google for feedback">Review with Gemini</button>
+  ${it.aiReview?`<section class="ai-review"><h3>AI visual feedback</h3><p>${esc(it.aiReview).replace(/\n/g,'<br>')}</p><small>Guidance only, not marketplace approval. Verify the image yourself.</small></section>`:''}<div class="ai-review" data-ai-status="${i}" role="status" aria-live="polite" hidden></div></div>`;d.querySelector('.thr').appendChild(it.th);rs.appendChild(d)});
+ rs.querySelectorAll('button[data-preview]').forEach(b=>b.onclick=()=>openPreview(+b.dataset.preview));
+ const reviewItem=async b=>{
+  if(busy||fixing||reviewing)return;const i=+b.dataset.aiReview,it=items[i];if(!it)return;
+  reviewing=true;rs.querySelectorAll('button[data-ai-review],button[data-fix],button[data-i]').forEach(control=>{control.disabled=true});b.setAttribute('aria-busy','true');showErr('');
+  const status=rs.querySelector(`[data-ai-status="${i}"]`);if(status){status.hidden=false;status.innerHTML='<span class="sp" aria-hidden="true"></span>Reviewing image with Gemini…'}
+  try{
+   const response=await fetch('/api/image/review',{method:'POST',headers:{'Content-Type':it.f.type,'X-Marketplace':mkv},body:it.f});
+   const result=await response.json().catch(()=>({}));
+   if(!response.ok)throw new Error(result.error||`Gemini review failed (${response.status}).`);
+   if(typeof result.review!=='string'||!result.review.trim())throw new Error('Gemini returned an empty review. Please try again.');
+   it.aiReview=result.review.trim();renderRes();stat(`Gemini review ready for ${it.f.name}.`);
+  }catch(e){if(status){status.hidden=true;status.textContent=''}showErr(e instanceof Error?e.message:'Could not review this image. Please try again.')}
+  finally{reviewing=false;rs.querySelectorAll('button[data-ai-review],button[data-fix],button[data-i]').forEach(control=>{control.disabled=false});if(b.isConnected)b.removeAttribute('aria-busy')}
+ };
+ const fixItem=async(b,downloadAfter)=>{
+  if(busy||fixing||reviewing||!skuOk())return;const i=+(b.dataset.fix??b.dataset.i);if(items[i].fixed){dl(items[i].f,items[i].f.name);stat('Fixed image downloaded again.');return}
+  fixing=true;
+  b.disabled=true;b.innerHTML='<span class="sp" aria-hidden="true"></span>Fixing image';
+  try{const old=items[i],fixed=await fixedAndChecked(old,i,(message,pct)=>stat(`${old.f.name}: ${message}`,pct));if(downloadAfter)dl(fixed.f,fixed.f.name);items[i]=fixed;renderRes();const left=check(fixed).filter(x=>x.s==='bad'||x.s==='warn').length;
+   stat(downloadAfter?(left?`Fixed file downloaded and rechecked. ${left} check${left===1?'':'s'} still need attention.`:'Fixed file downloaded. All measurable checks pass; review the manual note.'):(left?`Image fixed and rechecked. ${left} check${left===1?'':'s'} still need attention. Review the results, then download when ready.`:'Image fixed and rechecked. Review the results, then download when ready. All measurable checks pass; review the manual note.'));
+  }catch(e){showErr(e instanceof Error?e.message:'Could not fix and verify this image. Try a different file.')}finally{fixing=false;if(b.isConnected){b.disabled=false;b.textContent=downloadAfter?'Fix and download':'Fix'}}
+ };
+ rs.querySelectorAll('button[data-fix]').forEach(b=>b.onclick=()=>fixItem(b,false));
+ rs.querySelectorAll('button[data-i]').forEach(b=>b.onclick=()=>fixItem(b,true));
+ rs.querySelectorAll('button[data-ai-review]').forEach(b=>b.onclick=()=>reviewItem(b));
+}
+function bindHome(){
+ document.querySelectorAll('input[name=mk]').forEach(r=>{r.checked=r.value===mkv;r.onchange=()=>{mkv=r.value;$('skuw').style.display=mkv==='amazon'?'':'none';renderRes()}});
+ $('skuw').style.display=mkv==='amazon'?'':'none';$('sku').value=sku;$('sku').oninput=skuOk;
+ $('pick').onclick=()=>$('fi').click();$('fi').onchange=e=>{stage(e.target.files);e.target.value=''};
+ const dz=$('dz');['dragenter','dragover'].forEach(v=>dz.addEventListener(v,e=>{e.preventDefault();dz.classList.add('on')}));['dragleave','drop'].forEach(v=>dz.addEventListener(v,e=>{e.preventDefault();dz.classList.remove('on')}));dz.addEventListener('drop',e=>stage(e.dataTransfer.files));
+ $('chk').onclick=runCheck;$('hcta').onclick=()=>$('fi').click();
+ $('clr').onclick=()=>{ if(busy||fixing||reviewing)return;items.forEach(freeItem);staged.forEach(i=>URL.revokeObjectURL(i.url));items=[];staged=[];stat('');showErr('');renderStaged();renderRes()};
+ $('fixAll').onclick=async()=>{if(busy||fixing||reviewing||!skuOk())return;const b=$('fixAll'),total=items.filter(it=>!it.fixed).length;if(!total){stat('All images are already fixed.');return}fixing=true;b.disabled=true;b.innerHTML='<span class="sp" aria-hidden="true"></span>Fixing images';showErr('');let done=0;
+  try{for(let i=0;i<items.length;i++){const old=items[i];if(old.fixed)continue;const fixed=await fixedAndChecked(old,i,(message,pct)=>stat(`Image ${i+1} of ${items.length}: ${message}`,Math.round((done+pct/100)/total*100)));items[i]=fixed;done++;stat(`Fixed ${done} of ${total} images. Review the results before downloading.`)}renderRes();const left=items.filter(it=>check(it).some(x=>x.s==='bad'||x.s==='warn')).length;stat(left?`All images fixed and rechecked. ${left} still need attention; review before downloading.`:'All images fixed and rechecked. Review the results before downloading; all measurable checks pass.')}
+  catch(e){renderRes();showErr(e instanceof Error?e.message:'Could not fix every image. Review the results and retry or use an individual Fix button.')}
+  finally{fixing=false;if(b.isConnected){b.disabled=items.length>0&&items.every(it=>it.fixed);b.textContent=b.disabled?'All images fixed':'Fix all images'}}
+ };
+ $('zip').onclick=async()=>{if(busy||fixing||reviewing||!skuOk())return;if(typeof JSZip==='undefined'){showErr('The ZIP tool did not load. Check your connection and reload, or use Fix and download on each image.');return}fixing=true;const b=$('zip'),total=items.length;b.disabled=true;b.innerHTML='<span class="sp" aria-hidden="true"></span>Fixing images';showErr('');try{const z=new JSZip(),fixed=[];stat('Starting image fixes',0);await nap(30);for(let i=0;i<total;i++){const old=items[i],result=old.fixed?old:await fixedAndChecked(old,i,(message,pct)=>stat(`Image ${i+1} of ${total}: ${message}`,Math.round((i+pct/100)/total*100)));fixed.push(result);z.file(result.f.name,result.f)}stat('Building ZIP archive',98);const archive=await z.generateAsync({type:'blob'},progress=>stat(`Building ZIP archive: ${Math.round(progress.percent)}%`,98+Math.round(progress.percent*0.02)));dl(archive,`${mkv}-ready.zip`);items=fixed;renderRes();const left=items.filter(it=>check(it).some(x=>x.s==='bad'||x.s==='warn')).length;stat(left?`ZIP downloaded and checked. ${left} image${left===1?'':'s'} still need attention.`:'ZIP downloaded. All measurable checks pass; review manual notes.')}catch(e){stat('');showErr(e instanceof Error?e.message:'Could not fix and verify the images. Try downloading them one at a time.')}finally{fixing=false;if(b.isConnected){b.disabled=false;b.textContent='Fix all and download ZIP'}}};
+ $('csv').onclick=()=>{if(!isPro()){go('#/pricing');return}const q=v=>'"'+String(v).replace(/"/g,'""')+'"',rows=[['file','marketplace','width','height','status','notes'],...items.map(it=>{const c=check(it);return[it.f.name,mkv,it.W,it.H,worst(c),c.map(x=>x.t).join(' | ')]})];dl(new Blob([rows.map(r=>r.map(q).join(',')).join('\n')],{type:'text/csv'}),'preflight-report.csv')};
+ renderStaged();renderRes();
+}
+function bindContact(){
+ $('cf').onsubmit=e=>{e.preventDefault();const n=$('cn2'),m=$('ce'),g=$('cm'),set=(i,el,msg)=>{$(i).textContent=msg;el.setAttribute('aria-invalid',msg?'true':'false');return!msg};
+  const a=set('e1',n,n.value.trim()?'':'Enter your name.'),b=set('e2',m,/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m.value.trim())?'':'Enter a valid email address.'),c=set('e3',g,g.value.trim().length>=10?'':'Write at least 10 characters.');
+  if(!(a&&b&&c)){(!a?n:!b?m:g).focus();return}
+  if(!CONFIG.email){$('cr').innerHTML='<div class="al" role="alert">Sending is not available because no contact email is configured.</div>';return}
+  location.href=`mailto:${CONFIG.email}?subject=${encodeURIComponent('ListingPreflight message from '+n.value.trim())}&body=${encodeURIComponent(g.value.trim()+'\n\nReply to: '+m.value.trim())}`;$('cr').textContent='Your email app should open with the message ready to send.'};
+}
+function bindCheckout(){
+ $('pf').onsubmit=e=>{e.preventDefault();const m=$('pe'),t=$('pt'),set=(i,el,msg)=>{$(i).textContent=msg;el.setAttribute('aria-invalid',msg?'true':'false');return!msg};
+  const a=set('pe-e',m,/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m.value.trim())?'':'Enter a valid email address.'),b=set('pt-e',t,t.checked?'':'You need to agree to continue.');
+  if(!(a&&b)){(!a?m:t).focus();return}
+  const link=CONFIG.checkout[qs().get('cycle')==='year'?'year':'month'],btn=$('pb');
+  if(!link){$('pr').innerHTML='<div class="al" role="alert">Payments are not connected yet. Please contact us to buy Pro.</div>';return}
+  trk('CheckoutStart');btn.disabled=true;btn.innerHTML='<span class="sp" aria-hidden="true"></span>Redirecting to secure payment';$('pr').textContent='Opening the payment page.';
+  setTimeout(()=>{location.href=link},400);
+ };
+}
+
+/* analytics and consent */
+const anDomain=()=>CONFIG.analytics.domain||(/[a-z]\.[a-z]/i.test(location.hostname)?location.hostname:'');
+function loadAn(){const a=CONFIG.analytics,d=anDomain();if(!a.enabled||!d||document.getElementById('an'))return;window.plausible=window.plausible||function(){(window.plausible.q=window.plausible.q||[]).push(arguments)};const s=document.createElement('script');s.id='an';s.defer=true;s.src=a.src;s.dataset.domain=d;document.head.appendChild(s)}
+function needConsent(){if(CONFIG.analytics.cookieless)return false;const z=(Intl.DateTimeFormat().resolvedOptions().timeZone||'');return/^(Europe|Atlantic\/(Azores|Canary|Madeira|Reykjavik))/.test(z)}
+function initAn(){const a=CONFIG.analytics;if(!a.enabled||!anDomain())return;let c=ls.get('pf-consent');
+ const set=v=>{ls.set('pf-consent',v);$('ck').hidden=true;if(v==='yes')loadAn()};$('cy').onclick=()=>set('yes');$('cn').onclick=()=>set('no');
+ if(!needConsent()){loadAn();return}
+ $('cs').hidden=false;$('cs').onclick=()=>{$('ck').hidden=false;$('cy').focus()};
+ if(c==='yes')loadAn();else if(c!=='no')$('ck').hidden=false}
+
+window.addEventListener('error',()=>{showErr('Something went wrong. Reload the page and try again.')});
+window.addEventListener('unhandledrejection',()=>{busy=false;stat('');showErr('Something went wrong. Reload the page and try again.')});
+window.addEventListener('hashchange',()=>{if(location.hash!==H){H=location.hash;route()}});window.addEventListener('popstate',()=>{H=location.hash;route()});
+document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[href^="#/"]');if(a&&e.button===0&&!e.metaKey&&!e.ctrlKey&&!e.shiftKey){e.preventDefault();go(a.getAttribute('href'))}});
+$('fo').textContent=`${new Date().getFullYear()} ${CONFIG.operator||CONFIG.name}`+(CONFIG.email?`, ${CONFIG.email}`:'');
+initAn();
+if(CONFIG.auth.endpoint){api('/me',undefined,'GET').then(j=>U.set(j.user||null)).catch(()=>U.set(null)).finally(()=>{renderAu();route()})}
+else{renderAu();route()}
+</script>
+</body>
+</html>
