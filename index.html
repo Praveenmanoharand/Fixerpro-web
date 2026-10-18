@@ -383,10 +383,10 @@ input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--accent); m
   background: linear-gradient(135deg, #10b981, #059669);
   z-index: -1;
   opacity: 0;
-  filter: blur(10px);
-  transition: opacity 0.4s;
+  filter: blur(14px);
+  transition: opacity 0.4s ease;
 }
-.card-glow:hover::before { opacity: 0.45; }
+.card-glow:hover::before { opacity: 0.16; }
 
 /* ── Marketplace Selector ─────────────────────────────────── */
 .marketplace-selector { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
@@ -854,20 +854,20 @@ input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--accent); m
 }
 .plan-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
 .plan-card.pro {
-  border: 2px solid #10b981;
-  background: linear-gradient(180deg, rgba(16, 185, 129, 0.08), var(--bg-card));
-  box-shadow: 0 0 24px rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  background: linear-gradient(180deg, rgba(16, 185, 129, 0.03), var(--bg-card));
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 .plan-card.pro:hover {
-  border-color: #34d399;
-  box-shadow: 0 0 35px rgba(16, 185, 129, 0.28), var(--shadow-lg);
+  border-color: rgba(16, 185, 129, 0.65);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45), 0 0 14px rgba(16, 185, 129, 0.12);
 }
 .plan-badge {
   position: absolute; top: -13px; left: 24px;
   background: linear-gradient(135deg, #10b981, #059669);
   color: #fff; font-size: 0.75rem; font-weight: 700;
   padding: 4px 14px; border-radius: var(--radius-full);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
 }
 .plan-price { font-size: 2.6rem; font-weight: 800; letter-spacing: -0.03em; margin: 8px 0 4px; }
 .plan-price span { font-size: 0.95rem; color: var(--text-muted); font-weight: 400; margin-left: 4px; }
