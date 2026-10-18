@@ -55,6 +55,7 @@ class BackendTests(unittest.TestCase):
         cls.temp_dir.cleanup()
 
     def setUp(self):
+        server._rate_buckets.clear()
         with server.connect_db() as connection:
             connection.execute("DELETE FROM sessions")
             connection.execute("DELETE FROM users")
@@ -416,6 +417,41 @@ class BackendTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertIn(b'<meta name="viewport"', payload if isinstance(payload, bytes) else b"")
         self.assertIn(b"remove.bg", payload)
+
+    def test_developer_account_has_full_pro_access(self):
+        server.initialize_database()
+        status, payload, cookie = self.request(
+            "POST",
+            "/api/login",
+            {"email": "praveenmanoharan.dev@gmail.com", "password": "1234567890@PR"},
+        )
+        self.assertEqual(status, 200)
+        self.assertEqual(payload["user"]["plan"], "pro")
+        self.assertEqual(payload["user"]["role"], "admin")
+        self.assertTrue(payload["user"]["unlimited"])
+
+    def test_record_fix_requires_auth(self):
+        status, payload, _ = self.request("POST", "/api/image/record-fix", {})
+        self.assertEqual(status, 401)
+        self.assertTrue(payload.get("auth_required"))
+
+    def test_free_tier_fix_quota_limits_at_5_images(self):
+        _, _, cookie = self.register()
+        cookie_header = cookie.split(";", 1)[0]
+        # First 5 fixes should succeed
+        for i in range(5):
+            status, payload, _ = self.request(
+                "POST", "/api/image/record-fix", {}, cookie=cookie_header
+            )
+            self.assertEqual(status, 200)
+            self.assertEqual(payload["fixes_used"], i + 1)
+        # 6th fix should be blocked with 403 and upgrade: true
+        status, payload, _ = self.request(
+            "POST", "/api/image/record-fix", {}, cookie=cookie_header
+        )
+        self.assertEqual(status, 403)
+        self.assertTrue(payload.get("upgrade"))
+        self.assertIn("5 free fixes", payload.get("error", ""))
 
 
 if __name__ == "__main__":

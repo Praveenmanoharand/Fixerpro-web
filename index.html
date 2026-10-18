@@ -2019,6 +2019,181 @@ footer {
 
 /* Note at the bottom */
 .note { font-size: 0.85rem; color: var(--text-muted); margin-top: 16px; }
+
+/* ── Interactive Modals & Quota Indicators ─────────────────── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 8, 18, 0.82);
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeIn 0.2s ease-out;
+}
+.modal-backdrop[hidden] {
+  display: none !important;
+}
+
+.modal-card {
+  position: relative;
+  background: rgba(13, 19, 36, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 22px;
+  max-width: 440px;
+  width: 100%;
+  padding: 28px 24px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.65), 0 0 32px rgba(0, 212, 170, 0.12);
+  animation: modalScaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.modal-card.pro-card {
+  border-color: rgba(255, 184, 0, 0.3);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7), 0 0 45px rgba(255, 184, 0, 0.18);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes modalScaleIn {
+  from { opacity: 0; transform: scale(0.93) translateY(12px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.modal-close:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  transform: rotate(90deg);
+}
+.modal-close svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  fill: none;
+}
+
+.modal-header {
+  text-align: center;
+  margin-bottom: 18px;
+}
+.modal-header h2 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin: 10px 0 6px;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+.modal-header p {
+  font-size: 0.85rem;
+  color: rgba(148, 163, 184, 0.85);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.crown-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+  margin-bottom: 6px;
+  filter: drop-shadow(0 4px 18px rgba(255, 184, 0, 0.5));
+}
+
+.modal-tabs {
+  display: flex;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 18px;
+}
+.modal-tab {
+  flex: 1;
+  padding: 9px 12px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-align: center;
+  border-radius: 9px;
+  border: none;
+  background: transparent;
+  color: rgba(148, 163, 184, 0.7);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.modal-tab.active {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+.pro-features-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  padding: 16px;
+  margin: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.pro-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+.pro-feature-item svg {
+  width: 18px;
+  height: 18px;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.quota-pill {
+  background: rgba(0, 212, 170, 0.12);
+  border: 1px solid rgba(0, 212, 170, 0.35);
+  color: var(--accent);
+  font-size: 0.75rem;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  letter-spacing: 0.02em;
+}
+.pro-pill {
+  background: linear-gradient(135deg, rgba(255, 184, 0, 0.2), rgba(255, 107, 0, 0.2));
+  border: 1px solid rgba(255, 184, 0, 0.45);
+  color: #ffb800;
+  font-size: 0.75rem;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 2px 12px rgba(255, 184, 0, 0.18);
+}
 </style>
 </head>
 <body>
@@ -2104,6 +2279,97 @@ footer {
   <button class="preview-nav preview-next" id="previewNext" type="button" aria-label="Next" title="Next">
     <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
   </button>
+</div>
+
+<!-- ═══ AUTH MODAL (Inline login / signup without losing staged images) ═══ -->
+<div class="modal-backdrop" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authModalTitle" hidden>
+  <div class="modal-card">
+    <button class="modal-close" id="authModalClose" type="button" aria-label="Close dialog">
+      <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <div class="modal-header">
+      <span class="badge" id="authModalBadge">⚡ 5 Free AI Fixes</span>
+      <h2 id="authModalTitle">Sign in to fix images</h2>
+      <p id="authModalSubtitle">Create a free account or log in to fix and download your images. No credit card required!</p>
+    </div>
+    
+    <div class="modal-tabs" role="tablist">
+      <button class="modal-tab active" id="tabLogin" type="button" role="tab" aria-selected="true">Log in</button>
+      <button class="modal-tab" id="tabRegister" type="button" role="tab" aria-selected="false">Sign up</button>
+    </div>
+
+    <form class="modal-form" id="modalAuthForm" novalidate>
+      <div class="field" id="mNameField" hidden>
+        <label for="mAuthName">Full name</label>
+        <input type="text" id="mAuthName" autocomplete="name" placeholder="Your name">
+        <p class="field-error" id="mAuthNameErr" role="alert"></p>
+      </div>
+
+      <div class="field">
+        <label for="mAuthEmail">Email address</label>
+        <input type="email" id="mAuthEmail" autocomplete="email" placeholder="seller@example.com" required>
+        <p class="field-error" id="mAuthEmailErr" role="alert"></p>
+      </div>
+
+      <div class="field">
+        <label for="mAuthPass">Password</label>
+        <div class="input-wrap">
+          <input type="password" id="mAuthPass" autocomplete="current-password" placeholder="At least 8 characters" required>
+          <button class="show-pw" type="button" id="mShowPw">Show</button>
+        </div>
+        <p class="field-error" id="mAuthPassErr" role="alert"></p>
+      </div>
+
+      <div id="mAuthFeedback" style="margin-top:10px"></div>
+
+      <button class="btn primary lg" id="mAuthSubmit" type="submit" style="width:100%;margin-top:14px">
+        Log in & Continue Fix
+      </button>
+
+      <p class="mono modal-dev-hint" style="font-size:0.75rem;text-align:center;margin-top:14px;color:rgba(148,163,184,0.7)">
+        Developer / Admin: <strong style="color:var(--accent);cursor:pointer" id="devQuickFill">praveenmanoharan.dev@gmail.com</strong>
+      </p>
+    </form>
+  </div>
+</div>
+
+<!-- ═══ PRO UPGRADE MODAL ═══ -->
+<div class="modal-backdrop" id="proModal" role="dialog" aria-modal="true" aria-labelledby="proModalTitle" hidden>
+  <div class="modal-card pro-card">
+    <button class="modal-close" id="proModalClose" type="button" aria-label="Close dialog">
+      <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <div class="modal-header">
+      <div class="crown-icon">👑</div>
+      <span class="badge pro-badge">Pro Upgrade Required</span>
+      <h2 id="proModalTitle">Free quota reached (5/5)</h2>
+      <p id="proModalSubtitle">You have used all 5 free AI fixes for this email. Upgrade to Pro for unlimited image fixes, bulk batch downloads, and CSV compliance reports.</p>
+    </div>
+
+    <div class="pro-features-box">
+      <div class="pro-feature-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg>
+        <span><b>Unlimited</b> Amazon background removals & AI fixes</span>
+      </div>
+      <div class="pro-feature-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg>
+        <span>Up to <b>200 images per check</b> (vs 5 on Free)</span>
+      </div>
+      <div class="pro-feature-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg>
+        <span>1-Click <b>Bulk ZIP Download</b></span>
+      </div>
+      <div class="pro-feature-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg>
+        <span>CSV compliance audit reports & Priority support</span>
+      </div>
+    </div>
+
+    <div class="modal-actions" style="margin-top:20px;display:flex;gap:10px;flex-direction:column">
+      <a class="btn primary lg" href="#/pricing" id="proModalUpgradeBtn" style="width:100%;text-align:center">Upgrade to Pro Now</a>
+      <button class="btn" id="proModalDismiss" type="button" style="width:100%">Continue with Free checks</button>
+    </div>
+  </div>
 </div>
 
 <!-- ═══ HIDDEN FILE INPUT ════════════════════════════════════ -->
@@ -2222,17 +2488,30 @@ function renderAu() {
     a.innerHTML = '<a class="lk" href="#/login">Log in</a><a class="btn primary sm" href="#/register">Sign up</a>';
     return;
   }
-  a.innerHTML = `<div class="am"><button class="btn sm" id="menuBtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="userMenu">
-    <span class="av" aria-hidden="true">${esc((u.name||'?')[0]).toUpperCase()}</span>
-    <span class="an">${esc(u.name)}</span>
-    <svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg>
-  </button>
-  <div class="menu" id="userMenu" role="menu" aria-label="Account" hidden>
-    <a role="menuitem" href="#/account">Account</a>
-    ${u.role === 'admin' ? '<a role="menuitem" href="#/admin">Admin dashboard</a>' : ''}
-    <a role="menuitem" href="#/pricing">Plans</a>
-    <button role="menuitem" type="button" id="menuLogout">Log out</button>
-  </div></div>`;
+  const isP = u.plan === 'pro';
+  const used = u.fixes_used || 0;
+  const badgeHTML = isP
+    ? '<span class="pro-pill">👑 PRO</span>'
+    : `<span class="quota-pill">⚡ ${Math.max(0, 5 - used)}/5 free</span>`;
+
+  a.innerHTML = `<div class="am">
+    ${badgeHTML}
+    <button class="btn sm" id="menuBtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="userMenu">
+      <span class="av" aria-hidden="true">${esc((u.name||'?')[0]).toUpperCase()}</span>
+      <span class="an">${esc(u.name)}</span>
+      <svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg>
+    </button>
+    <div class="menu" id="userMenu" role="menu" aria-label="Account" hidden>
+      <div style="padding:10px 14px;font-size:0.75rem;border-bottom:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02)">
+        <div style="font-weight:700;color:#fff">${esc(u.email)}</div>
+        <div style="margin-top:4px;font-weight:600;color:${isP ? '#ffb800' : 'var(--accent)'}">${isP ? '👑 Unlimited Pro Access' : `⚡ ${used}/5 free fixes used`}</div>
+      </div>
+      <a role="menuitem" href="#/account">Account</a>
+      ${u.role === 'admin' ? '<a role="menuitem" href="#/admin">Admin dashboard</a>' : ''}
+      <a role="menuitem" href="#/pricing">Plans & Pricing</a>
+      <button role="menuitem" type="button" id="menuLogout">Log out</button>
+    </div>
+  </div>`;
   const b = $('menuBtn'), m = $('userMenu');
   const shut = () => { m.hidden = true; b.setAttribute('aria-expanded', 'false'); };
   b.onclick = e => { e.stopPropagation(); const o = m.hidden; m.hidden = !o; b.setAttribute('aria-expanded', String(o)); if (o && m.querySelector('[role=menuitem]')) m.querySelector('[role=menuitem]').focus(); };
@@ -2249,6 +2528,155 @@ document.addEventListener('click', e => {
   const m = $('userMenu'), b = $('menuBtn');
   if (m && !m.hidden && !m.contains(e.target)) { m.hidden = true; b.setAttribute('aria-expanded', 'false'); }
 });
+
+/* ── Auth & Pro Modals Logic ────────────────────────────────── */
+let authModalCallback = null;
+let modalAuthMode = 'login';
+
+function openAuthModal(options = {}) {
+  authModalCallback = options.onSuccess || null;
+  const m = $('authModal');
+  if (!m) return;
+  m.hidden = false;
+  $('authModalTitle').textContent = options.title || 'Sign in to fix images';
+  $('authModalSubtitle').textContent = options.subtitle || 'Create a free account or log in to fix and download your images. No credit card required!';
+  setModalAuthMode('login');
+  $('mAuthFeedback').innerHTML = '';
+  setTimeout(() => $('mAuthEmail').focus(), 50);
+}
+
+function closeAuthModal() {
+  const m = $('authModal');
+  if (m) m.hidden = true;
+  authModalCallback = null;
+}
+
+function openProModal(options = {}) {
+  const m = $('proModal');
+  if (!m) return;
+  m.hidden = false;
+  if (options.title) $('proModalTitle').textContent = options.title;
+  if (options.message) $('proModalSubtitle').textContent = options.message;
+}
+
+function closeProModal() {
+  const m = $('proModal');
+  if (m) m.hidden = true;
+}
+
+function setModalAuthMode(mode) {
+  modalAuthMode = mode;
+  const isReg = mode === 'register';
+  $('tabLogin').classList.toggle('active', !isReg);
+  $('tabRegister').classList.toggle('active', isReg);
+  $('tabLogin').setAttribute('aria-selected', String(!isReg));
+  $('tabRegister').setAttribute('aria-selected', String(isReg));
+  $('mNameField').hidden = !isReg;
+  $('mAuthSubmit').textContent = isReg ? 'Create Account & Continue' : 'Log in & Continue Fix';
+  $('mAuthFeedback').innerHTML = '';
+}
+
+function bindModalHandlers() {
+  $('authModalClose').onclick = closeAuthModal;
+  $('proModalClose').onclick = closeProModal;
+  $('proModalDismiss').onclick = closeProModal;
+  $('proModalUpgradeBtn').onclick = () => { closeProModal(); go('#/pricing'); };
+  
+  $('tabLogin').onclick = () => setModalAuthMode('login');
+  $('tabRegister').onclick = () => setModalAuthMode('register');
+
+  $('mShowPw').onclick = () => {
+    const inp = $('mAuthPass'), isPw = inp.type === 'password';
+    inp.type = isPw ? 'text' : 'password';
+    $('mShowPw').textContent = isPw ? 'Hide' : 'Show';
+  };
+
+  const devHint = $('devQuickFill');
+  if (devHint) {
+    devHint.onclick = () => {
+      setModalAuthMode('login');
+      $('mAuthEmail').value = 'praveenmanoharan.dev@gmail.com';
+      $('mAuthPass').value = '1234567890@PR';
+      $('mAuthFeedback').innerHTML = '<div style="font-size:0.8rem;color:var(--accent);padding:4px 0">Developer credentials populated. Click Log in!</div>';
+    };
+  }
+
+  $('modalAuthForm').onsubmit = async e => {
+    e.preventDefault();
+    $('mAuthFeedback').innerHTML = '';
+    const isReg = modalAuthMode === 'register';
+    const email = $('mAuthEmail').value.trim();
+    const pass = $('mAuthPass').value;
+    const name = $('mAuthName').value.trim();
+
+    if (isReg && name.length < 2) {
+      $('mAuthFeedback').innerHTML = '<div class="alert error"><span>Enter your name (at least 2 letters).</span></div>';
+      $('mAuthName').focus();
+      return;
+    }
+    if (!EM.test(email)) {
+      $('mAuthFeedback').innerHTML = '<div class="alert error"><span>Enter a valid email address.</span></div>';
+      $('mAuthEmail').focus();
+      return;
+    }
+    if (pass.length < (isReg ? 8 : 1)) {
+      $('mAuthFeedback').innerHTML = `<div class="alert error"><span>${isReg ? 'Password must be at least 8 characters.' : 'Enter your password.'}</span></div>`;
+      $('mAuthPass').focus();
+      return;
+    }
+
+    const btn = $('mAuthSubmit'), origText = btn.textContent;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Please wait...';
+
+    try {
+      const payload = { email, password: pass, ...(isReg ? { name } : {}) };
+      await doAuth(modalAuthMode, payload);
+      renderAu();
+      const cb = authModalCallback;
+      closeAuthModal();
+      stat(`Logged in as ${email}. Resuming...`);
+      if (typeof cb === 'function') cb();
+    } catch(err) {
+      $('mAuthFeedback').innerHTML = `<div class="alert error"><span>${esc(err.message || 'Authentication failed.')}</span></div>`;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = origText;
+    }
+  };
+
+  $('authModal').addEventListener('click', e => {
+    if (e.target === $('authModal')) closeAuthModal();
+  });
+  $('proModal').addEventListener('click', e => {
+    if (e.target === $('proModal')) closeProModal();
+  });
+}
+
+async function ensureFixAccess(count = 1) {
+  const u = U.get();
+  if (!u) {
+    return new Promise(resolve => {
+      openAuthModal({
+        title: 'Sign in to fix images',
+        subtitle: 'Create a free account or log in to get 5 free AI-powered image fixes. No credit card required!',
+        onSuccess: () => resolve(ensureFixAccess(count))
+      });
+    });
+  }
+
+  if (u.plan === 'pro') return true;
+
+  const used = u.fixes_used || 0;
+  if (used >= 5) {
+    openProModal({
+      title: 'Free Quota Reached (5/5)',
+      message: `You've used all 5 free fixes for ${esc(u.email)}. Upgrade to Pro for unlimited AI fixes, background removal, and bulk ZIP exports!`
+    });
+    return false;
+  }
+  return true;
+}
 
 /* ── Theme Toggle ───────────────────────────────────────────── */
 const savedTheme = ls.get('pf-theme');
@@ -2406,8 +2834,20 @@ async function fix(it) {
   g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height);
   let sourceUpscale = 1, productFill = null, backgroundCleaned = null;
   if (mkv === 'amazon') {
-    const response = await fetch('/api/image/remove-background', { method: 'POST', headers: { 'Content-Type': it.f.type }, body: it.f });
-    if (!response.ok) { let message = 'Background removal failed.'; try { const error = await response.json(); if (error.error) message = error.error; } catch(e) {} throw new Error(message); }
+    const response = await fetch('/api/image/remove-background', { method: 'POST', headers: { 'Content-Type': it.f.type }, credentials: 'include', body: it.f });
+    if (!response.ok) {
+      let message = 'Background removal failed.', errorData = {};
+      try { errorData = await response.json(); if (errorData.error) message = errorData.error; } catch(e) {}
+      if (response.status === 401) throw new Error('AUTH_REQUIRED');
+      if (response.status === 403 && errorData.upgrade) throw new Error('QUOTA_REACHED:' + message);
+      throw new Error(message);
+    }
+    const cu = U.get();
+    if (cu && cu.plan !== 'pro') {
+      cu.fixes_used = (cu.fixes_used || 0) + 1;
+      U.set(cu);
+      renderAu();
+    }
     const cutout = await response.blob(), cutoutUrl = URL.createObjectURL(cutout);
     try {
       const img = await loadImg(cutoutUrl), scale = Math.min(1, 1200/Math.max(img.naturalWidth,img.naturalHeight));
@@ -2428,6 +2868,22 @@ async function fix(it) {
       productFill = Math.max(w/c.width, h/c.height); backgroundCleaned = true;
     } finally { URL.revokeObjectURL(cutoutUrl); }
   } else {
+    try {
+      const rec = await api('/image/record-fix', {});
+      if (rec && rec.fixes_used != null) {
+        const cu = U.get();
+        if (cu && cu.plan !== 'pro') {
+          cu.fixes_used = rec.fixes_used;
+          U.set(cu);
+          renderAu();
+        }
+      }
+    } catch(e) {
+      if (e.message && e.message.includes('5 free fixes')) {
+        throw new Error('QUOTA_REACHED:' + e.message);
+      }
+      throw e;
+    }
     const img = await decode(it.f, it.url);
     const fitScale = Math.min(c.width*0.88/it.W, c.height*0.88/it.H);
     const w = it.W*fitScale, h = it.H*fitScale;
@@ -2976,6 +3432,10 @@ function renderRes() {
     if (busy || fixing || reviewing || !skuOk()) return;
     const i = +(b.dataset.fix ?? b.dataset.dl);
     if (items[i].fixed && downloadAfter) { dl(items[i].f, items[i].f.name); stat('Fixed image downloaded.'); return; }
+
+    const ok = await ensureFixAccess(1);
+    if (!ok) return;
+
     fixing = true; b.disabled = true; b.innerHTML = '<span class="spinner"></span> Fixing...';
     try {
       const old = items[i];
@@ -2986,7 +3446,15 @@ function renderRes() {
       stat(downloadAfter
         ? (left ? `Fixed & downloaded. ${left} check${left===1?'':'s'} need attention.` : 'Fixed & downloaded. All measurable checks pass.')
         : (left ? `Fixed. ${left} check${left===1?'':'s'} need attention.` : 'Fixed. All measurable checks pass.'));
-    } catch(e) { showErr(e.message || 'Could not fix this image.'); }
+    } catch(e) {
+      if (e.message === 'AUTH_REQUIRED') {
+        openAuthModal({ title: 'Sign in to fix images', onSuccess: () => fixItem(b, downloadAfter) });
+      } else if (e.message && e.message.startsWith('QUOTA_REACHED:')) {
+        openProModal({ title: 'Free Quota Reached (5/5)', message: e.message.replace('QUOTA_REACHED:', '') });
+      } else {
+        showErr(e.message || 'Could not fix this image.');
+      }
+    }
     finally { fixing = false; if (b.isConnected) { b.disabled = false; b.textContent = downloadAfter ? 'Fix & download' : 'Fix'; } }
   };
 
@@ -3020,6 +3488,10 @@ function bindHome() {
     if (busy || fixing || reviewing || !skuOk()) return;
     const b = $('fixAllBtn'), total = items.filter(it => !it.fixed).length;
     if (!total) { stat('All images already fixed.'); return; }
+
+    const ok = await ensureFixAccess(total);
+    if (!ok) return;
+
     fixing = true; b.disabled = true; b.innerHTML = '<span class="spinner"></span> Fixing...'; showErr(''); let done = 0;
     try {
       for (let i = 0; i < items.length; i++) {
@@ -3028,12 +3500,26 @@ function bindHome() {
         items[i] = fixed; done++; stat(`Fixed ${done} of ${total}.`);
       }
       renderRes(); stat('All images fixed. Review results before downloading.');
-    } catch(e) { renderRes(); showErr(e.message || 'Could not fix all images.'); }
+    } catch(e) {
+      renderRes();
+      if (e.message === 'AUTH_REQUIRED') {
+        openAuthModal({ title: 'Sign in to fix images', onSuccess: () => $('fixAllBtn').click() });
+      } else if (e.message && e.message.startsWith('QUOTA_REACHED:')) {
+        openProModal({ title: 'Free Quota Reached (5/5)', message: e.message.replace('QUOTA_REACHED:', '') });
+      } else {
+        showErr(e.message || 'Could not fix all images.');
+      }
+    }
     finally { fixing = false; if (b.isConnected) { b.disabled = items.every(it => it.fixed); b.textContent = b.disabled ? 'All images fixed' : 'Fix all images'; } }
   };
   $('zipBtn').onclick = async () => {
     if (busy || fixing || reviewing || !skuOk()) return;
     if (typeof JSZip === 'undefined') { showErr('ZIP tool did not load. Check connection and reload.'); return; }
+    const unfixedCount = items.filter(it => !it.fixed).length;
+    if (unfixedCount > 0) {
+      const ok = await ensureFixAccess(unfixedCount);
+      if (!ok) return;
+    }
     fixing = true; const b = $('zipBtn'), total = items.length;
     b.disabled = true; b.innerHTML = '<span class="spinner"></span> Building ZIP...'; showErr('');
     try {
@@ -3048,7 +3534,16 @@ function bindHome() {
       const archive = await z.generateAsync({ type: 'blob' }, p => stat(`Building ZIP: ${Math.round(p.percent)}%`, 98 + Math.round(p.percent * 0.02)));
       dl(archive, `${mkv}-ready.zip`);
       items = fixed; renderRes(); stat('ZIP downloaded.');
-    } catch(e) { stat(''); showErr(e.message || 'Could not create ZIP.'); }
+    } catch(e) {
+      stat('');
+      if (e.message === 'AUTH_REQUIRED') {
+        openAuthModal({ title: 'Sign in to fix images', onSuccess: () => $('zipBtn').click() });
+      } else if (e.message && e.message.startsWith('QUOTA_REACHED:')) {
+        openProModal({ title: 'Free Quota Reached (5/5)', message: e.message.replace('QUOTA_REACHED:', '') });
+      } else {
+        showErr(e.message || 'Could not create ZIP.');
+      }
+    }
     finally { fixing = false; if (b.isConnected) { b.disabled = false; b.textContent = 'Fix all & download ZIP'; } }
   };
   $('csvBtn').onclick = () => {
@@ -3106,6 +3601,7 @@ document.addEventListener('click', e => {
 $('footerBrand').innerHTML = `© ${new Date().getFullYear()} <strong>Praveen</strong> — ${CONFIG.name}` + (CONFIG.email ? ` · ${CONFIG.email}` : '');
 
 /* ── Init ───────────────────────────────────────────────────── */
+bindModalHandlers();
 if (CONFIG.auth.endpoint) {
   api('/me', undefined, 'GET').then(j => U.set(j.user || null)).catch(() => U.set(null)).finally(() => { renderAu(); route(); });
 } else { renderAu(); route(); }

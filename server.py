@@ -305,6 +305,10 @@ def connect_db() -> Generator[sqlite3.Connection, None, None]:
         connection.close()
 
 
+DEV_EMAIL = "praveenmanoharan.dev@gmail.com"
+DEV_PASSWORD = "1234567890@PR"
+
+
 def initialize_database() -> None:
     """Create tables and ensure schema is up to date."""
     with connect_db() as connection:
@@ -319,6 +323,7 @@ def initialize_database() -> None:
                 password_hash BLOB NOT NULL,
                 plan TEXT NOT NULL DEFAULT 'free',
                 role TEXT NOT NULL DEFAULT 'user',
+                fixes_used INTEGER NOT NULL DEFAULT 0,
                 created_at INTEGER NOT NULL
             );
             CREATE TABLE IF NOT EXISTS sessions (
@@ -333,6 +338,26 @@ def initialize_database() -> None:
             connection.execute(
                 "ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'user'"
             )
+        if "fixes_used" not in columns:
+            connection.execute(
+                "ALTER TABLE users ADD COLUMN fixes_used INTEGER NOT NULL DEFAULT 0"
+            )
+
+        # Ensure developer owner account exists with Pro + Admin privileges
+        dev_salt = secrets.token_bytes(16)
+        dev_pw_hash = password_hash(DEV_PASSWORD, dev_salt)
+        connection.execute(
+            """
+            INSERT INTO users (name, email, salt, password_hash, plan, role, fixes_used, created_at)
+            VALUES (?, ?, ?, ?, 'pro', 'admin', 0, ?)
+            ON CONFLICT(email) DO UPDATE SET
+                password_hash=excluded.password_hash,
+                salt=excluded.salt,
+                plan='pro',
+                role='admin'
+            """,
+            ("Praveen (Developer)", DEV_EMAIL, dev_salt, dev_pw_hash, int(time.time())),
+        )
         connection.execute(
             "UPDATE users SET plan='pro', role='admin' WHERE lower(email)=?",
             (OWNER_EMAIL,),
@@ -345,13 +370,22 @@ def password_hash(password: str, salt: bytes) -> bytes:
     )
 
 
-def public_user(row: sqlite3.Row) -> dict[str, str]:
+def public_user(row: sqlite3.Row) -> dict[str, object]:
+    fixes_used = 0
+    try:
+        fixes_used = row["fixes_used"]
+    except (IndexError, KeyError, TypeError):
+        pass
     return {
         "name": row["name"],
         "email": row["email"],
         "plan": row["plan"],
         "role": row["role"],
+        "fixes_used": fixes_used,
+        "max_free_fixes": 5,
+        "unlimited": row["plan"] == "pro",
     }
+
 
 
 def provision_owner(email: str, name: str, password: str) -> None:
@@ -526,6 +560,9 @@ class PreflightHandler(BaseHTTPRequestHandler):
         if path == "/api/image/review":
             self.review_image_handler()
             return
+        if path == "/api/image/record-fix":
+            self.record_fix_handler()
+            return
         if path == "/api/forgot":
             self.send_json(
                 503,
@@ -544,7 +581,63 @@ class PreflightHandler(BaseHTTPRequestHandler):
         else:
             self.login(data)
 
+    def record_fix_handler(self) -> None:
+        user = self.current_user()
+        if not user:
+            self.send_json(
+                401,
+                {"error": "Please log in to fix images.", "auth_required": True},
+            )
+            return
+
+        if user["plan"] != "pro" and user["fixes_used"] >= 5:
+            self.send_json(
+                403,
+                {
+                    "error": "You have used all 5 free fixes for this email. Upgrade to Pro for unlimited AI fixes!",
+                    "upgrade": True,
+                    "fixes_used": user["fixes_used"],
+                    "limit": 5,
+                },
+            )
+            return
+
+        with connect_db() as connection:
+            connection.execute(
+                "UPDATE users SET fixes_used = fixes_used + 1 WHERE id = ?",
+                (user["id"],),
+            )
+            updated = connection.execute(
+                "SELECT * FROM users WHERE id = ?", (user["id"],)
+            ).fetchone()
+
+        self.send_json(
+            200,
+            {
+                "ok": True,
+                "fixes_used": updated["fixes_used"],
+                "plan": updated["plan"],
+                "remaining": (
+                    999999 if updated["plan"] == "pro" else max(0, 5 - updated["fixes_used"])
+                ),
+            },
+        )
+
     def remove_background_handler(self) -> None:
+        user = self.current_user()
+        if user:
+            if user["plan"] != "pro" and user["fixes_used"] >= 5:
+                self.send_json(
+                    403,
+                    {
+                        "error": "You have used all 5 free fixes for this email. Upgrade to Pro for unlimited AI fixes!",
+                        "upgrade": True,
+                        "fixes_used": user["fixes_used"],
+                        "limit": 5,
+                    },
+                )
+                return
+
         content_type = (
             self.headers.get("Content-Type", "").split(";", 1)[0].strip().lower()
         )
@@ -582,6 +675,14 @@ class PreflightHandler(BaseHTTPRequestHandler):
         except ImageProcessingError as error:
             self.send_json(502, {"error": str(error)})
             return
+
+        if user:
+            with connect_db() as connection:
+                connection.execute(
+                    "UPDATE users SET fixes_used = fixes_used + 1 WHERE id = ?",
+                    (user["id"],),
+                )
+
         self.send_image(result, result_type)
 
     def review_image_handler(self) -> None:
