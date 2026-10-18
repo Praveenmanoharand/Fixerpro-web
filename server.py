@@ -57,7 +57,10 @@ def read_env_file(path: Path) -> dict[str, str]:
 for _key, _value in read_env_file(ENV_FILE).items():
     os.environ.setdefault(_key, _value)
 
-DB_PATH = Path(os.environ.get("LISTING_PREFLIGHT_DB", ROOT / "listingpreflight.sqlite3"))
+if os.environ.get("VERCEL"):
+    DB_PATH = Path("/tmp/listingpreflight.sqlite3")
+else:
+    DB_PATH = Path(os.environ.get("LISTING_PREFLIGHT_DB", ROOT / "listingpreflight.sqlite3"))
 HOST = os.environ.get("LISTING_PREFLIGHT_HOST", "127.0.0.1")
 PORT = int(os.environ.get("LISTING_PREFLIGHT_PORT", "8000"))
 OWNER_EMAIL = (
@@ -430,8 +433,18 @@ class PreflightHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def do_OPTIONS(self) -> None:
+        self.send_response(204)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, X-Marketplace, Cookie")
+        self.end_headers()
+
     def do_GET(self) -> None:
         path = unquote(urlsplit(self.path).path)
+        if not path.startswith("/api/"):
+            if path in ("/me", "/health", "/admin/summary"):
+                path = "/api" + path
 
         # API endpoints
         if path == "/api/me":
@@ -492,14 +505,17 @@ class PreflightHandler(BaseHTTPRequestHandler):
             return
 
         origin = self.headers.get("Origin")
-        if origin and urlsplit(origin).netloc != self.headers.get("Host"):
+        if origin and urlsplit(origin).netloc != self.headers.get("Host") and not os.environ.get("VERCEL"):
             self.send_json(403, {"error": "Cross-origin requests are not allowed."})
             return
 
         path = unquote(urlsplit(self.path).path)
         if not path.startswith("/api/"):
-            self.send_json(404, {"error": "Not found."})
-            return
+            if path.startswith("/image/") or path in ("/register", "/login", "/logout", "/forgot"):
+                path = "/api" + path
+            else:
+                self.send_json(404, {"error": "Not found."})
+                return
 
         if path == "/api/logout":
             self.logout()

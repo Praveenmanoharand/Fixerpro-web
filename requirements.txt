@@ -1,0 +1,2 @@
+# ListingPreflight — Zero external dependencies
+# Built entirely using Python standard library
