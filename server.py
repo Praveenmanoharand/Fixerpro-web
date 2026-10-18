@@ -827,5 +827,10 @@ def main() -> None:
         httpd.server_close()
 
 
+handler = PreflightHandler
+app = PreflightHandler
+application = PreflightHandler
+
+
 if __name__ == "__main__":
     main()
