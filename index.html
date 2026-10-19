@@ -133,9 +133,37 @@ body {
   color: var(--text-primary);
   background: var(--bg-primary);
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+main {
+  flex: 1 0 auto;
+  min-height: 75vh;
+  width: 100%;
+}
+
+.page-enter {
+  animation: pageZoomIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes pageZoomIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.96) translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter { animation: none; }
 }
 
 /* ── Animated Background ──────────────────────────────────── */
@@ -1398,7 +1426,7 @@ fieldset { min-width: 0; }
   .menu { min-width: min(260px, calc(100vw - 32px)); }
 
   /* ── Hamburger button + slide-in drawer (replaces the old bottom tab bar) ── */
-  main { min-height: 60vh; }
+  main { min-height: 80vh; }
   .nav-toggle {
     display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
     width: 44px; height: 44px; padding: 0; cursor: pointer;
@@ -2791,10 +2819,15 @@ function route() {
   meta('og:title', ti, 'property'); meta('og:description', p.d, 'property');
   meta('twitter:title', ti); meta('twitter:description', p.d);
 
-  try { $('main').innerHTML = p.h(); } catch(e) { $('main').innerHTML = '<div class="container page-content"><h1>Something went wrong.</h1><p><a href="#/">Go to the checker</a> or reload.</p></div>'; }
+  const mainEl = $('main');
+  mainEl.classList.remove('page-enter');
+  void mainEl.offsetWidth; // Force CSS reflow to replay zoom-in animation
+  mainEl.classList.add('page-enter');
+
+  try { mainEl.innerHTML = p.h(); } catch(e) { mainEl.innerHTML = '<div class="container page-content"><h1>Something went wrong.</h1><p><a href="#/">Go to the checker</a> or reload.</p></div>'; }
   document.querySelectorAll('nav a').forEach(a => a.dataset.r === key && !bad ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current'));
   const s = STICKY[key]; $('stickyCta').hidden = !s; if (s) { $('stickyBtn').textContent = s[0]; $('stickyBtn').disabled = false; $('stickyBtn').onclick = s[1]; }
-  window.scrollTo(0, 0); $('main').focus({ preventScroll: true });
+  window.scrollTo(0, 0); mainEl.focus({ preventScroll: true });
   try {
     if (key === '') { bindHome(); bindPrice(); }
     if (key === 'pricing') bindPrice();
@@ -3262,9 +3295,20 @@ $('footerBrand').innerHTML = `© ${new Date().getFullYear()} <strong>Verdict</st
 
 /* ── Init ───────────────────────────────────────────────────── */
 bindModalHandlers();
+// Instant initial route render (no delay or footer-jump on load)
+renderAu();
+route();
+
+// Background auth refresh to verify live session cookies without blocking main UI
 if (CONFIG.auth.endpoint) {
-  api('/me', undefined, 'GET').then(j => U.set(j.user || null)).catch(() => U.set(null)).finally(() => { renderAu(); route(); });
-} else { renderAu(); route(); }
+  api('/me', undefined, 'GET').then(j => {
+    U.set(j.user || null);
+    renderAu();
+  }).catch(() => {
+    U.set(null);
+    renderAu();
+  });
+}
 </script>
 </body>
 </html>
