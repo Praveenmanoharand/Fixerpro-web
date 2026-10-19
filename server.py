@@ -402,6 +402,7 @@ def initialize_database() -> None:
                     plan TEXT NOT NULL DEFAULT 'free',
                     role TEXT NOT NULL DEFAULT 'user',
                     fixes_used INTEGER NOT NULL DEFAULT 0,
+                    plan_expires_at BIGINT DEFAULT 0,
                     created_at BIGINT NOT NULL
                 );
                 CREATE TABLE IF NOT EXISTS sessions (
@@ -409,6 +410,7 @@ def initialize_database() -> None:
                     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
                     expires_at BIGINT NOT NULL
                 );
+                ALTER TABLE users ADD COLUMN IF NOT EXISTS plan_expires_at BIGINT DEFAULT 0;
                 """
             )
         else:
@@ -424,6 +426,7 @@ def initialize_database() -> None:
                     plan TEXT NOT NULL DEFAULT 'free',
                     role TEXT NOT NULL DEFAULT 'user',
                     fixes_used INTEGER NOT NULL DEFAULT 0,
+                    plan_expires_at INTEGER DEFAULT 0,
                     created_at INTEGER NOT NULL
                 );
                 CREATE TABLE IF NOT EXISTS sessions (
@@ -438,6 +441,8 @@ def initialize_database() -> None:
                 connection.execute("ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'user'")
             if "fixes_used" not in columns:
                 connection.execute("ALTER TABLE users ADD COLUMN fixes_used INTEGER NOT NULL DEFAULT 0")
+            if "plan_expires_at" not in columns:
+                connection.execute("ALTER TABLE users ADD COLUMN plan_expires_at INTEGER DEFAULT 0")
 
         # Ensure developer owner account exists with Pro + Admin privileges
         dev_salt = secrets.token_bytes(16)
@@ -474,14 +479,33 @@ def public_user(row: Any) -> dict[str, object]:
         fixes_used = row["fixes_used"]
     except (IndexError, KeyError, TypeError):
         pass
+
+    plan = row["plan"]
+    plan_expires_at = 0
+    try:
+        plan_expires_at = int(row["plan_expires_at"] or 0)
+    except (IndexError, KeyError, TypeError, ValueError):
+        pass
+
+    now = int(time.time())
+    # If Pro plan has expired, treat as free
+    if plan == "pro" and plan_expires_at > 0 and plan_expires_at < now and row["role"] != "admin":
+        plan = "free"
+
+    days_left = 0
+    if plan == "pro" and plan_expires_at > now:
+        days_left = max(1, int((plan_expires_at - now) / 86400))
+
     return {
         "name": row["name"],
         "email": row["email"],
-        "plan": row["plan"],
+        "plan": plan,
         "role": row["role"],
         "fixes_used": fixes_used,
+        "plan_expires_at": plan_expires_at,
+        "days_left": days_left,
         "max_free_fixes": 5,
-        "unlimited": row["plan"] == "pro",
+        "unlimited": plan == "pro",
     }
 
 
@@ -762,11 +786,13 @@ class PreflightHandler(BaseHTTPRequestHandler):
             self.send_json(400, {"error": "Payment verification failed. Invalid signature."})
             return
 
-        # Upgrade user in Database
+        # Upgrade user in Database with 30-day validity
+        now = int(time.time())
+        expires_at = now + (30 * 86400)  # 30 days in seconds
         with connect_db() as connection:
             connection.execute(
-                "UPDATE users SET plan = 'pro', fixes_used = 0 WHERE id = ?",
-                (user["id"],)
+                "UPDATE users SET plan = 'pro', fixes_used = 0, plan_expires_at = ? WHERE id = ?",
+                (expires_at, user["id"])
             )
             updated_user = connection.execute(
                 "SELECT * FROM users WHERE id = ?",

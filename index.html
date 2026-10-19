@@ -2569,6 +2569,10 @@ function priceHTML() {
   const li = t => `<li>${ico('ok')}<span>${t}</span></li>`;
   const yes = `<span style="color:var(--success)">${ico('ok')}<span class="sr-only">Included</span></span>`;
   const no = '<span style="color:var(--text-muted)" aria-hidden="true">&ndash;</span><span class="sr-only">Not included</span>';
+  const u = U.get();
+  const isPro = u && u.plan === 'pro';
+  const daysLeft = u && u.days_left ? u.days_left : 30;
+
   return `<section class="container section" id="pricing" aria-labelledby="pricingTitle">
     <div class="pricing-header">
       <span class="badge">Pricing</span>
@@ -2580,19 +2584,23 @@ function priceHTML() {
       </div>
     </div>
     <div class="plans-grid">
-      <article class="plan-card card">
+      <article class="plan-card card" style="${!isPro ? 'border-color:var(--accent);box-shadow:0 0 20px rgba(47,207,143,0.12)' : ''}">
+        ${!isPro ? '<span class="plan-badge" style="background:var(--accent);color:#0d1311;font-weight:700">Your Current Plan</span>' : ''}
         <h3>Free</h3><p class="mono" style="margin:0">To try it out</p>
         <p class="plan-price">${cur(0)}<span>forever</span></p>
         <ul>${li(`${FREE} images per check`)}${li('Amazon & Etsy rule checks')}${li('Auto-fix & ZIP download')}${li('Runs in your browser')}</ul>
-        <a class="btn" href="#/">Start checking</a>
+        <a class="btn ${!isPro ? 'disabled' : ''}" href="#/" style="${!isPro ? 'pointer-events:none;opacity:0.75' : ''}">${!isPro ? '✓ Currently Active' : 'Free Plan'}</a>
       </article>
-      <article class="plan-card pro card card-glow">
-        <span class="plan-badge">Most popular</span>
+      <article class="plan-card pro card card-glow" style="${isPro ? 'border-color:var(--accent);box-shadow:0 0 35px rgba(47,207,143,0.3)' : ''}">
+        <span class="plan-badge" style="${isPro ? 'background:var(--accent);color:#0d1311;font-weight:700' : ''}">${isPro ? '✓ Active Plan' : 'Most popular'}</span>
         <h3>Pro</h3><p class="mono" style="margin:0">For active sellers</p>
         <p class="plan-price">${cur(amt)}<span>per ${y ? 'year' : 'month'}</span></p>
-        <p class="mono" style="margin:0;min-height:1.5em">${y ? cur(Math.round(P.year/12*100)/100) + '/month, billed yearly' : 'Yearly saves ' + save + '%'}</p>
+        <p class="mono" style="margin:0;min-height:1.5em">${isPro ? `<span style="color:var(--accent);font-weight:600">Active · ${daysLeft} days remaining</span>` : (y ? cur(Math.round(P.year/12*100)/100) + '/month, billed yearly' : 'Yearly saves ' + save + '%')}</p>
         <ul>${li('Up to 200 images per check')}${li('CSV report of every check')}${li('Email support')}${li('Everything in Free')}</ul>
-        <a class="btn primary" href="#/checkout?plan=pro&cycle=${cycle}">Get Pro</a>
+        ${isPro 
+          ? `<button class="btn primary" disabled style="opacity:0.9;cursor:default;background:var(--accent);color:#0d1311;font-weight:600">✓ Current Plan (${daysLeft}d left)</button>`
+          : `<a class="btn primary" href="#/checkout?plan=pro&cycle=${cycle}">Get Pro</a>`
+        }
       </article>
     </div>
     <ul class="trust-list"><li>${ico('ok')}Cancel any time</li><li>${ico('ok')}${CONFIG.refundDays}-day refund</li><li>${ico('ok')}Card details never touch this site</li></ul>
