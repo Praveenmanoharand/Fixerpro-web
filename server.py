@@ -18,10 +18,13 @@ import urllib.error
 import urllib.request
 from collections import defaultdict
 from contextlib import contextmanager
+from email.message import EmailMessage
 from getpass import getpass
 from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+import smtplib
+import ssl
 from typing import Any, Generator
 from urllib.parse import unquote, urlsplit
 
@@ -67,6 +70,8 @@ DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
 RAZORPAY_KEY_ID = os.environ.get("RAZORPAY_KEY_ID", "").strip()
 RAZORPAY_KEY_SECRET = os.environ.get("RAZORPAY_KEY_SECRET", "").strip()
 PRO_PLAN_PRICE = int(os.environ.get("PRO_PLAN_PRICE", "499"))
+SMTP_EMAIL = os.environ.get("SMTP_EMAIL", "officialverdictv@gmail.com").strip()
+SMTP_APP_PASSWORD = os.environ.get("SMTP_APP_PASSWORD", "").strip()
 
 if os.environ.get("VERCEL"):
     DB_PATH = Path("/tmp/listingpreflight.sqlite3")
@@ -637,7 +642,7 @@ class PreflightHandler(BaseHTTPRequestHandler):
 
         path = unquote(urlsplit(self.path).path)
         if not path.startswith("/api/"):
-            if path.startswith("/image/") or path in ("/register", "/login", "/logout", "/forgot"):
+            if path.startswith("/image/") or path in ("/register", "/login", "/logout", "/forgot", "/contact"):
                 path = "/api" + path
             else:
                 self.send_json(404, {"error": "Not found."})
@@ -660,6 +665,9 @@ class PreflightHandler(BaseHTTPRequestHandler):
             return
         if path == "/api/image/record-fix":
             self.record_fix_handler()
+            return
+        if path == "/api/contact":
+            self.contact_handler()
             return
         if path == "/api/forgot":
             self.send_json(
@@ -770,6 +778,59 @@ class PreflightHandler(BaseHTTPRequestHandler):
             "message": "Payment verified! Your account is now upgraded to Pro.",
             "user": public_user(updated_user) if updated_user else None
         })
+
+    def contact_handler(self) -> None:
+        data = self.read_json()
+        if not data:
+            return
+
+        name = str(data.get("name", "")).strip()
+        email = str(data.get("email", "")).strip()
+        message = str(data.get("message", "")).strip()
+
+        if not name or len(name) < 2:
+            self.send_json(400, {"error": "Please provide your name (at least 2 characters)."})
+            return
+        if not email or not EMAIL_RE.fullmatch(email):
+            self.send_json(400, {"error": "Please provide a valid email address."})
+            return
+        if not message or len(message) < 5:
+            self.send_json(400, {"error": "Message must be at least 5 characters long."})
+            return
+
+        if not SMTP_EMAIL or not SMTP_APP_PASSWORD:
+            self.send_json(503, {"error": "Email service is not configured on this server."})
+            return
+
+        try:
+            msg = EmailMessage()
+            msg["Subject"] = f"New Contact Message from Verdict - {name}"
+            msg["From"] = f"Verdict Contact Form <{SMTP_EMAIL}>"
+            msg["To"] = SMTP_EMAIL
+            msg["Reply-To"] = email
+            msg.set_content(
+                f"You received a new message from the Verdict contact form:\n\n"
+                f"Name: {name}\n"
+                f"Email: {email}\n"
+                f"Time: {time.strftime('%Y-%m-%d %H:%M:%S UTC', time.gmtime())}\n\n"
+                f"--------------------------------------------------\n"
+                f"Message:\n{message}\n"
+                f"--------------------------------------------------\n\n"
+                f"You can simply reply to this email to respond directly to {name}."
+            )
+
+            context = ssl.create_default_context()
+            with smtplib.SMTP("smtp.gmail.com", 587, timeout=15) as server:
+                server.starttls(context=context)
+                server.login(SMTP_EMAIL, SMTP_APP_PASSWORD)
+                server.send_message(msg)
+
+            self.send_json(200, {
+                "ok": True,
+                "message": "Thank you! Your message has been sent successfully. We will get back to you shortly."
+            })
+        except Exception as err:
+            self.send_json(502, {"error": f"Failed to deliver message: {err}"})
 
     def record_fix_handler(self) -> None:
         user = self.current_user()

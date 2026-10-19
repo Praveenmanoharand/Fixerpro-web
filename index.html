@@ -352,6 +352,7 @@ h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; }
   border-radius: var(--radius-full);
   background: var(--accent-subtle); color: var(--accent);
   border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+  margin-bottom: 22px;
 }
 
 /* ── Forms ─────────────────────────────────────────────────── */
@@ -1895,7 +1896,8 @@ const CONFIG = {
   name: 'Verdict',
   siteUrl: '',
   operator: 'Praveen',
-  email: 'praveenmanoharan.dev@gmail.com',
+  email: 'officialverdictv@gmail.com',
+  ownerEmail: 'praveenmanoharan.dev@gmail.com',
   jurisdiction: '',
   provider: '',
   refundDays: 7,
@@ -2719,7 +2721,7 @@ const PAGES = {
     <form id="contactForm" novalidate><div class="field"><label for="contactName">Name</label><input type="text" id="contactName" autocomplete="name" aria-describedby="contactNameErr"><p class="field-error" id="contactNameErr"></p></div>
     <div class="field"><label for="contactEmail">Email</label><input type="email" id="contactEmail" autocomplete="email" aria-describedby="contactEmailErr"><p class="field-error" id="contactEmailErr"></p></div>
     <div class="field"><label for="contactMsg">Message</label><textarea id="contactMsg" rows="5" aria-describedby="contactMsgErr"></textarea><p class="field-error" id="contactMsgErr"></p></div>
-    <button class="btn primary" type="submit">Send message</button><div id="contactStatus" role="status" aria-live="polite" style="margin-top:12px"></div></form>
+    <button class="btn primary" type="submit" id="contactSubmit">Send message</button><div id="contactStatus" role="status" aria-live="polite" style="margin-top:12px"></div></form>
     ${contactInfoHTML()}</div>`
   },
   'login': { t: 'Log in', d: 'Log in to your Verdict account.', h: () => authShell('Log in', 'Welcome back to Verdict.', `<form id="authForm" novalidate data-m="login">${authField('authEmail','Email','email','email')}${authField('authPass','Password','password','current-password')}<p style="margin:0 0 14px"><a href="#/forgot">Forgot your password?</a></p><button class="btn primary" id="authSubmit" type="submit" style="width:100%">Log in</button></form>`, 'New here? <a href="#/register">Create an account</a>') },
@@ -2750,7 +2752,8 @@ const authField = (id, l, type, ac, hint = '') => `<div class="field"><label for
 const authShell = (h, sub, body, foot) => `<div class="container section"><div class="auth-card card"><h1>${h}</h1><p class="lead" style="font-size:1rem">${sub}</p>${body}<div id="authFeedback"></div><p class="note" style="text-align:center">${foot}</p></div></div>`;
 function contactInfoHTML() {
   const C = CONFIG.contact, r = [];
-  if (CONFIG.email) r.push(['Email', `<a href="mailto:${esc(CONFIG.email)}">${esc(CONFIG.email)}</a>`]);
+  if (CONFIG.email) r.push(['Official Support', `<a href="mailto:${esc(CONFIG.email)}">${esc(CONFIG.email)}</a>`]);
+  if (CONFIG.ownerEmail) r.push(['Developer & Owner', `<a href="mailto:${esc(CONFIG.ownerEmail)}">${esc(CONFIG.ownerEmail)}</a>`]);
   if (C.phone) r.push(['Phone', `<a href="tel:${esc(C.phone.replace(/[^\d+]/g, ''))}">${esc(C.phone)}</a>`]);
   if (C.address) r.push(['Address', esc(C.address)]);
   if (C.hours) r.push(['Hours', esc(C.hours)]);
@@ -3110,17 +3113,43 @@ function bindHome() {
 }
 
 function bindContact() {
-  $('contactForm').onsubmit = e => {
-    e.preventDefault();
+  const form = $('contactForm');
+  if (!form) return;
+  form.onsubmit = async e => {
+    if (e && e.preventDefault) e.preventDefault();
     const n = $('contactName'), m = $('contactEmail'), g = $('contactMsg');
     const set = (id, el, msg) => { $(id).textContent = msg; el.setAttribute('aria-invalid', msg ? 'true' : 'false'); return !msg; };
     const a = set('contactNameErr', n, n.value.trim() ? '' : 'Enter your name.');
     const b = set('contactEmailErr', m, EM.test(m.value.trim()) ? '' : 'Enter a valid email.');
-    const c = set('contactMsgErr', g, g.value.trim().length >= 10 ? '' : 'Write at least 10 characters.');
+    const c = set('contactMsgErr', g, g.value.trim().length >= 5 ? '' : 'Write at least 5 characters.');
     if (!(a && b && c)) { (!a ? n : !b ? m : g).focus(); return; }
-    if (!CONFIG.email) { $('contactStatus').innerHTML = '<div class="alert error">No contact email configured.</div>'; return; }
-    location.href = `mailto:${CONFIG.email}?subject=${encodeURIComponent('Verdict message from ' + n.value.trim())}&body=${encodeURIComponent(g.value.trim() + '\n\nReply to: ' + m.value.trim())}`;
-    $('contactStatus').textContent = 'Your email app should open with the message.';
+
+    const submitBtn = $('contactSubmit') || form.querySelector('button');
+    const origText = submitBtn ? submitBtn.textContent : 'Send message';
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner"></span> Sending message...';
+    }
+    $('contactStatus').innerHTML = '<div style="color:var(--text-secondary);font-size:0.9rem"><span class="spinner"></span> Delivering your message to our inbox...</div>';
+
+    try {
+      const res = await api('/contact', {
+        name: n.value.trim(),
+        email: m.value.trim(),
+        message: g.value.trim()
+      });
+      $('contactStatus').innerHTML = `<div class="alert success" role="status" style="margin-top:14px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg><span>${esc(res.message || 'Message sent! We will reply to your email soon.')}</span></div>`;
+      n.value = '';
+      m.value = '';
+      g.value = '';
+    } catch(err) {
+      $('contactStatus').innerHTML = `<div class="alert error" role="alert" style="margin-top:14px"><span>${esc(err.message || 'Failed to send message. Please try again or email us directly.')}</span></div>`;
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = origText;
+      }
+    }
   };
 }
 
@@ -3221,7 +3250,7 @@ document.addEventListener('click', e => {
 });
 
 /* ── Footer ─────────────────────────────────────────────────── */
-$('footerBrand').innerHTML = `© ${new Date().getFullYear()} <strong>Praveen</strong> — ${CONFIG.name}` + (CONFIG.email ? ` · ${CONFIG.email}` : '');
+$('footerBrand').innerHTML = `© ${new Date().getFullYear()} <strong>Verdict</strong> · Owner & Developer: <strong>Praveen</strong> (<a href="mailto:${CONFIG.ownerEmail}" style="color:var(--text-secondary)">${CONFIG.ownerEmail}</a>) · Support: <a href="mailto:${CONFIG.email}" style="color:var(--text-secondary)">${CONFIG.email}</a>`;
 
 /* ── Init ───────────────────────────────────────────────────── */
 bindModalHandlers();
