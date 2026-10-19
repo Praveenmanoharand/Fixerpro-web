@@ -1,4 +1,4 @@
-# 🚀 ListingPreflight — Production-Ready Amazon & Etsy Image Validator & Optimizer
+# 🚀 Verdict — Production-Ready Amazon & Etsy Image Validator & Optimizer
 
 **Developed & Maintained by Praveen**
 
@@ -11,7 +11,7 @@
 
 ## 🌟 Executive Summary
 
-**ListingPreflight** is a high-performance, resilient, production-ready web application engineered for e-commerce sellers on **Amazon** and **Etsy**. It validates listing photos against marketplace standards, automatically fixes background and dimensional issues, provides optional AI visual critiques, and allows bulk ZIP export — all with a sleek, ultra-responsive modern UI.
+**Verdict** is a high-performance, resilient, production-ready web application engineered for e-commerce sellers on **Amazon** and **Etsy**. It validates listing photos against marketplace standards, automatically fixes background and dimensional issues, provides optional AI visual critiques, and allows bulk ZIP export — all with a sleek, ultra-responsive modern UI.
 
 ---
 
@@ -150,5 +150,5 @@ d:\MARKET\
 ## 👨‍💻 Author & Credits
 
 - **Creator & Lead Developer**: **Praveen** (`praveenmanoharan.dev@gmail.com`)
-- **Product**: ListingPreflight v2.0
+- **Product**: Verdict v2.0
 - Built with high attention to performance, resilience, and UI/UX craftsmanship.

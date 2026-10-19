@@ -1,6 +1,6 @@
 [Skip to content](#main)
 
-[ListingPreflight](#/)
+[Verdict](#/)
 
 [Checker](#/)[Pricing](#/pricing)[Rules](#/rules)[Contact](#/contact)
 

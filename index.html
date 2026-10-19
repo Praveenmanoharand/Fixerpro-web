@@ -3,19 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<title>Amazon & Etsy Image Checker | ListingPreflight</title>
+<title>Amazon & Etsy Image Checker | Verdict</title>
 <meta name="description" content="Check product photos against Amazon and Etsy image rules before you upload. See what will likely fail, fix it, and download. Runs in your browser.">
 <meta name="robots" content="index,follow">
 <meta name="theme-color" content="#0d1311">
 <meta name="author" content="Praveen">
 <meta name="keywords" content="amazon image checker, etsy image checker, product photo checker, listing image validator, e-commerce photo tools">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="ListingPreflight">
-<meta property="og:title" content="Amazon & Etsy Image Checker | ListingPreflight">
+<meta property="og:site_name" content="Verdict">
+<meta property="og:title" content="Amazon & Etsy Image Checker | Verdict">
 <meta property="og:description" content="Check product photos against Amazon and Etsy image rules before you upload. Runs in your browser.">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Amazon & Etsy Image Checker | ListingPreflight">
+<meta name="twitter:title" content="Amazon & Etsy Image Checker | Verdict">
 <meta name="twitter:description" content="Check product photos against Amazon and Etsy image rules before you upload.">
 
 <!-- Responsive for ALL devices -->
@@ -1679,12 +1679,12 @@ h1, h2, .plan-price, .modal-header h2 { text-rendering: optimizeLegibility; font
 <!-- ═══ HEADER ════════════════════════════════════════════════ -->
 <header id="header">
   <div class="container">
-    <a class="brand" href="#/" aria-label="ListingPreflight home">
+    <a class="brand" href="#/" aria-label="Verdict home">
       <svg width="24" height="24" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <rect x="1.5" y="1.5" width="13" height="13" rx="2"/>
         <path d="M4.5 8.5l2.5 2.5 4.5-5"/>
       </svg>
-      ListingPreflight
+      Verdict
     </a>
     <nav aria-label="Main" id="mainNav">
       <div class="nav-head">
@@ -1892,7 +1892,7 @@ h1, h2, .plan-price, .modal-header h2 { text-rendering: optimizeLegibility; font
 <script>
 /* ── Configuration ──────────────────────────────────────────── */
 const CONFIG = {
-  name: 'ListingPreflight',
+  name: 'Verdict',
   siteUrl: '',
   operator: 'Praveen',
   email: 'praveenmanoharan.dev@gmail.com',
@@ -1981,7 +1981,7 @@ async function api(path, body, method = 'POST') {
   return j;
 }
 async function doAuth(mode, v) {
-  if (!CONFIG.auth.endpoint) throw new Error('Account service is not connected. Start the ListingPreflight server and try again.');
+  if (!CONFIG.auth.endpoint) throw new Error('Account service is not connected. Start the Verdict server and try again.');
   const j = await api('/' + mode, v);
   U.set(j.user || { name: v.name || v.email.split('@')[0], email: v.email, plan: 'free' });
 }
@@ -2673,7 +2673,7 @@ const PAGES = {
   },
   'pricing': {
     t: 'Pricing',
-    d: 'ListingPreflight pricing. Check 5 images free, or choose Pro for larger batches.',
+    d: 'Verdict pricing. Check 5 images free, or choose Pro for larger batches.',
     h: () => `<div style="padding-top:28px">${priceHTML()}</div>${FAQ_HTML}`
   },
   'rules': {
@@ -2703,18 +2703,18 @@ const PAGES = {
   },
   'checkout': {
     t: 'Checkout',
-    d: 'Review your ListingPreflight Pro order.',
-    h: () => { const P = CONFIG.price, y = qs().get('cycle') === 'year', amt = y ? P.year : P.month; return `<div class="container page-content" style="max-width:940px"><h1>Checkout</h1>${U.get() ? '' : '<p class="note" style="margin:0 0 14px">Have an account? <a href="#/login?next=checkout">Log in</a> first.</p>'}<div class="checkout-grid"><form id="checkoutForm" novalidate><div class="field"><label for="checkoutEmail">Email for receipt</label><input type="email" id="checkoutEmail" autocomplete="email" value="${esc((U.get()||{}).email||'')}" aria-describedby="checkoutEmailErr"><p class="field-error" id="checkoutEmailErr"></p></div><div class="field"><label style="display:flex;font-size:1rem;font-weight:400"><input type="checkbox" id="checkoutTerms" aria-describedby="checkoutTermsErr">I agree to the <a href="#/terms">Terms</a> and <a href="#/refunds">Refund Policy</a>.</label><p class="field-error" id="checkoutTermsErr"></p></div><button class="btn primary" type="submit" id="checkoutSubmit">Continue to secure payment</button><div id="checkoutStatus" role="status" aria-live="polite" style="margin-top:12px"></div><p class="note">Card details go to the payment provider, never this site.</p><ul class="trust-list" style="justify-content:flex-start"><li>${ico('ok')}Secure checkout</li><li>${ico('ok')}${CONFIG.refundDays}-day refund</li></ul></form><aside class="summary-card" aria-label="Order summary"><h2 style="font-size:1.1rem">Order summary</h2><dl><dt>Plan</dt><dd>ListingPreflight Pro</dd><dt>Billing</dt><dd>${y?'Yearly':'Monthly'}</dd><dt>Price</dt><dd>${cur(amt)} per ${y?'year':'month'}</dd></dl><p class="note" style="margin:0">Renews until cancelled. <a href="#/pricing">Change plan</a></p></aside></div></div>`; }
+    d: 'Review your Verdict Pro order.',
+    h: () => { const P = CONFIG.price, y = qs().get('cycle') === 'year', amt = y ? P.year : P.month; return `<div class="container page-content" style="max-width:940px"><h1>Checkout</h1>${U.get() ? '' : '<p class="note" style="margin:0 0 14px">Have an account? <a href="#/login?next=checkout">Log in</a> first.</p>'}<div class="checkout-grid"><form id="checkoutForm" novalidate><div class="field"><label for="checkoutEmail">Email for receipt</label><input type="email" id="checkoutEmail" autocomplete="email" value="${esc((U.get()||{}).email||'')}" aria-describedby="checkoutEmailErr"><p class="field-error" id="checkoutEmailErr"></p></div><div class="field"><label style="display:flex;font-size:1rem;font-weight:400"><input type="checkbox" id="checkoutTerms" aria-describedby="checkoutTermsErr">I agree to the <a href="#/terms">Terms</a> and <a href="#/refunds">Refund Policy</a>.</label><p class="field-error" id="checkoutTermsErr"></p></div><button class="btn primary" type="submit" id="checkoutSubmit">Continue to secure payment</button><div id="checkoutStatus" role="status" aria-live="polite" style="margin-top:12px"></div><p class="note">Card details go to the payment provider, never this site.</p><ul class="trust-list" style="justify-content:flex-start"><li>${ico('ok')}Secure checkout</li><li>${ico('ok')}${CONFIG.refundDays}-day refund</li></ul></form><aside class="summary-card" aria-label="Order summary"><h2 style="font-size:1.1rem">Order summary</h2><dl><dt>Plan</dt><dd>Verdict Pro</dd><dt>Billing</dt><dd>${y?'Yearly':'Monthly'}</dd><dt>Price</dt><dd>${cur(amt)} per ${y?'year':'month'}</dd></dl><p class="note" style="margin:0">Renews until cancelled. <a href="#/pricing">Change plan</a></p></aside></div></div>`; }
   },
   'success': { t: 'Payment complete', d: 'Thanks for your purchase.', h: () => `<div class="container page-content"><span class="badge">Payment</span><h1>Thank you.</h1><p class="lead">Receipt is sent to your email by the payment provider. Keep it for your records.</p><p>If Pro features are not active in a few minutes, <a href="#/contact">contact us</a>.</p><a class="btn primary" href="#/">Back to the checker</a></div>` },
   'payment-failed': { t: 'Payment not completed', d: 'Payment was cancelled or failed.', h: () => `<div class="container page-content"><span class="badge">Payment</span><h1>Payment not completed.</h1><p class="lead">The payment was cancelled or declined. Nothing was charged.</p><div class="actions"><a class="btn primary" href="#/checkout?plan=pro&cycle=${cycle}">Try again</a><a class="btn" href="#/contact">Contact us</a></div></div>` },
   'payment-cancelled': { t: 'Checkout cancelled', d: 'Checkout was cancelled.', h: () => `<div class="container page-content"><span class="badge">Payment</span><h1>Checkout cancelled.</h1><p class="lead">You were not charged. Your plan has not changed.</p><div class="actions"><a class="btn primary" href="#/pricing">Back to pricing</a><a class="btn" href="#/contact">Ask a question</a></div></div>` },
-  'refunds': { t: 'Refund Policy', d: 'ListingPreflight refund and cancellation policy.', h: () => `<div class="container page-content"><h1>Refund Policy</h1><p class="mono">Last updated October 2026</p><h2>Refunds</h2><p style="color:var(--text-secondary)">Ask for a refund within ${CONFIG.refundDays} days of your first payment.</p><h2>Cancelling</h2><p style="color:var(--text-secondary)">Cancel any time. Pro stays active until the end of the paid period.</p><h2>Renewals</h2><p style="color:var(--text-secondary)">Renewal payments are not refunded after the ${CONFIG.refundDays}-day window unless required by law.</p><h2>How to ask</h2><p style="color:var(--text-secondary)">${CONFIG.email ? `Email <a href="mailto:${esc(CONFIG.email)}">${esc(CONFIG.email)}</a>` : 'Use the <a href="#/contact">contact page</a>'} with your payment email.</p></div>` },
-  'privacy': { t: 'Privacy Policy', d: 'How ListingPreflight handles your images and data.', h: () => `<div class="container page-content"><h1>Privacy Policy</h1><p class="mono">Last updated October 2026</p><h2>Your images</h2><p style="color:var(--text-secondary)">Image checks run in your browser. Amazon Fix sends images to remove.bg. Gemini review is separate and optional.</p><h2>Data we collect</h2><p style="color:var(--text-secondary)">The checker collects no personal data. Accounts store name and email. Passwords are never stored in plain text.</p><h2>Payments</h2><p style="color:var(--text-secondary)">Handled by a payment provider. We never see or store card numbers.</p><h2>Third parties</h2><p style="color:var(--text-secondary)">Fonts from Google Fonts, ZIP library from cdnjs. These services receive your IP when the page loads.</p><h2>Your rights</h2><p style="color:var(--text-secondary)">Contact ${CONFIG.email ? `<a href="mailto:${esc(CONFIG.email)}">${esc(CONFIG.email)}</a>` : 'us'} to access, correct or delete personal data.</p><h2>Operator</h2><p style="color:var(--text-secondary)">${esc(op())}.</p></div>` },
-  'terms': { t: 'Terms of Service', d: 'Terms for using ListingPreflight.', h: () => `<div class="container page-content"><h1>Terms of Service</h1><p class="mono">Last updated October 2026</p><h2>The service</h2><p style="color:var(--text-secondary)">ListingPreflight checks images against marketplace guidance. Provided as is, without warranty.</p><h2>No approval guarantee</h2><p style="color:var(--text-secondary)">A pass means likely to meet tested rules, not guaranteed acceptance by any marketplace.</p><h2>Subscriptions</h2><p style="color:var(--text-secondary)">Pro renews automatically until cancelled. See the <a href="#/refunds">Refund Policy</a>.</p><h2>Your content</h2><p style="color:var(--text-secondary)">You are responsible for image rights and marketplace policies.</p><h2>Liability</h2><p style="color:var(--text-secondary)">To the extent allowed, ${esc(op())} is not liable for rejected listings or lost sales.</p></div>` },
+  'refunds': { t: 'Refund Policy', d: 'Verdict refund and cancellation policy.', h: () => `<div class="container page-content"><h1>Refund Policy</h1><p class="mono">Last updated October 2026</p><h2>Refunds</h2><p style="color:var(--text-secondary)">Ask for a refund within ${CONFIG.refundDays} days of your first payment.</p><h2>Cancelling</h2><p style="color:var(--text-secondary)">Cancel any time. Pro stays active until the end of the paid period.</p><h2>Renewals</h2><p style="color:var(--text-secondary)">Renewal payments are not refunded after the ${CONFIG.refundDays}-day window unless required by law.</p><h2>How to ask</h2><p style="color:var(--text-secondary)">${CONFIG.email ? `Email <a href="mailto:${esc(CONFIG.email)}">${esc(CONFIG.email)}</a>` : 'Use the <a href="#/contact">contact page</a>'} with your payment email.</p></div>` },
+  'privacy': { t: 'Privacy Policy', d: 'How Verdict handles your images and data.', h: () => `<div class="container page-content"><h1>Privacy Policy</h1><p class="mono">Last updated October 2026</p><h2>Your images</h2><p style="color:var(--text-secondary)">Image checks run in your browser. Amazon Fix sends images to remove.bg. Gemini review is separate and optional.</p><h2>Data we collect</h2><p style="color:var(--text-secondary)">The checker collects no personal data. Accounts store name and email. Passwords are never stored in plain text.</p><h2>Payments</h2><p style="color:var(--text-secondary)">Handled by a payment provider. We never see or store card numbers.</p><h2>Third parties</h2><p style="color:var(--text-secondary)">Fonts from Google Fonts, ZIP library from cdnjs. These services receive your IP when the page loads.</p><h2>Your rights</h2><p style="color:var(--text-secondary)">Contact ${CONFIG.email ? `<a href="mailto:${esc(CONFIG.email)}">${esc(CONFIG.email)}</a>` : 'us'} to access, correct or delete personal data.</p><h2>Operator</h2><p style="color:var(--text-secondary)">${esc(op())}.</p></div>` },
+  'terms': { t: 'Terms of Service', d: 'Terms for using Verdict.', h: () => `<div class="container page-content"><h1>Terms of Service</h1><p class="mono">Last updated October 2026</p><h2>The service</h2><p style="color:var(--text-secondary)">Verdict checks images against marketplace guidance. Provided as is, without warranty.</p><h2>No approval guarantee</h2><p style="color:var(--text-secondary)">A pass means likely to meet tested rules, not guaranteed acceptance by any marketplace.</p><h2>Subscriptions</h2><p style="color:var(--text-secondary)">Pro renews automatically until cancelled. See the <a href="#/refunds">Refund Policy</a>.</p><h2>Your content</h2><p style="color:var(--text-secondary)">You are responsible for image rights and marketplace policies.</p><h2>Liability</h2><p style="color:var(--text-secondary)">To the extent allowed, ${esc(op())} is not liable for rejected listings or lost sales.</p></div>` },
   'contact': {
     t: 'Contact',
-    d: 'Contact ListingPreflight with questions or feedback.',
+    d: 'Contact Verdict with questions or feedback.',
     h: () => `<div class="container page-content"><h1>Contact</h1><p class="lead">Found a wrong rule, a bug or billing problem? Tell us.</p>
     <form id="contactForm" novalidate><div class="field"><label for="contactName">Name</label><input type="text" id="contactName" autocomplete="name" aria-describedby="contactNameErr"><p class="field-error" id="contactNameErr"></p></div>
     <div class="field"><label for="contactEmail">Email</label><input type="email" id="contactEmail" autocomplete="email" aria-describedby="contactEmailErr"><p class="field-error" id="contactEmailErr"></p></div>
@@ -2722,11 +2722,11 @@ const PAGES = {
     <button class="btn primary" type="submit">Send message</button><div id="contactStatus" role="status" aria-live="polite" style="margin-top:12px"></div></form>
     ${contactInfoHTML()}</div>`
   },
-  'login': { t: 'Log in', d: 'Log in to your ListingPreflight account.', h: () => authShell('Log in', 'Welcome back to ListingPreflight.', `<form id="authForm" novalidate data-m="login">${authField('authEmail','Email','email','email')}${authField('authPass','Password','password','current-password')}<p style="margin:0 0 14px"><a href="#/forgot">Forgot your password?</a></p><button class="btn primary" id="authSubmit" type="submit" style="width:100%">Log in</button></form>`, 'New here? <a href="#/register">Create an account</a>') },
-  'register': { t: 'Create account', d: 'Create a free ListingPreflight account.', h: () => authShell('Create your account', 'Free to start. No card needed.', `<form id="authForm" novalidate data-m="register">${authField('authName','Name','text','name')}${authField('authEmail','Email','email','email')}${authField('authPass','Password','password','new-password','At least 8 characters.')}<div class="field"><label style="display:flex;font-size:.95rem;font-weight:400"><input type="checkbox" id="authTerms" aria-describedby="authTermsErr">I agree to the <a href="#/terms">Terms</a> and <a href="#/privacy">Privacy Policy</a>.</label><p class="field-error" id="authTermsErr"></p></div><button class="btn primary" id="authSubmit" type="submit" style="width:100%">Create account</button></form>`, 'Already registered? <a href="#/login">Log in</a>') },
-  'forgot': { t: 'Reset password', d: 'Reset your ListingPreflight password.', h: () => authShell('Reset password', 'Enter your email for a reset link.', `<form id="authForm" novalidate data-m="forgot">${authField('authEmail','Email','email','email')}<button class="btn primary" id="authSubmit" type="submit" style="width:100%">Send reset link</button></form>`, '<a href="#/login">Back to log in</a>') },
-  'account': { t: 'Your account', d: 'Manage your ListingPreflight account.', h: () => { const u = U.get() || {}; return `<div class="container page-content"><h1>Your account</h1><div class="summary-card"><dl><dt>Name</dt><dd>${esc(u.name)}</dd><dt>Email</dt><dd>${esc(u.email)}</dd><dt>Plan</dt><dd>${u.plan==='pro'?'Pro':'Free'}</dd><dt>Role</dt><dd>${u.role==='admin'?'Admin':'User'}</dd></dl></div><div class="actions">${u.plan==='pro'?`<a class="btn primary" href="${CONFIG.portal?esc(CONFIG.portal):'#/contact'}">Manage billing</a>`:'<a class="btn primary" href="#/pricing">Upgrade to Pro</a>'}${u.role==='admin'?'<a class="btn" href="#/admin">Admin dashboard</a>':''}<button class="btn" id="accountLogout" type="button">Log out</button></div></div>`; } },
-  'admin': { t: 'Admin dashboard', d: 'ListingPreflight owner dashboard.', h: () => `<div class="container page-content"><span class="badge">Owner Tools</span><h1>Admin dashboard</h1><p class="lead">Account and plan totals for this instance.</p><div id="adminMsg" role="status" aria-live="polite">Loading admin summary...</div><div class="summary-card"><dl><dt>Total accounts</dt><dd id="adminUsers">—</dd><dt>Pro accounts</dt><dd id="adminPro">—</dd><dt>Active sessions</dt><dd id="adminSessions">—</dd></dl></div><div class="actions"><a class="btn" href="#/account">Account</a><a class="btn" href="#/">Image checker</a></div></div>` },
+  'login': { t: 'Log in', d: 'Log in to your Verdict account.', h: () => authShell('Log in', 'Welcome back to Verdict.', `<form id="authForm" novalidate data-m="login">${authField('authEmail','Email','email','email')}${authField('authPass','Password','password','current-password')}<p style="margin:0 0 14px"><a href="#/forgot">Forgot your password?</a></p><button class="btn primary" id="authSubmit" type="submit" style="width:100%">Log in</button></form>`, 'New here? <a href="#/register">Create an account</a>') },
+  'register': { t: 'Create account', d: 'Create a free Verdict account.', h: () => authShell('Create your account', 'Free to start. No card needed.', `<form id="authForm" novalidate data-m="register">${authField('authName','Name','text','name')}${authField('authEmail','Email','email','email')}${authField('authPass','Password','password','new-password','At least 8 characters.')}<div class="field"><label style="display:flex;font-size:.95rem;font-weight:400"><input type="checkbox" id="authTerms" aria-describedby="authTermsErr">I agree to the <a href="#/terms">Terms</a> and <a href="#/privacy">Privacy Policy</a>.</label><p class="field-error" id="authTermsErr"></p></div><button class="btn primary" id="authSubmit" type="submit" style="width:100%">Create account</button></form>`, 'Already registered? <a href="#/login">Log in</a>') },
+  'forgot': { t: 'Reset password', d: 'Reset your Verdict password.', h: () => authShell('Reset password', 'Enter your email for a reset link.', `<form id="authForm" novalidate data-m="forgot">${authField('authEmail','Email','email','email')}<button class="btn primary" id="authSubmit" type="submit" style="width:100%">Send reset link</button></form>`, '<a href="#/login">Back to log in</a>') },
+  'account': { t: 'Your account', d: 'Manage your Verdict account.', h: () => { const u = U.get() || {}; return `<div class="container page-content"><h1>Your account</h1><div class="summary-card"><dl><dt>Name</dt><dd>${esc(u.name)}</dd><dt>Email</dt><dd>${esc(u.email)}</dd><dt>Plan</dt><dd>${u.plan==='pro'?'Pro':'Free'}</dd><dt>Role</dt><dd>${u.role==='admin'?'Admin':'User'}</dd></dl></div><div class="actions">${u.plan==='pro'?`<a class="btn primary" href="${CONFIG.portal?esc(CONFIG.portal):'#/contact'}">Manage billing</a>`:'<a class="btn primary" href="#/pricing">Upgrade to Pro</a>'}${u.role==='admin'?'<a class="btn" href="#/admin">Admin dashboard</a>':''}<button class="btn" id="accountLogout" type="button">Log out</button></div></div>`; } },
+  'admin': { t: 'Admin dashboard', d: 'Verdict owner dashboard.', h: () => `<div class="container page-content"><span class="badge">Owner Tools</span><h1>Admin dashboard</h1><p class="lead">Account and plan totals for this instance.</p><div id="adminMsg" role="status" aria-live="polite">Loading admin summary...</div><div class="summary-card"><dl><dt>Total accounts</dt><dd id="adminUsers">—</dd><dt>Pro accounts</dt><dd id="adminPro">—</dd><dt>Active sessions</dt><dd id="adminSessions">—</dd></dl></div><div class="actions"><a class="btn" href="#/account">Account</a><a class="btn" href="#/">Image checker</a></div></div>` },
   '404': {
     t: 'Page not found',
     d: 'This page does not exist.',
@@ -3119,7 +3119,7 @@ function bindContact() {
     const c = set('contactMsgErr', g, g.value.trim().length >= 10 ? '' : 'Write at least 10 characters.');
     if (!(a && b && c)) { (!a ? n : !b ? m : g).focus(); return; }
     if (!CONFIG.email) { $('contactStatus').innerHTML = '<div class="alert error">No contact email configured.</div>'; return; }
-    location.href = `mailto:${CONFIG.email}?subject=${encodeURIComponent('ListingPreflight message from ' + n.value.trim())}&body=${encodeURIComponent(g.value.trim() + '\n\nReply to: ' + m.value.trim())}`;
+    location.href = `mailto:${CONFIG.email}?subject=${encodeURIComponent('Verdict message from ' + n.value.trim())}&body=${encodeURIComponent(g.value.trim() + '\n\nReply to: ' + m.value.trim())}`;
     $('contactStatus').textContent = 'Your email app should open with the message.';
   };
 }
@@ -3156,7 +3156,7 @@ function bindCheckout() {
         key: orderRes.key_id,
         amount: orderRes.amount,
         currency: orderRes.currency,
-        name: 'ListingPreflight',
+        name: 'Verdict',
         description: 'Pro Subscription - Unlimited AI fixes',
         order_id: orderRes.order_id,
         prefill: {

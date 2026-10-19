@@ -1,5 +1,5 @@
 """
-ListingPreflight — Production-ready backend server.
+Verdict — Production-ready backend server.
 Serves the SPA frontend plus REST API for auth, background removal, and AI review.
 """
 from __future__ import annotations
@@ -510,7 +510,7 @@ def provision_owner(email: str, name: str, password: str) -> None:
 # ── HTTP Handler ───────────────────────────────────────────────────────────
 
 class PreflightHandler(BaseHTTPRequestHandler):
-    server_version = "ListingPreflight/2.0"
+    server_version = "Verdict/2.0"
 
     def log_message(self, format: str, *args: object) -> None:
         print(f"{self.address_string()} - {format % args}")
@@ -1114,7 +1114,7 @@ def main() -> None:
 
     httpd = ThreadingHTTPServer((HOST, PORT), PreflightHandler)
     print(f"\n{'='*60}")
-    print(f"  ListingPreflight v2.0 - Production Ready")
+    print(f"  Verdict v2.0 - Production Ready")
     print(f"{'='*60}")
     print(f"  URL:          http://{HOST}:{httpd.server_port}/")
     print(f"  Database:     {DB_PATH}")
@@ -1130,7 +1130,7 @@ def main() -> None:
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
-        print("\nStopping ListingPreflight.")
+        print("\nStopping Verdict.")
     finally:
         httpd.server_close()
 
