@@ -1,5 +1,5 @@
 """
-Verdict — Production-ready backend server.
+Fixerpro — Production-ready backend server.
 Serves the SPA frontend plus REST API for auth, background removal, and AI review.
 """
 from __future__ import annotations
@@ -547,7 +547,7 @@ def provision_owner(email: str, name: str, password: str) -> None:
 # ── HTTP Handler ───────────────────────────────────────────────────────────
 
 class PreflightHandler(BaseHTTPRequestHandler):
-    server_version = "Verdict/2.0"
+    server_version = "Fixerpro/2.0"
 
     def log_message(self, format: str, *args: object) -> None:
         print(f"{self.address_string()} - {format % args}")
@@ -846,12 +846,12 @@ class PreflightHandler(BaseHTTPRequestHandler):
 
         try:
             msg = EmailMessage()
-            msg["Subject"] = f"New Contact Message from Verdict - {name}"
-            msg["From"] = f"Verdict Contact Form <{SMTP_EMAIL}>"
+            msg["Subject"] = f"New Contact Message from Fixerpro - {name}"
+            msg["From"] = f"Fixerpro Contact Form <{SMTP_EMAIL}>"
             msg["To"] = SMTP_EMAIL
             msg["Reply-To"] = email
             msg.set_content(
-                f"You received a new message from the Verdict contact form:\n\n"
+                f"You received a new message from the Fixerpro contact form:\n\n"
                 f"Name: {name}\n"
                 f"Email: {email}\n"
                 f"Time: {time.strftime('%Y-%m-%d %H:%M:%S UTC', time.gmtime())}\n\n"
@@ -1217,7 +1217,7 @@ def main() -> None:
 
     httpd = ThreadingHTTPServer((HOST, PORT), PreflightHandler)
     print(f"\n{'='*60}")
-    print(f"  Verdict v2.0 - Production Ready")
+    print(f"  Fixerpro v2.0 - Better Images. Higher Sales.")
     print(f"{'='*60}")
     print(f"  URL:          http://{HOST}:{httpd.server_port}/")
     print(f"  Database:     {DB_PATH}")
@@ -1226,14 +1226,14 @@ def main() -> None:
     print(f"  Owner email:  {OWNER_EMAIL}")
     print(f"{'='*60}")
     print(f"  Image checks run in the browser - no API keys needed!")
-    print(f"  Set REMOVE_BG_API_KEY and GEMINI_API_KEY in .env for")
+    print(f"  Set POOF_BG_API_KEY and GEMINI_API_KEY in .env for")
     print(f"  optional background removal and AI review features.")
     print(f"{'='*60}\n")
 
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
-        print("\nStopping Verdict.")
+        print("\nStopping Fixerpro.")
     finally:
         httpd.server_close()
 
