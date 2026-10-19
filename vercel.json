@@ -6,7 +6,7 @@
       "use": "@vercel/python"
     },
     {
-      "src": "index.html",
+      "src": "*.{html,png,jpg,jpeg,svg,ico,webp}",
       "use": "@vercel/static"
     }
   ],
@@ -14,6 +14,10 @@
     {
       "src": "/api/(.*)",
       "dest": "api/index.py"
+    },
+    {
+      "src": "/(favicon\\.png|icon\\.png|logo\\.png|logo_web\\.png)",
+      "dest": "/$1"
     },
     {
       "src": "/(.*)",
