@@ -1,5 +1,6 @@
-# 🚀 MarketPro (Verdict) — Production E-Commerce Image Validator & Optimizer
+# 🚀 Fixerpro — Production E-Commerce Image Validator & Studio Optimizer
 
+**Better Images. Higher Sales.**  
 **Developed & Maintained by Praveen** (`praveenmanoharan.dev@gmail.com`)  
 **Official Support:** `officialverdictv@gmail.com`  
 **Live Production URL:** [https://market-pro-seven.vercel.app/](https://market-pro-seven.vercel.app/)
@@ -14,7 +15,7 @@
 
 ## 🌟 Executive Summary
 
-**MarketPro** (Verdict) is an enterprise-grade, privacy-first image validation and studio-enhancement suite engineered specifically for e-commerce merchants selling on **Amazon** and **Etsy**. 
+**Fixerpro** is an enterprise-grade, privacy-first image validation and studio-enhancement suite engineered specifically for e-commerce merchants selling on **Amazon** and **Etsy**. 
 
 It validates listing photos against strict marketplace guidelines, automatically fixes backgrounds into **Amazon-compliant pure white canvases (#FFFFFF)** using GPU-accelerated cloud AI, delivers optional Gemini visual critiques, enables bulk ZIP downloads, and features an end-to-end subscription & checkout workflow powered by **Razorpay** (verified live) and **Supabase**.
 
@@ -23,7 +24,7 @@ It validates listing photos against strict marketplace guidelines, automatically
 ## 🛡️ Enterprise Security & Strict Privacy Architecture
 
 ### 1. Zero Image Storage & Ephemeral Memory Guarantee
-- **Strict Seller Privacy:** MarketPro **never stores, logs, or writes product image bytes or thumbnails to disk, database, or external object storage**.
+- **Strict Seller Privacy:** Fixerpro **never stores, logs, or writes product image bytes or thumbnails to disk, database, or external object storage**.
 - All dimension checks, cropping, alpha-channel inspections, aspect ratio checks, and pure white canvas generations execute **ephemerally inside the merchant's browser memory (HTML5 Canvas)**.
 - Upstream background removals via **Poof.bg GPU Cloud** (or remove.bg fallback) are streamed through Python in-memory buffers (`BytesIO`) and discarded immediately upon response delivery.
 
@@ -50,7 +51,7 @@ It validates listing photos against strict marketplace guidelines, automatically
 
 ## 🗄️ Database Architecture (Dual-Mode Resilient Engine)
 
-MarketPro features a unified database abstraction layer supporting both production cloud databases and offline local development:
+Fixerpro features a unified database abstraction layer supporting both production cloud databases and offline local development:
 
 1. **Production (Supabase PostgreSQL):**
    - Connects using Supabase's IPv4 **Session Pooler** on port `6543` (`aws-0-ap-southeast-2.pooler.supabase.com`).
@@ -78,7 +79,7 @@ MarketPro features a unified database abstraction layer supporting both producti
 
 ## ⚡ Background Removal Providers (Poof.bg + remove.bg)
 
-MarketPro integrates a resilient dual-provider architecture for background removal:
+Fixerpro integrates a resilient dual-provider architecture for background removal:
 - **Primary Engine (Poof.bg GPU Cloud AI):**
   - ~1.5-second processing time with fine edge detection for complex product photos.
   - Output is auto-composed onto a **pure white #FFFFFF Amazon-standard canvas** with 85% optimal product fill.
