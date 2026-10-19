@@ -653,8 +653,16 @@ class PreflightHandler(BaseHTTPRequestHandler):
         self.send_json(404, {"error": "Not found."})
 
     def do_POST(self) -> None:
+        try:
+            self._do_POST_internal()
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            self.send_json(500, {"error": f"Internal server error: {e}"})
+
+    def _do_POST_internal(self) -> None:
         # Rate limiting
-        client_ip = self.address_string()
+        client_ip = self.headers.get("x-forwarded-for", "").split(",")[0].strip() or self.address_string()
         if rate_limited(client_ip):
             self.send_json(429, {"error": "Too many requests. Please slow down."})
             return
