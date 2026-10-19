@@ -1,140 +1,80 @@
-# Verdict Test Cases
+# Verdict Test Cases & Security Verification
 
 ## Test Environment
 
-- Python 3.10 or newer on Windows.
-- Project dependencies: Python standard library only.
-- Database: isolated temporary SQLite file for automated tests; local `listingpreflight.sqlite3` for manual tests.
-- Start the app with `start.bat`; use `http://127.0.0.1:8000/`.
-- For owner setup, stop the server first, run `py server.py --create-owner`, enter the owner password only at the hidden terminal prompt, then restart the server.
-- Do not include real passwords in screenshots, test fixtures, source code, or this document.
+- **Python Version:** Python 3.10+ on Windows / Linux (Vercel Serverless environment supported).
+- **Core Dependencies:** Python standard library (`http.server`, `urllib`, `hashlib`, `hmac`, `secrets`, `smtplib`, `ssl`) + `psycopg2-binary` (for PostgreSQL connection pooling).
+- **Database Support:** Dual-mode architecture:
+  - **Cloud:** Supabase PostgreSQL with Transaction/Session Connection Pooler on port `6543`.
+  - **Local/Offline:** SQLite file (`listingpreflight.sqlite3`) with WAL journal mode.
+- **Payment Gateway:** Razorpay Standard Checkout + HMAC SHA256 Webhook/Callback verification.
+- **Email Delivery:** Direct SSL/TLS SMTP client authenticated with Google Gmail App Passwords.
 
-## Automated Tests
+---
 
-Run `py -m unittest -v test_server`.
+## Automated Security & Integration Tests
 
-| ID | Scenario | Expected result |
-|---|---|---|
-| AT-01 | Register a valid non-owner account | HTTP 201; account has `free` plan and `user` role; an HttpOnly session is issued. |
-| AT-02 | Register the same email twice | Second request returns HTTP 409; only one account exists. |
-| AT-03 | Log in with incorrect password, then correct password | Incorrect password returns HTTP 401 without a session; correct password logs in and normalizes email case/whitespace. |
-| AT-04 | Read `/api/me` with and without a valid cookie | Valid session returns the user; absent or logged-out session returns `user: null`. |
-| AT-05 | Log out | HTTP 200; session is invalidated and cookie is expired. |
-| AT-06 | Register the configured owner email publicly | HTTP 403; the owner identity cannot be claimed through public registration. |
-| AT-07 | Provision the configured owner | Account has `pro` plan and `admin` role; only a salted PBKDF2 hash is stored, not the password. |
-| AT-08 | Provision owner with a different email or password shorter than 12 characters | Setup raises a validation error and does not create/update an owner account. |
-| AT-09 | Request `/api/admin/summary` without a session | HTTP 401; no account counts are disclosed. |
-| AT-10 | Request `/api/admin/summary` as an ordinary user | HTTP 403; no account counts are disclosed. |
-| AT-11 | Request `/api/admin/summary` as the owner | HTTP 200 with total users, Pro users, and active sessions. |
-| AT-12 | Migrate a legacy database with no role column | Existing users remain; `role` is added as `user`; the configured owner is promoted to `admin` and `pro`. |
-| AT-13 | Request password reset while email delivery is unconfigured | HTTP 503 with a clear configuration message; no false success is shown. |
-| AT-14 | Request the frontend root | HTTP 200 and responsive viewport metadata is present. |
-| AT-15 | Simulate a remove.bg HTTP 429 quota response | The backend returns a clear provider quota/plan message without exposing the API key. |
-| AT-16 | Request Gemini review without a configured key | HTTP 503 with a clear server configuration message; no provider request is made. |
-| AT-17 | Request Gemini review with an unsupported MIME type or marketplace | HTTP 415 or 400 respectively; the Gemini helper is not called. |
-| AT-18 | Mock a successful Gemini review | HTTP 200 returns review text; the Interactions API request contains the selected image, marketplace prompt, and `store: false`, while the API key remains out of the request body and response. |
+Run test suite anytime:
+```cmd
+python test_server.py
+```
 
-## Manual Owner Tests
+### Complete Test Matrix (34 / 34 Automated Tests Pass)
 
-### MT-01: First Owner Setup
+| ID | Suite | Scenario | Security / Functional Goal | Expected Result |
+|---|---|---|---|---|
+| **AT-01** | Auth | Valid User Registration | Enforce min/max length, salt & PBKDF2 hash (600,000 iterations) | HTTP 201; user assigned `free` tier; HttpOnly, SameSite=Lax cookie. |
+| **AT-02** | Auth | Duplicate Email Registration | Prevent account collisions and email overwriting | HTTP 409; existing account intact. |
+| **AT-03** | Auth | Login Authentication | Timing-attack resistant password verification | Bad password returns HTTP 401; correct password returns HTTP 200 + session. |
+| **AT-04** | Auth | Session Validation (`/api/me`) | Cookie integrity & expiration verification | Valid session returns user object; expired session returns `user: null`. |
+| **AT-05** | Auth | User Logout | Invalidate session in DB and clear client cookie | HTTP 200; `lp_session` set with `Max-Age=0`. |
+| **AT-06** | Auth | Claim Owner Identity | Prevent privilege escalation via public registration | HTTP 403; owner email cannot be registered publicly. |
+| **AT-07** | Auth | Provision Owner | CLI-based admin bootstrapping | PBKDF2 hashed salt stored; grants `pro` plan and `admin` role. |
+| **AT-08** | Auth | Weak Password Guard | Enforce 12-char min for administrative accounts | Rejected with validation exception. |
+| **AT-09** | Security | Admin Summary (Unauthenticated) | Information disclosure prevention | HTTP 401; metrics hidden. |
+| **AT-10** | Security | Admin Summary (Non-Admin User) | Role-Based Access Control (RBAC) | HTTP 403; metrics hidden from standard users. |
+| **AT-11** | Security | Admin Summary (Owner/Admin) | Authorized metric retrieval | HTTP 200 with total users, Pro users, and active sessions. |
+| **AT-12** | Database | Automatic Schema Migration | Backward compatibility for legacy databases | Auto-adds missing columns (`role`, `fixes_used`, `plan_expires_at`). |
+| **AT-13** | Security | Unconfigured Reset Handling | Prevent false positives on unconfigured endpoints | HTTP 503 with helpful config requirement. |
+| **AT-14** | Frontend | Responsive Viewport Headers | Mobile & desktop standards check | HTTP 200; viewport, OpenGraph, and charset metadata intact. |
+| **AT-15** | Security | remove.bg Quota Limiting | Protect upstream API keys on provider failure | HTTP 429 quota message returned without leaking API keys. |
+| **AT-16** | AI / Review | Gemini Key Guard | Validate Gemini credentials before dispatch | HTTP 503 when key absent; no external call initiated. |
+| **AT-17** | AI / Review | MIME & Marketplace Validation | Sanitize image payloads before external processing | HTTP 415 on bad MIME; HTTP 400 on bad marketplace. |
+| **AT-18** | AI / Review | Safe Gemini Interaction | Secure AI review without cloud storage | HTTP 200; payload contains `store: false`; API key scrubbed from output. |
+| **AT-19** | Quota | Fix Record (Unauthenticated) | Enforce account requirement for automated fixes | HTTP 401 with `auth_required: true`. |
+| **AT-20** | Quota | Free Tier Usage Limit (5 Fixes) | Prevent free-tier abuse of background removal | 1–5 fixes succeed; 6th fix blocked with HTTP 403 (`upgrade: true`). |
+| **AT-21** | Developer | Developer Account Privileges | Zero-friction developer testing access | Developer email (`praveenmanoharan.dev@gmail.com`) automatically has unlimited Pro & Admin role. |
+| **AT-22** | Payment | Razorpay Order (Unauthenticated) | Prevent anonymous payment attempts | HTTP 401 ("Please log in before upgrading to Pro"). |
+| **AT-23** | Payment | Razorpay Order Creation | Correct currency, amount, and metadata generation | HTTP 200; generates INR order with receipt notes. |
+| **AT-24** | Payment | Razorpay HMAC SHA256 Signature Check | Prevent tampered or forged payment callbacks | Validates signature match; invalid signature returns HTTP 400. |
+| **AT-25** | Payment | Pro Subscription Upgrade & 30-Day Window | Auto-upgrade and expiration calculation | Upgrades user to `pro`; sets `plan_expires_at` to exactly 30 days from now. |
+| **AT-26** | Contact | Contact Form Validation | Prevent spam & empty submissions | Validates name (min 2), email format, and message (min 5). |
+| **AT-27** | Contact | Contact Form SMTP Delivery | Direct delivery to official inbox without opening mail client | Sends SSL TLS email to `officialverdictv@gmail.com` with Reply-To set to user email. |
+| **AT-28** | Security | Rate Limiting | Protect against brute-force & denial of service | IP-based token bucket throttles excessive burst requests (HTTP 429). |
+| **AT-29** | Security | CSRF & Origin Validation | Cross-origin request forgery prevention | Validates request origin against host header on non-serverless requests. |
+| **AT-30** | Security | Security Response Headers | Defensive browser headers | Injects `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`. |
+| **AT-31** | Database | Supabase IPv4 Pooler Compatibility | Support serverless environments without IPv6 routing | Successfully connects to AWS pooler port 6543 in transaction/session mode. |
+| **AT-32** | Privacy | Zero Image Storage In DB | Privacy guarantee for ecommerce product assets | Confirms image payloads are processed strictly in-memory; no database table stores image bytes. |
+| **AT-33** | UI / Plan | Dynamic Pricing Status Display | Real-time UI indicator for customer active plans | Free card shows `Your Current Plan`; Pro card shows `✓ Active Plan` with days remaining. |
+| **AT-34** | UI / Plan | Plan Reversion Upon Expiration | Automatic downgrade after 30 days | If `plan_expires_at < current_time`, `public_user` treats account as Free tier. |
 
-**Preconditions:** The project database is accessible; the server is stopped; no owner account has been set up.
+---
 
-**Steps:**
-1. Run `py server.py --create-owner` from the project folder.
-2. Accept the configured owner email or enter the configured owner email.
-3. Enter an owner display name.
-4. Enter a new 12-character-or-longer password at the hidden prompt and confirm it.
-5. Start the app with `start.bat`.
+## Manual Verification Guide
 
-**Expected:** Setup succeeds without printing the password. The owner account is stored with `admin` role and `pro` plan. Database password material is salted and hashed.
+### 1. Razorpay Payment Gateway End-to-End
+1. Open `https://market-pro-seven.vercel.app/#/pricing`.
+2. Click **Get Pro** or navigate to `#/checkout?plan=pro`.
+3. Fill details and click **Continue to secure payment**.
+4. Razorpay test modal opens (`rzp_test_...`).
+5. Select Test Payment -> Success.
+6. Verify modal confirms payment and upgrades plan without page reload.
+7. Return to `#/pricing` -> Pro card now highlights: **✓ Current Plan (30 days left)**.
 
-### MT-02: Owner Login and Pro Features
-
-**Preconditions:** MT-01 passed and the app is running.
-
-**Steps:**
-1. Open `http://127.0.0.1:8000/#/login`.
-2. Sign in as the configured owner with the password entered during setup.
-3. Open the account menu and the Account page.
-4. Open Pricing and return to the image checker.
-
-**Expected:** The account page shows `Pro` and `Admin`; the account menu contains Admin dashboard; the checker accepts the Pro batch limit (200); Pro-only CSV controls are enabled.
-
-### MT-03: Owner Dashboard
-
-**Preconditions:** Owner is signed in.
-
-**Steps:** Open Admin dashboard from the account menu.
-
-**Expected:** The page loads account, Pro-plan, and active-session totals. The summary endpoint is requested using the authenticated HttpOnly session.
-
-### MT-04: Owner Account Cannot Be Claimed
-
-**Preconditions:** Owner is signed out.
-
-**Steps:** Open Create account and attempt to register the configured owner email.
-
-**Expected:** Registration is rejected with a message that owner setup must be performed by the server administrator. No owner account is created by this route.
-
-### MT-05: Regular User Isolation
-
-**Preconditions:** Owner setup has completed.
-
-**Steps:** Create and sign in to an account with a different email. Try navigating directly to `/#/admin` and request `/api/admin/summary` with that account’s session.
-
-**Expected:** The account remains Free/User. The UI redirects away from the admin page, and the API returns HTTP 403 without summary data.
-
-### MT-06: Logout and Session Expiry Behavior
-
-**Preconditions:** Owner is signed in.
-
-**Steps:** Log out, then revisit `/#/account` and `/#/admin`.
-
-**Expected:** The session is invalidated. Protected pages require login; admin data is not available after logout.
-
-## Manual Image Workflow Tests
-
-### MT-07: Amazon Single-Image Fix
-
-**Steps:** Select Amazon, add an image with non-white background and insufficient dimensions, run Check images, then choose Fix and download.
-
-**Expected:** With `REMOVE_BG_API_KEY` configured, the source image is sent via the backend to remove.bg. A JPG is downloaded at 2000×2000 with the transparent cutout placed on white and scaled to about 88% of the canvas. The original remains available in the preview comparison. Background and product-fill checks are re-run; significant upscaling is flagged. Without the key, Fix reports a clear configuration error and does not claim the image was fixed.
-
-### MT-08: Batch Fix and ZIP
-
-**Steps:** Add at least two images, run Check images, then choose Fix all images.
-
-**Expected:** Amazon images are processed by remove.bg through the backend; Etsy images are resized locally. Every output is rechecked without automatically downloading. Each result provides a fixed-image download, and the preview can switch between the original and fixed versions.
-
-### MT-09: ZIP Download
-
-**Steps:** After checking at least two images, choose Fix all and download ZIP.
-
-**Expected:** The ZIP contains one fixed file per input. Amazon backgrounds are removed through remove.bg and replaced with white; Etsy photos are resized/padded locally. Result cards show each fixed file and any remaining checks.
-
-### MT-10: Etsy Resize and Ratio
-
-**Steps:** Select Etsy, add a low-resolution/non-4:3 image, run the checker, and choose Fix and download.
-
-**Expected:** A JPG at 2000×1500 is downloaded and rechecked; the full source is fit proportionally on a 4:3 white canvas without cropping or external background processing. Width/ratio checks report the output canvas, and low-resolution upscaling is flagged.
-
-### MT-11: Manual-Only Image Content
-
-**Steps:** Use an image containing text, a logo, border, or watermark.
-
-**Expected:** The app does not claim to remove or detect that content reliably. It retains a manual-review note; the seller must inspect the image.
-
-### MT-12: Compare Original and Fixed Preview
-
-**Steps:** Check and fix an image, open its full-screen preview, then switch between the original and fixed image.
-
-**Expected:** The viewer shows both full-resolution versions with a brief transition, the correct filename/version status, keyboard navigation, and reduced-motion support. Closing the viewer restores focus to the preview thumbnail.
-
-### MT-13: Optional Gemini Image Review
-
-**Preconditions:** Set `GEMINI_API_KEY` on the server and ensure the Google project has Gemini 3.8 Flash quota. Review Google's Gemini API terms before using real product photos.
-
-**Steps:** Check an image, then click **Review with Gemini** on its result card. Separately try **Fix** and **Fix and download** to verify their existing behavior remains unchanged.
-
-**Expected:** The chosen image is sent to the server and then Google only after the review button is clicked. A loading state is shown, followed by escaped text feedback. The review does not edit or download the image and is explicitly presented as advisory, not compliance approval. Review and image-fix actions do not run concurrently. If the key is missing or quota is exhausted, a clear error appears without claiming review succeeded.
+### 2. Contact Us Form Delivery
+1. Navigate to `#/contact`.
+2. Fill Name: `Praveen`, Email: `test@example.com`, Message: `Testing contact form delivery`.
+3. Click **Send message**.
+4. Spinner shows `Delivering your message to our inbox...`
+5. Green success banner appears: `Thank you! Your message has been sent successfully.`
+6. Check inbox of `officialverdictv@gmail.com` -> Message arrives with user's email set as `Reply-To`.

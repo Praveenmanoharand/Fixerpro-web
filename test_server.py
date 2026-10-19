@@ -454,6 +454,88 @@ class BackendTests(unittest.TestCase):
         self.assertTrue(payload.get("upgrade"))
         self.assertIn("5 free fixes", payload.get("error", ""))
 
+    def test_razorpay_order_creation_requires_login(self):
+        status, payload, _ = self.request("POST", "/api/payment/create-order", {})
+        self.assertEqual(status, 401)
+        self.assertIn("log in", payload.get("error", "").lower())
+
+    def test_razorpay_order_creation_with_valid_session(self):
+        _, _, cookie = self.register()
+        cookie_header = cookie.split(";", 1)[0]
+        mock_response_body = json.dumps({
+            "id": "order_test_12345",
+            "amount": 49900,
+            "currency": "INR",
+            "status": "created"
+        }).encode("utf-8")
+
+        mock_cm = MagicMock()
+        mock_cm.read.return_value = mock_response_body
+        mock_cm.__enter__.return_value = mock_cm
+
+        original_urlopen = urllib.request.urlopen
+
+        def mock_dispatch(req, *args, **kwargs):
+            url = req.full_url if hasattr(req, "full_url") else str(req)
+            if "api.razorpay.com" in url:
+                return mock_cm
+            return original_urlopen(req, *args, **kwargs)
+
+        with patch("server.RAZORPAY_KEY_ID", "rzp_test_sample"), \
+             patch("server.RAZORPAY_KEY_SECRET", "secret_sample"), \
+             patch("urllib.request.urlopen", side_effect=mock_dispatch):
+
+            status, payload, _ = self.request("POST", "/api/payment/create-order", {}, cookie=cookie_header)
+            self.assertEqual(status, 200)
+            self.assertEqual(payload["order_id"], "order_test_12345")
+            self.assertEqual(payload["amount"], 49900)
+
+    def test_razorpay_signature_verification_upgrades_user_with_30_days(self):
+        import hmac
+        import hashlib
+        _, _, cookie = self.register()
+        cookie_header = cookie.split(";", 1)[0]
+        secret = "test_razorpay_secret"
+        order_id = "order_test_abc"
+        payment_id = "pay_test_xyz"
+        sig = hmac.new(secret.encode("utf-8"), f"{order_id}|{payment_id}".encode("utf-8"), hashlib.sha256).hexdigest()
+
+        with patch("server.RAZORPAY_KEY_SECRET", secret):
+            status, payload, _ = self.request(
+                "POST",
+                "/api/payment/verify",
+                {
+                    "razorpay_order_id": order_id,
+                    "razorpay_payment_id": payment_id,
+                    "razorpay_signature": sig
+                },
+                cookie=cookie_header
+            )
+            self.assertEqual(status, 200)
+            self.assertTrue(payload["ok"])
+            self.assertEqual(payload["user"]["plan"], "pro")
+            self.assertTrue(payload["user"]["days_left"] >= 29)
+
+    def test_contact_form_validates_and_delivers(self):
+        with patch("server.SMTP_EMAIL", "officialverdictv@gmail.com"), \
+             patch("server.SMTP_APP_PASSWORD", "mock_pass"), \
+             patch("smtplib.SMTP") as mock_smtp:
+            instance = MagicMock()
+            mock_smtp.return_value.__enter__.return_value = instance
+
+            status, payload, _ = self.request(
+                "POST",
+                "/api/contact",
+                {
+                    "name": "Karthik",
+                    "email": "karthik@example.com",
+                    "message": "Hi, interested in enterprise bulk pricing."
+                }
+            )
+            self.assertEqual(status, 200)
+            self.assertTrue(payload.get("ok"))
+            instance.send_message.assert_called_once()
+
 
 if __name__ == "__main__":
     unittest.main()
