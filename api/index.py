@@ -13,8 +13,11 @@ os.environ.setdefault("LISTING_PREFLIGHT_DB", "/tmp/listingpreflight.sqlite3")
 
 import server
 
-# Initialize SQLite database in /tmp
-server.initialize_database()
+# Initialize database safely on cold start
+try:
+    server.initialize_database()
+except Exception as e:
+    print(f"Database initialization warning: {e}")
 
 # Subclass BaseHTTPRequestHandler directly so AST parser detects it immediately
 class handler(server.PreflightHandler):
