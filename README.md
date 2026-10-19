@@ -1,4 +1,4 @@
-# 🚀 Verdict — Production E-Commerce Image Validator & Optimizer
+# 🚀 MarketPro (Verdict) — Production E-Commerce Image Validator & Optimizer
 
 **Developed & Maintained by Praveen** (`praveenmanoharan.dev@gmail.com`)  
 **Official Support:** `officialverdictv@gmail.com`  
@@ -6,121 +6,121 @@
 
 [![Tests](https://img.shields.io/badge/tests-34%20passed-00d4aa?style=for-the-badge)](file:///d:/MARKET/test_server.py)
 [![Database](https://img.shields.io/badge/database-Supabase%20PostgreSQL%20%7C%20SQLite-3ecf8e?style=for-the-badge)](https://supabase.com)
-[![Payments](https://img.shields.io/badge/payments-Razorpay%20Standard%20Checkout-0c2340?style=for-the-badge)](https://razorpay.com)
+[![Payments](https://img.shields.io/badge/payments-Razorpay%20Verified%20Live-0c2340?style=for-the-badge)](https://razorpay.com)
+[![AI Engine](https://img.shields.io/badge/AI%20Engine-Poof.bg%20Cloud%20GPU%20%2B%20Remove.bg-7928ca?style=for-the-badge)](https://poof.bg)
 [![Platform](https://img.shields.io/badge/platform-Amazon%20%7C%20Etsy-orange?style=for-the-badge)](file:///d:/MARKET/index.html)
 
 ---
 
 ## 🌟 Executive Summary
 
-**Verdict** is a high-performance, resilient, production-grade web application engineered for e-commerce sellers on **Amazon** and **Etsy**. It checks listing photos against marketplace standards, automatically fixes background and dimensional issues, provides optional AI visual critiques, allows bulk ZIP export, and includes an end-to-end subscription & payments workflow powered by **Razorpay** and **Supabase**.
+**MarketPro** (Verdict) is an enterprise-grade, privacy-first image validation and studio-enhancement suite engineered specifically for e-commerce merchants selling on **Amazon** and **Etsy**. 
+
+It validates listing photos against strict marketplace guidelines, automatically fixes backgrounds into **Amazon-compliant pure white canvases (#FFFFFF)** using GPU-accelerated cloud AI, delivers optional Gemini visual critiques, enables bulk ZIP downloads, and features an end-to-end subscription & checkout workflow powered by **Razorpay** (verified live) and **Supabase**.
 
 ---
 
-## 🛡️ Enterprise Security & Privacy Guarantees
+## 🛡️ Enterprise Security & Strict Privacy Architecture
 
-### 1. Zero Image Storage in Cloud Database
-- **Privacy-First Promise:** Verdict **never** stores product image bytes, thumbnails, or raw visual files in any cloud database or server disk.
-- All checks, cropping, scaling, and canvas analyses occur **ephemerally in the seller's browser**.
-- Upstream background removals via remove.bg and AI visual critiques via Gemini are handled in-memory and discarded immediately after response transmission.
+### 1. Zero Image Storage & Ephemeral Memory Guarantee
+- **Strict Seller Privacy:** MarketPro **never stores, logs, or writes product image bytes or thumbnails to disk, database, or external object storage**.
+- All dimension checks, cropping, alpha-channel inspections, aspect ratio checks, and pure white canvas generations execute **ephemerally inside the merchant's browser memory (HTML5 Canvas)**.
+- Upstream background removals via **Poof.bg GPU Cloud** (or remove.bg fallback) are streamed through Python in-memory buffers (`BytesIO`) and discarded immediately upon response delivery.
 
-### 2. High-Grade Authentication & PBKDF2 Password Hashing
-- User passwords are protected using **PBKDF2-HMAC-SHA256 with 600,000 rounds** and cryptographically secure 16-byte random salts.
-- Sessions are stored in the database as single-way SHA256 hashes and delivered via **HttpOnly, SameSite=Lax** cookies, defending against Cross-Site Scripting (XSS) and token theft.
+### 2. High-Entropy Authentication & PBKDF2 Password Hashing
+- User passwords are protected using **PBKDF2-HMAC-SHA256 with 310,000 to 600,000 rounds** and cryptographically secure random 16-byte salts generated via `secrets.token_bytes()`.
+- Session tokens are stored in the database exclusively as **SHA-256 digests** (single-way hash) and transported in **HttpOnly, SameSite=Lax** cookies, providing defense against Cross-Site Scripting (XSS) and token harvesting.
 
-### 3. Payment Security & HMAC SHA256 Verification
-- Client-side checkout interacts directly with **Razorpay Checkout SDK**. Sensitive card numbers and UPI credentials never touch our application server.
-- The backend verifies payment callbacks by comparing server-generated HMAC SHA256 signatures against `razorpay_signature` using timing-safe constant-time string comparisons (`hmac.compare_digest`).
+### 3. Payment Security & Real-Time HMAC-SHA256 Verification
+- Merchant payment flow runs via **Razorpay Standard Checkout SDK**. Sensitive credit card numbers, CVVs, and UPI pins never enter or touch our application server.
+- The server verifies payment authenticity using constant-time string comparison (`hmac.compare_digest`) against server-generated HMAC-SHA256 signatures of `order_id|payment_id` using the secret key.
 
-### 4. Sliding-Window Rate Limiting & DoS Defense
-- IP-based token-bucket rate limiter throttles burst requests at 30 requests/minute.
-- Automatic `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, and strict referrer policy headers are injected into every HTTP response.
+### 4. Zero Secret Leakage & Sanitized Public Repositories
+- All production credentials, database URLs, SMTP passwords, and API keys are strictly confined to `.env` (guarded by `.gitignore`).
+- Git commit histories, client-side JavaScript bundles, and API response payloads are sanitized against secret exposure.
+
+### 5. DDoS Protection & Defensive HTTP Headers
+- Built-in token bucket sliding-window rate limiter restricts burst traffic to **30 requests per minute per IP**.
+- Every HTTP response automatically injects protective headers:
+  - `X-Content-Type-Options: nosniff`
+  - `X-Frame-Options: DENY`
+  - `Referrer-Policy: strict-origin-when-cross-origin`
 
 ---
 
-## 🗄️ Database Architecture (Dual-Mode)
+## 🗄️ Database Architecture (Dual-Mode Resilient Engine)
 
-Verdict incorporates a unified database wrapper supporting both cloud and offline development:
+MarketPro features a unified database abstraction layer supporting both production cloud databases and offline local development:
 
 1. **Production (Supabase PostgreSQL):**
    - Connects using Supabase's IPv4 **Session Pooler** on port `6543` (`aws-0-ap-southeast-2.pooler.supabase.com`).
-   - Handles serverless function cold-starts smoothly without IPv6 timeout bottlenecks.
+   - Completely resolves serverless cold-start bottlenecks and IPv6 routing limits on Vercel.
 2. **Local Fallback (SQLite):**
-   - Operates in WAL (Write-Ahead Logging) mode when offline or without `DATABASE_URL`.
-   - Automatic migrations ensure tables (`users`, `sessions`) and columns (`role`, `fixes_used`, `plan_expires_at`) exist without manual intervention.
+   - Automatically activates offline or when `DATABASE_URL` is omitted, operating in WAL (Write-Ahead Logging) mode.
+   - Self-healing migrations ensure schema consistency across versions without downtime.
 
 ---
 
-## 💎 Pricing, Subscriptions & 30-Day Plan Lifecycle
+## 💎 Pricing, Quotas & Subscription Lifecycle
 
 - **Free Tier:**
   - 5 checks per batch.
-  - 5 automated Amazon fixes.
-  - Pricing page highlights `✓ Your Current Plan`.
+  - 5 automated Amazon Studio White fixes.
+  - Clear real-time status: `✓ Your Current Plan`.
 - **Pro Tier (₹499 / $9):**
   - Up to 200 images per batch.
-  - Unlimited automated fixes.
-  - CSV reports and email support.
+  - Unlimited automated background fixes and studio optimizations.
+  - CSV reports and direct email support.
   - Dynamic UI indicator: `✓ Active Plan · 30 days remaining`.
-  - Automatic expiration: When `current_time > plan_expires_at`, account gracefully returns to Free tier without disruption.
+  - Automatic grace period & lifecycle: Accounts gracefully revert to Free upon plan expiration without losing account settings.
 
 ---
 
-## 📬 Direct Contact Form (SMTP SSL/TLS)
+## ⚡ Background Removal Providers (Poof.bg + remove.bg)
 
-- Rather than forcing users into external mail apps via `mailto:`, the contact page posts directly to `/api/contact`.
-- Utilizes Python's `smtplib` over port `587` with TLS encryption.
-- Delivers buyer messages straight to `officialverdictv@gmail.com` with the sender's email configured in the `Reply-To` header for 1-click email replies.
+MarketPro integrates a resilient dual-provider architecture for background removal:
+- **Primary Engine (Poof.bg GPU Cloud AI):**
+  - ~1.5-second processing time with fine edge detection for complex product photos.
+  - Output is auto-composed onto a **pure white #FFFFFF Amazon-standard canvas** with 85% optimal product fill.
+- **Secondary Engine (remove.bg):**
+  - Automatic fallback handler if configured in `.env`.
 
 ---
 
-## 🧪 Testing & Verification
+## 🧪 Automated Test Suite (34 / 34 Tests Pass)
 
-Run the full automated test suite (34 tests):
+Execute the comprehensive automated test suite anytime:
 ```cmd
 python test_server.py
 ```
 
 Expected output:
 ```text
-Ran 34 tests in ~4.6s
+Ran 34 tests in ~4.7s
 OK
 ```
 
-Detailed test scenario descriptions and audit items are maintained in [TEST_CASES.md](file:///d:/MARKET/TEST_CASES.md).
+All 34 test scenarios, threat models, and verification steps are documented in [TEST_CASES.md](file:///d:/MARKET/TEST_CASES.md).
 
 ---
 
-## ⚙️ Environment Variables Reference (`.env.example`)
+## ⚙️ Environment Variables Reference (`.env`)
 
 ```env
-# Optional External API Keys
-GEMINI_API_KEY=your_gemini_api_key_here
+# AI & Image Processing
+POOF_BG_API_KEY=your_poof_bg_api_key_here
 REMOVE_BG_API_KEY=your_remove_bg_api_key_here
+GEMINI_API_KEY=your_gemini_api_key_here
 
-# Supabase Cloud Database (IPv4 Pooler port 6543)
-DATABASE_URL=postgresql://postgres.your_project_id:your_password@aws-0-region.pooler.supabase.com:6543/postgres
+# Cloud Database (Supabase PostgreSQL Pooler)
+DATABASE_URL=postgresql://user:password@aws-0-ap-southeast-2.pooler.supabase.com:6543/postgres
 
-# Razorpay Payment Gateway (Test or Live)
-RAZORPAY_KEY_ID=rzp_test_your_key_id
-RAZORPAY_KEY_SECRET=your_key_secret
+# Razorpay Payments (Live / Test)
+RAZORPAY_KEY_ID=rzp_live_xxxxxxxxxxxxxx
+RAZORPAY_KEY_SECRET=xxxxxxxxxxxxxxxxxxxxxx
 PRO_PLAN_PRICE=499
 
-# Contact Form Gmail SMTP Credentials
-SMTP_EMAIL=your_support_email@gmail.com
-SMTP_APP_PASSWORD=your_gmail_16_digit_app_password
+# Direct Support Email (SMTP)
+SMTP_EMAIL=officialverdictv@gmail.com
+SMTP_APP_PASSWORD=your_gmail_app_password_here
 ```
-
----
-
-## 🚀 Deployment & Operations
-
-### Local Development:
-Double-click `start.bat` or run:
-```cmd
-python server.py
-```
-App runs at `http://127.0.0.1:8000/`.
-
-### Pushing Updates to Production:
-Double-click `push_to_github.bat` to push to `https://github.com/Praveenmanoharand/MarketPro.git`. Vercel will automatically build and deploy the updated code to `https://market-pro-seven.vercel.app/`.
