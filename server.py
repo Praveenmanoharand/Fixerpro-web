@@ -22,8 +22,14 @@ from getpass import getpass
 from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from typing import Generator
+from typing import Any, Generator
 from urllib.parse import unquote, urlsplit
+
+try:
+    import psycopg2
+    import psycopg2.extras
+except ImportError:
+    psycopg2 = None
 
 # ── Configuration ──────────────────────────────────────────────────────────
 
@@ -56,6 +62,11 @@ def read_env_file(path: Path) -> dict[str, str]:
 
 for _key, _value in read_env_file(ENV_FILE).items():
     os.environ.setdefault(_key, _value)
+
+DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
+RAZORPAY_KEY_ID = os.environ.get("RAZORPAY_KEY_ID", "").strip()
+RAZORPAY_KEY_SECRET = os.environ.get("RAZORPAY_KEY_SECRET", "").strip()
+PRO_PLAN_PRICE = int(os.environ.get("PRO_PLAN_PRICE", "499"))
 
 if os.environ.get("VERCEL"):
     DB_PATH = Path("/tmp/listingpreflight.sqlite3")
@@ -289,20 +300,82 @@ def review_image_with_gemini(
 
 # ── Database ───────────────────────────────────────────────────────────────
 
+class DBConnectionWrapper:
+    def __init__(self, raw_conn, is_pg: bool):
+        self.raw_conn = raw_conn
+        self.is_pg = is_pg
+        self.lastrowid = None
+
+    def _convert_query(self, query: str) -> str:
+        if self.is_pg:
+            return query.replace("?", "%s")
+        return query
+
+    def execute(self, query: str, params: tuple | list = ()):
+        q = self._convert_query(query)
+        if self.is_pg:
+            cur = self.raw_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            cur.execute(q, params)
+            if cur.description:
+                rows = cur.fetchall()
+                cur.close()
+                return DBResultWrapper(rows)
+            cur.close()
+            return DBResultWrapper([])
+        else:
+            return self.raw_conn.execute(q, params)
+
+    def executescript(self, script: str):
+        if self.is_pg:
+            cur = self.raw_conn.cursor()
+            cur.execute(script)
+            cur.close()
+        else:
+            self.raw_conn.executescript(script)
+
+    def commit(self):
+        self.raw_conn.commit()
+
+    def rollback(self):
+        self.raw_conn.rollback()
+
+    def close(self):
+        self.raw_conn.close()
+
+
+class DBResultWrapper:
+    def __init__(self, rows: list):
+        self.rows = rows
+        self._idx = 0
+
+    def fetchone(self):
+        if self.rows:
+            return self.rows[0]
+        return None
+
+    def fetchall(self):
+        return self.rows
+
+
 @contextmanager
-def connect_db() -> Generator[sqlite3.Connection, None, None]:
-    """Context manager for SQLite connections with WAL mode."""
-    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    connection = sqlite3.connect(DB_PATH, timeout=10)
-    connection.row_factory = sqlite3.Row
+def connect_db() -> Generator[Any, None, None]:
+    """Context manager for Database connection (Supabase Postgres or SQLite)."""
+    if DATABASE_URL and psycopg2:
+        conn = psycopg2.connect(DATABASE_URL)
+        wrapper = DBConnectionWrapper(conn, is_pg=True)
+    else:
+        DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+        raw_conn = sqlite3.connect(DB_PATH, timeout=10)
+        raw_conn.row_factory = sqlite3.Row
+        wrapper = DBConnectionWrapper(raw_conn, is_pg=False)
     try:
-        yield connection
-        connection.commit()
+        yield wrapper
+        wrapper.commit()
     except Exception:
-        connection.rollback()
+        wrapper.rollback()
         raise
     finally:
-        connection.close()
+        wrapper.close()
 
 
 DEV_EMAIL = "praveenmanoharan.dev@gmail.com"
@@ -312,36 +385,54 @@ DEV_PASSWORD = "1234567890@PR"
 def initialize_database() -> None:
     """Create tables and ensure schema is up to date."""
     with connect_db() as connection:
-        connection.executescript(
-            """
-            PRAGMA journal_mode = WAL;
-            CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                email TEXT NOT NULL UNIQUE,
-                salt BLOB NOT NULL,
-                password_hash BLOB NOT NULL,
-                plan TEXT NOT NULL DEFAULT 'free',
-                role TEXT NOT NULL DEFAULT 'user',
-                fixes_used INTEGER NOT NULL DEFAULT 0,
-                created_at INTEGER NOT NULL
-            );
-            CREATE TABLE IF NOT EXISTS sessions (
-                token_hash TEXT PRIMARY KEY,
-                user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-                expires_at INTEGER NOT NULL
-            );
-            """
-        )
-        columns = {row[1] for row in connection.execute("PRAGMA table_info(users)")}
-        if "role" not in columns:
-            connection.execute(
-                "ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'user'"
+        if connection.is_pg:
+            connection.executescript(
+                """
+                CREATE TABLE IF NOT EXISTS users (
+                    id SERIAL PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    email TEXT NOT NULL UNIQUE,
+                    salt BYTEA NOT NULL,
+                    password_hash BYTEA NOT NULL,
+                    plan TEXT NOT NULL DEFAULT 'free',
+                    role TEXT NOT NULL DEFAULT 'user',
+                    fixes_used INTEGER NOT NULL DEFAULT 0,
+                    created_at BIGINT NOT NULL
+                );
+                CREATE TABLE IF NOT EXISTS sessions (
+                    token_hash TEXT PRIMARY KEY,
+                    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                    expires_at BIGINT NOT NULL
+                );
+                """
             )
-        if "fixes_used" not in columns:
-            connection.execute(
-                "ALTER TABLE users ADD COLUMN fixes_used INTEGER NOT NULL DEFAULT 0"
+        else:
+            connection.executescript(
+                """
+                PRAGMA journal_mode = WAL;
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    email TEXT NOT NULL UNIQUE,
+                    salt BLOB NOT NULL,
+                    password_hash BLOB NOT NULL,
+                    plan TEXT NOT NULL DEFAULT 'free',
+                    role TEXT NOT NULL DEFAULT 'user',
+                    fixes_used INTEGER NOT NULL DEFAULT 0,
+                    created_at INTEGER NOT NULL
+                );
+                CREATE TABLE IF NOT EXISTS sessions (
+                    token_hash TEXT PRIMARY KEY,
+                    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                    expires_at INTEGER NOT NULL
+                );
+                """
             )
+            columns = {row[1] for row in connection.execute("PRAGMA table_info(users)").fetchall()}
+            if "role" not in columns:
+                connection.execute("ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'user'")
+            if "fixes_used" not in columns:
+                connection.execute("ALTER TABLE users ADD COLUMN fixes_used INTEGER NOT NULL DEFAULT 0")
 
         # Ensure developer owner account exists with Pro + Admin privileges
         dev_salt = secrets.token_bytes(16)
@@ -365,12 +456,14 @@ def initialize_database() -> None:
 
 
 def password_hash(password: str, salt: bytes) -> bytes:
+    # Convert memoryview/bytes safely
+    salt_bytes = bytes(salt) if not isinstance(salt, bytes) else salt
     return hashlib.pbkdf2_hmac(
-        "sha256", password.encode("utf-8"), salt, PASSWORD_ITERATIONS
+        "sha256", password.encode("utf-8"), salt_bytes, PASSWORD_ITERATIONS
     )
 
 
-def public_user(row: sqlite3.Row) -> dict[str, object]:
+def public_user(row: Any) -> dict[str, object]:
     fixes_used = 0
     try:
         fixes_used = row["fixes_used"]
@@ -385,7 +478,6 @@ def public_user(row: sqlite3.Row) -> dict[str, object]:
         "max_free_fixes": 5,
         "unlimited": row["plan"] == "pro",
     }
-
 
 
 def provision_owner(email: str, name: str, password: str) -> None:
@@ -554,6 +646,12 @@ class PreflightHandler(BaseHTTPRequestHandler):
         if path == "/api/logout":
             self.logout()
             return
+        if path == "/api/payment/create-order":
+            self.create_payment_order_handler()
+            return
+        if path == "/api/payment/verify":
+            self.verify_payment_handler()
+            return
         if path == "/api/image/remove-background":
             self.remove_background_handler()
             return
@@ -580,6 +678,98 @@ class PreflightHandler(BaseHTTPRequestHandler):
             self.register(data)
         else:
             self.login(data)
+
+    def create_payment_order_handler(self) -> None:
+        user = self.current_user()
+        if not user:
+            self.send_json(401, {"error": "Please log in before upgrading to Pro."})
+            return
+        if not RAZORPAY_KEY_ID or not RAZORPAY_KEY_SECRET:
+            self.send_json(503, {"error": "Payment gateway is not configured on this server."})
+            return
+
+        amount_in_paise = PRO_PLAN_PRICE * 100
+        receipt = f"rcpt_{user['id']}_{int(time.time())}"
+        order_payload = {
+            "amount": amount_in_paise,
+            "currency": "INR",
+            "receipt": receipt,
+            "notes": {
+                "user_id": str(user["id"]),
+                "email": user["email"],
+                "plan": "pro"
+            }
+        }
+        auth_bytes = base64.b64encode(f"{RAZORPAY_KEY_ID}:{RAZORPAY_KEY_SECRET}".encode("ascii")).decode("ascii")
+        req = urllib.request.Request(
+            "https://api.razorpay.com/v1/orders",
+            data=json.dumps(order_payload).encode("utf-8"),
+            headers={
+                "Authorization": f"Basic {auth_bytes}",
+                "Content-Type": "application/json"
+            },
+            method="POST"
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=15) as res:
+                order_data = json.loads(res.read().decode("utf-8"))
+        except Exception as err:
+            self.send_json(502, {"error": f"Failed to initialize payment with Razorpay: {err}"})
+            return
+
+        self.send_json(200, {
+            "order_id": order_data.get("id"),
+            "amount": amount_in_paise,
+            "currency": "INR",
+            "key_id": RAZORPAY_KEY_ID,
+            "user_name": user["name"],
+            "user_email": user["email"]
+        })
+
+    def verify_payment_handler(self) -> None:
+        user = self.current_user()
+        if not user:
+            self.send_json(401, {"error": "Please log in."})
+            return
+        data = self.read_json()
+        if not data:
+            return
+
+        order_id = data.get("razorpay_order_id", "").strip()
+        payment_id = data.get("razorpay_payment_id", "").strip()
+        signature = data.get("razorpay_signature", "").strip()
+
+        if not (order_id and payment_id and signature):
+            self.send_json(400, {"error": "Missing payment verification parameters."})
+            return
+
+        # HMAC SHA256 verification
+        expected_sig = hmac.new(
+            RAZORPAY_KEY_SECRET.encode("utf-8"),
+            f"{order_id}|{payment_id}".encode("utf-8"),
+            hashlib.sha256
+        ).hexdigest()
+
+        if not hmac.compare_digest(expected_sig, signature):
+            self.send_json(400, {"error": "Payment verification failed. Invalid signature."})
+            return
+
+        # Upgrade user in Database
+        with connect_db() as connection:
+            connection.execute(
+                "UPDATE users SET plan = 'pro', fixes_used = 0 WHERE id = ?",
+                (user["id"],)
+            )
+            updated_user = connection.execute(
+                "SELECT * FROM users WHERE id = ?",
+                (user["id"],)
+            ).fetchone()
+
+        self.send_json(200, {
+            "ok": True,
+            "message": "Payment verified! Your account is now upgraded to Pro.",
+            "user": public_user(updated_user) if updated_user else None
+        })
 
     def record_fix_handler(self) -> None:
         user = self.current_user()
@@ -785,26 +975,43 @@ class PreflightHandler(BaseHTTPRequestHandler):
         salt = secrets.token_bytes(16)
         try:
             with connect_db() as connection:
-                cursor = connection.execute(
-                    "INSERT INTO users (name, email, salt, password_hash, created_at) "
-                    "VALUES (?, ?, ?, ?, ?)",
-                    (
-                        name.strip(),
-                        normalized_email,
-                        salt,
-                        password_hash(password, salt),
-                        int(time.time()),
-                    ),
+                if connection.is_pg:
+                    res = connection.execute(
+                        "INSERT INTO users (name, email, salt, password_hash, created_at) "
+                        "VALUES (?, ?, ?, ?, ?) RETURNING id",
+                        (
+                            name.strip(),
+                            normalized_email,
+                            salt,
+                            password_hash(password, salt),
+                            int(time.time()),
+                        ),
+                    )
+                    user_id = res.fetchone()["id"]
+                else:
+                    cursor = connection.execute(
+                        "INSERT INTO users (name, email, salt, password_hash, created_at) "
+                        "VALUES (?, ?, ?, ?, ?)",
+                        (
+                            name.strip(),
+                            normalized_email,
+                            salt,
+                            password_hash(password, salt),
+                            int(time.time()),
+                        ),
+                    )
+                    user_id = cursor.lastrowid
+        except Exception as exc:
+            err_str = str(exc).lower()
+            if "unique" in err_str or "duplicate" in err_str or "integrity" in err_str:
+                self.send_json(
+                    409,
+                    {
+                        "error": "An account with this email already exists. Log in instead."
+                    },
                 )
-                user_id = cursor.lastrowid
-        except sqlite3.IntegrityError:
-            self.send_json(
-                409,
-                {
-                    "error": "An account with this email already exists. Log in instead."
-                },
-            )
-            return
+                return
+            raise
         self.create_session(user_id, 201)
 
     def login(self, data: dict) -> None:

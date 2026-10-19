@@ -39,6 +39,7 @@ class BackendTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        server.DATABASE_URL = ""
         cls.temp_dir = tempfile.TemporaryDirectory()
         server.DB_PATH = Path(cls.temp_dir.name) / "test.sqlite3"
         server.initialize_database()
