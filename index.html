@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
 <title>Amazon & Etsy Image Checker | Fixerpro</title>
 <meta name="description" content="Check product photos against Amazon and Etsy image rules before you upload. See what will likely fail, fix it, and download. Runs in your browser.">
 <meta name="robots" content="index,follow">
-<meta name="theme-color" content="#0d1311">
+<meta name="theme-color" content="#ffffff">
 <meta name="author" content="Praveen">
 <meta name="keywords" content="amazon image checker, etsy image checker, product photo checker, listing image validator, e-commerce photo tools">
 <meta property="og:type" content="website">
@@ -2226,11 +2226,16 @@ async function ensureFixAccess(count = 1) {
 
 /* ── Theme Toggle ───────────────────────────────────────────── */
 const savedTheme = ls.get('pf-theme');
-if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+if (savedTheme) {
+  if (savedTheme === 'dark') document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme', 'light');
+} else {
+  // Default to clean, modern Light theme
+  document.documentElement.setAttribute('data-theme', 'light');
+}
 $('themeToggle').onclick = () => {
   const current = document.documentElement.getAttribute('data-theme');
   const next = current === 'light' ? 'dark' : 'light';
-  document.documentElement.setAttribute('data-theme', next === 'dark' ? '' : next);
   if (next === 'dark') document.documentElement.removeAttribute('data-theme');
   else document.documentElement.setAttribute('data-theme', 'light');
   ls.set('pf-theme', next);
