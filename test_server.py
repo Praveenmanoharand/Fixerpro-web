@@ -347,7 +347,7 @@ class BackendTests(unittest.TestCase):
         self.assertIn("not configured", payload["error"])
 
     def test_background_removal_reports_missing_server_api_key(self):
-        with patch.dict(os.environ, {"REMOVE_BG_API_KEY": ""}):
+        with patch.dict(os.environ, {"REMOVE_BG_API_KEY": "", "POOF_BG_API_KEY": ""}):
             status, payload, _ = self.request(
                 "POST",
                 "/api/image/remove-background",

@@ -89,6 +89,7 @@ PASSWORD_ITERATIONS = 310_000
 EMAIL_RE = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
 MAX_IMAGE_BYTES = 25 * 1024 * 1024
 REMOVE_BG_URL = "https://api.remove.bg/v1.0/removebg"
+POOF_BG_URL = "https://api.poof.bg/v1/remove"
 GEMINI_INTERACTIONS_URL = "https://generativelanguage.googleapis.com/v1beta/interactions"
 GEMINI_URL = GEMINI_INTERACTIONS_URL
 MAX_GEMINI_RESPONSE_BYTES = 256 * 1024
@@ -121,54 +122,61 @@ class ImageProcessingError(Exception):
 
 
 def remove_background(image: bytes, content_type: str, api_key: str) -> tuple[bytes, str]:
-    """Send image to remove.bg and return the result PNG."""
+    """Send image to Poof.bg (or remove.bg fallback) and return transparent PNG."""
+    is_poof = api_key.startswith("pk_") or "poof" in api_key.lower()
+    endpoint = POOF_BG_URL if is_poof else REMOVE_BG_URL
+    header_key = "x-api-key" if is_poof else "X-Api-Key"
+
     boundary = secrets.token_hex(16)
-    body = b"".join(
-        (
-            f"--{boundary}\r\n".encode("ascii"),
-            b'Content-Disposition: form-data; name="image_file"; filename="product-image"\r\n',
-            f"Content-Type: {content_type}\r\n\r\n".encode("ascii"),
-            image,
-            b"\r\n",
-            f"--{boundary}\r\n".encode("ascii"),
-            b'Content-Disposition: form-data; name="size"\r\n\r\nauto\r\n',
-            f"--{boundary}\r\n".encode("ascii"),
-            b'Content-Disposition: form-data; name="format"\r\n\r\npng\r\n',
-            f"--{boundary}--\r\n".encode("ascii"),
-        )
-    )
+    crlf = b"\r\n"
+    parts = [
+        b"--" + boundary.encode("ascii") + crlf,
+        b'Content-Disposition: form-data; name="image_file"; filename="product.png"' + crlf,
+        f"Content-Type: {content_type}".encode("ascii") + crlf + crlf,
+        image,
+        crlf,
+        b"--" + boundary.encode("ascii") + crlf,
+        b'Content-Disposition: form-data; name="size"' + crlf + crlf + b"auto" + crlf,
+        b"--" + boundary.encode("ascii") + crlf,
+        b'Content-Disposition: form-data; name="format"' + crlf + crlf + b"png" + crlf,
+        b"--" + boundary.encode("ascii") + b"--" + crlf,
+    ]
+    body = b"".join(parts)
+
     request = urllib.request.Request(
-        REMOVE_BG_URL,
+        endpoint,
         data=body,
         headers={
-            "X-Api-Key": api_key,
+            header_key: api_key,
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) MarketPro/2.0",
             "Content-Type": f"multipart/form-data; boundary={boundary}",
+            "Content-Length": str(len(body)),
         },
         method="POST",
     )
+    provider_name = "Poof.bg" if is_poof else "remove.bg"
     try:
         with urllib.request.urlopen(request, timeout=90) as response:
             result = response.read(MAX_IMAGE_BYTES + 1)
-            result_type = response.headers.get_content_type()
     except urllib.error.HTTPError as error:
         if error.code in (402, 429):
             raise ImageProcessingError(
-                "remove.bg plan credits or request limit reached. Check your remove.bg account."
+                f"{provider_name} plan credits or request limit reached. Check your API account."
             ) from error
         if error.code in (401, 403):
             raise ImageProcessingError(
-                "remove.bg rejected the API key. Check REMOVE_BG_API_KEY in .env."
+                f"{provider_name} rejected the API key. Check POOF_BG_API_KEY / REMOVE_BG_API_KEY in .env."
             ) from error
         if error.code in (400, 413):
             raise ImageProcessingError(
-                "remove.bg could not process this image. Check format and size."
+                f"{provider_name} could not process this image. Check format and size."
             ) from error
         raise ImageProcessingError(
-            f"remove.bg is temporarily unavailable (HTTP {error.code})."
+            f"{provider_name} is temporarily unavailable (HTTP {error.code})."
         ) from error
     except urllib.error.URLError as error:
         raise ImageProcessingError(
-            "Could not connect to remove.bg. Check your internet connection."
+            f"Could not connect to {provider_name}. Check your internet connection."
         ) from error
     except TimeoutError as error:
         raise ImageProcessingError(
@@ -176,11 +184,11 @@ def remove_background(image: bytes, content_type: str, api_key: str) -> tuple[by
         ) from error
     if len(result) > MAX_IMAGE_BYTES:
         raise ImageProcessingError("Processed image exceeded the 25 MB limit.")
-    if not result or result_type != "image/png":
+    if not result:
         raise ImageProcessingError(
-            "remove.bg returned an unexpected result. Check your API key."
+            f"{provider_name} returned an unexpected empty result. Check your API key."
         )
-    return result, result_type
+    return result, "image/png"
 
 
 def review_image_with_gemini(
@@ -946,12 +954,12 @@ class PreflightHandler(BaseHTTPRequestHandler):
                 400, {"error": "Image upload was incomplete. Please try again."}
             )
             return
-        api_key = os.environ.get("REMOVE_BG_API_KEY", "").strip()
+        api_key = os.environ.get("REMOVE_BG_API_KEY", "").strip() or os.environ.get("POOF_BG_API_KEY", "").strip()
         if not api_key:
             self.send_json(
                 503,
                 {
-                    "error": "Background removal is not configured. Set REMOVE_BG_API_KEY in .env file."
+                    "error": "Background removal is not configured. Set REMOVE_BG_API_KEY or POOF_BG_API_KEY in .env file."
                 },
             )
             return
@@ -1204,7 +1212,7 @@ def main() -> None:
     initialize_database()
 
     # Check for API keys
-    has_removebg = bool(os.environ.get("REMOVE_BG_API_KEY", "").strip())
+    has_removebg = bool(os.environ.get("POOF_BG_API_KEY", "").strip() or os.environ.get("REMOVE_BG_API_KEY", "").strip())
     has_gemini = bool(os.environ.get("GEMINI_API_KEY", "").strip())
 
     httpd = ThreadingHTTPServer((HOST, PORT), PreflightHandler)
@@ -1213,7 +1221,7 @@ def main() -> None:
     print(f"{'='*60}")
     print(f"  URL:          http://{HOST}:{httpd.server_port}/")
     print(f"  Database:     {DB_PATH}")
-    print(f"  remove.bg:    {'[OK] Configured' if has_removebg else '[-] Not set (Amazon Fix disabled)'}")
+    print(f"  AI Remover:   {'[OK] Configured (Poof.bg/Cloud GPU)' if has_removebg else '[-] Not set (Amazon Fix disabled)'}")
     print(f"  Gemini AI:    {'[OK] Configured' if has_gemini else '[-] Not set (AI Review disabled)'}")
     print(f"  Owner email:  {OWNER_EMAIL}")
     print(f"{'='*60}")
