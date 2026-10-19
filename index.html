@@ -1771,6 +1771,10 @@ h1, h2, .plan-price, .modal-header h2 { text-rendering: optimizeLegibility; font
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
         <span>Rules</span>
       </a>
+      <a href="#/how-to-use" data-r="how-to-use">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>How to Use</span>
+      </a>
       <a href="#/pricing" data-r="pricing">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
         <span>Pricing</span>
@@ -1827,6 +1831,7 @@ h1, h2, .plan-price, .modal-header h2 { text-rendering: optimizeLegibility; font
   <div class="container">
     <span id="footerBrand"></span>
     <span>
+      <a href="#/how-to-use">How to Use</a>
       <a href="#/pricing">Pricing</a>
       <a href="#/privacy">Privacy</a>
       <a href="#/terms">Terms</a>
@@ -2443,14 +2448,16 @@ function check(it) {
     it.fixed && it.backgroundCleaned === false ? a('warn', 'Original background preserved. Replace with pure white manually for Amazon main image.') : it.pure >= 0.98 ? a('ok', 'Background is pure white at edges.') : it.near >= 0.98 ? a('warn', 'Background looks off-white. Main image needs pure white (RGB 255,255,255).') : a('bad', 'Background is not white. Main image needs pure white.');
     if (it.fixed && it.backgroundCleaned) a('info', 'Review cutout edges and compare with original before using.');
     it.fixed && it.backgroundCleaned === false ? a('warn', 'Product fill cannot be measured with original background.') : it.near < 0.98 ? a('warn', 'Product fill cannot be estimated against non-white background.') : !it.bbox ? a('warn', 'Product not found. Check manually.') : it.fill >= r.fill ? a('ok', `Product fill ~${Math.round(it.fill*100)}% of frame.`) : it.fill >= 0.75 ? a('warn', `Product fill ~${Math.round(it.fill*100)}%. Aim for 85%+.`) : a('bad', `Product fill ~${Math.round(it.fill*100)}%. Aim for 85%+.`);
-    if (it.fixed && it.sourceUpscale > 1.5) a('warn', `Source enlarged ~${it.sourceUpscale.toFixed(1)}×. Result may look soft.`);
+    if (it.fixed && it.sourceUpscale > 1.8) {
+      a('info', `Source enlarged ~${it.sourceUpscale.toFixed(1)}×. Resolution is compliant (2000×2000), but original was smaller so preview may look slightly soft.`);
+    }
     const q = it.W / it.H; q > 0.97 && q < 1.03 ? a('ok', 'Square image.') : a('warn', 'Not square. Square is recommended.');
     ['image/jpeg', 'image/png'].includes(it.type) ? a('ok', 'File type accepted.') : a('warn', 'Convert to JPG or PNG.');
     a('info', 'Check by eye: no text, logos, borders or extra items on main image.');
   } else {
     it.W >= r.w ? a('ok', `Width ${it.W} px is enough.`) : a('warn', `Width ${it.W} px. ~1500 px+ recommended.`);
     Math.abs(it.W / it.H - r.ratio) < 0.04 ? a('ok', 'Ratio is ~4:3.') : a('warn', 'Not 4:3. Search grids may crop unexpectedly.');
-    if (it.fixed && it.sourceUpscale > 1.5) a('warn', `Source enlarged ~${it.sourceUpscale.toFixed(1)}×. May look soft.`);
+    if (it.fixed && it.sourceUpscale > 1.8) a('info', `Source enlarged ~${it.sourceUpscale.toFixed(1)}×. May look slightly soft.`);
     a('info', 'Avoid watermark overlays. Etsy advises against them.');
   }
   return o;
@@ -2784,6 +2791,164 @@ const PAGES = {
       </tbody></table></div>
       <p style="margin-top:24px"><a class="btn primary" href="#/">Check your images</a></p>
     </div>`
+  },
+  'how-to-use': {
+    t: 'How to Use Fixerpro — Complete Step-by-Step Guide',
+    d: 'Learn how to check, auto-fix, and optimize product images for Amazon, Flipkart, Meesho, Myntra & Etsy in seconds.',
+    h: () => `<div class="container page-content" style="max-width:1040px;padding-top:24px;">
+      <div style="text-align:center;max-width:720px;margin:0 auto 36px;">
+        <span class="badge" style="background:rgba(16,185,129,0.12);color:var(--accent);border:1px solid rgba(16,185,129,0.25);font-size:0.85rem;padding:6px 14px;border-radius:9999px;font-weight:600;display:inline-flex;align-items:center;gap:6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Seller Quickstart Guide
+        </span>
+        <h1 style="font-size:clamp(1.9rem, 4vw, 2.6rem);font-weight:800;letter-spacing:-0.03em;margin:14px 0 10px;line-height:1.2;">How to Use Fixerpro</h1>
+        <p class="lead" style="font-size:1.05rem;color:var(--text-secondary);margin:0;">Validate, transform, and optimize product images in 4 simple steps to meet marketplace guidelines and avoid listing rejection.</p>
+      </div>
+
+      <!-- 4 Step Interactive Cards -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:20px;margin-bottom:44px;">
+        <!-- Step 1 -->
+        <div class="card" style="padding:24px;border-radius:18px;border:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;background:rgba(16,185,129,0.15);color:var(--accent);font-weight:700;font-size:0.95rem;">01</span>
+            <span style="font-size:0.8rem;color:var(--text-secondary);font-weight:600;text-transform:uppercase;letter-spacing:0.04em;">Upload</span>
+          </div>
+          <h3 style="margin:0;font-size:1.18rem;font-weight:700;">Select Marketplace & Photos</h3>
+          <p style="margin:0;color:var(--text-secondary);font-size:0.92rem;line-height:1.55;">Choose <strong>Amazon</strong> (or Flipkart / Meesho / Myntra square main image) or <strong>Etsy</strong> (4:3 ratio). Drag & drop up to 10 photos or click to browse files from your computer.</p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="card" style="padding:24px;border-radius:18px;border:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;background:rgba(59,130,246,0.15);color:#3b82f6;font-weight:700;font-size:0.95rem;">02</span>
+            <span style="font-size:0.8rem;color:var(--text-secondary);font-weight:600;text-transform:uppercase;letter-spacing:0.04em;">Validate</span>
+          </div>
+          <h3 style="margin:0;font-size:1.18rem;font-weight:700;">Instant Compliance Scan</h3>
+          <p style="margin:0;color:var(--text-secondary);font-size:0.92rem;line-height:1.55;">Within milliseconds in your browser, Fixerpro checks <strong>pure white background (#FFFFFF)</strong>, <strong>product fill % (85%+)</strong>, <strong>dimensions (2000×2000)</strong>, aspect ratio, and colour space (RGB).</p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="card" style="padding:24px;border-radius:18px;border:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;background:rgba(245,158,11,0.15);color:#f59e0b;font-weight:700;font-size:0.95rem;">03</span>
+            <span style="font-size:0.8rem;color:var(--text-secondary);font-weight:600;text-transform:uppercase;letter-spacing:0.04em;">Auto-Fix</span>
+          </div>
+          <h3 style="margin:0;font-size:1.18rem;font-weight:700;">1-Click AI Background Removal</h3>
+          <p style="margin:0;color:var(--text-secondary);font-size:0.92rem;line-height:1.55;">Click <strong>Fix</strong> or <strong>Fix all images</strong>. Our AI automatically isolates the product, places it on a compliant studio pure white canvas (#FFFFFF), and crops to optimal ~88% fill.</p>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="card" style="padding:24px;border-radius:18px;border:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;background:rgba(139,92,246,0.15);color:#8b5cf6;font-weight:700;font-size:0.95rem;">04</span>
+            <span style="font-size:0.8rem;color:var(--text-secondary);font-weight:600;text-transform:uppercase;letter-spacing:0.04em;">Download</span>
+          </div>
+          <h3 style="margin:0;font-size:1.18rem;font-weight:700;">Download Single or Bulk ZIP</h3>
+          <p style="margin:0;color:var(--text-secondary);font-size:0.92rem;line-height:1.55;">Download individual high-res compliant images with standard SKU naming (e.g. <code>SKU.MAIN.jpg</code>) or download a complete batch ZIP package ready to upload to seller central.</p>
+        </div>
+      </div>
+
+      <!-- Marketplace Compatibility Guide Section -->
+      <div class="card" style="padding:32px;border-radius:20px;border:1px solid var(--border);background:var(--surface);margin-bottom:36px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;background:rgba(16,185,129,0.15);color:var(--accent);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </span>
+          <h2 style="margin:0;font-size:1.4rem;font-weight:700;">Marketplace Rules Compatibility Guide</h2>
+        </div>
+        <p style="color:var(--text-secondary);font-size:0.95rem;margin:0 0 20px;line-height:1.6;">
+          Are the Amazon rules also applicable to <strong>Flipkart, Meesho, and Myntra</strong>? <strong>Yes!</strong> In fact, Indian e-commerce marketplaces enforce very similar standards for listing approval:
+        </p>
+
+        <div class="table-wrap">
+          <table style="width:100%;font-size:0.92rem;">
+            <thead>
+              <tr>
+                <th style="text-align:left;">Marketplace</th>
+                <th style="text-align:left;">Main Image Background</th>
+                <th style="text-align:left;">Min / Rec Resolution</th>
+                <th style="text-align:left;">Aspect Ratio</th>
+                <th style="text-align:left;">Fixerpro Preset to Use</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Amazon</strong></td>
+                <td><span class="tag pass" style="font-size:0.75rem;">Pure White (#FFFFFF)</span></td>
+                <td>1000px min (2000×2000 rec)</td>
+                <td>1:1 Square</td>
+                <td><code>Amazon</code> (Export 2000×2000)</td>
+              </tr>
+              <tr>
+                <td><strong>Flipkart</strong></td>
+                <td><span class="tag pass" style="font-size:0.75rem;">Pure White (#FFFFFF)</span></td>
+                <td>1100px min (2000×2000 rec)</td>
+                <td>1:1 Square</td>
+                <td><code>Amazon</code> (100% Flipkart Compliant)</td>
+              </tr>
+              <tr>
+                <td><strong>Meesho</strong></td>
+                <td><span class="tag pass" style="font-size:0.75rem;">Pure White / Clean Plain</span></td>
+                <td>500px min (1000–2000 rec)</td>
+                <td>1:1 Square or 3:4</td>
+                <td><code>Amazon</code> (Square) or <code>Etsy</code></td>
+              </tr>
+              <tr>
+                <td><strong>Myntra</strong></td>
+                <td><span class="tag pass" style="font-size:0.75rem;">Pure White / Studio Grey</span></td>
+                <td>1080×1440 min (Zoomable)</td>
+                <td>3:4 Portrait</td>
+                <td><code>Etsy</code> or <code>Amazon</code></td>
+              </tr>
+              <tr>
+                <td><strong>Etsy</strong></td>
+                <td>Any artistic / clean studio</td>
+                <td>1500px+ width</td>
+                <td>4:3 Landscape/Square</td>
+                <td><code>Etsy</code> (Export 2000×1500)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="font-size:0.88rem;color:var(--text-secondary);margin:16px 0 0;line-height:1.5;">
+          💡 <strong>Pro Tip for Indian Sellers:</strong> Selecting the <strong>Amazon</strong> option in Fixerpro automatically creates a high-res <strong>2000×2000 px image on pure white (#FFFFFF) background with 88% product fill</strong>. This is 100% fully compliant with both <strong>Amazon India</strong> and <strong>Flipkart Seller Hub</strong>!
+        </p>
+      </div>
+
+      <!-- FAQ: Understanding Status Badges -->
+      <div class="card" style="padding:32px;border-radius:20px;border:1px solid var(--border);background:var(--surface);margin-bottom:36px;">
+        <h2 style="font-size:1.35rem;font-weight:700;margin:0 0 16px;">Understanding Image Status Badges</h2>
+        <div style="display:flex;flex-direction:column;gap:18px;">
+          <div style="display:flex;gap:16px;align-items:flex-start;">
+            <span class="tag pass" style="white-space:nowrap;padding:4px 10px;font-size:0.85rem;">✓ Likely to pass</span>
+            <p style="margin:0;font-size:0.92rem;color:var(--text-secondary);line-height:1.5;">Image satisfies all critical technical requirements: pure white edges, high pixel resolution (2000×2000), optimal product fill, and accepted JPEG/PNG format.</p>
+          </div>
+          <div style="display:flex;gap:16px;align-items:flex-start;">
+            <span class="tag warn" style="white-space:nowrap;padding:4px 10px;font-size:0.85rem;">! Needs a look</span>
+            <p style="margin:0;font-size:0.92rem;color:var(--text-secondary);line-height:1.5;">The image has one non-critical warning. For example, if you upload a very small low-res thumbnail (e.g. 400×400 px), enlarging it to Amazon's mandatory 2000×2000 px can cause the product to look slightly soft or pixelated. We advise checking visual sharpness or uploading a higher-resolution original camera photo.</p>
+          </div>
+          <div style="display:flex;gap:16px;align-items:flex-start;">
+            <span class="tag fail" style="white-space:nowrap;padding:4px 10px;font-size:0.85rem;">✕ Likely to fail</span>
+            <p style="margin:0;font-size:0.92rem;color:var(--text-secondary);line-height:1.5;">Image violates marketplace policy (e.g. non-white background, CMYK color space, or product fills under 70% of the frame). Click <strong>Fix</strong> to automatically convert it into a compliant listing photo.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom CTA banner -->
+      <div style="text-align:center;padding:36px 20px;border-radius:20px;background:linear-gradient(135deg, rgba(16,185,129,0.1), rgba(59,130,246,0.06));border:1px solid rgba(16,185,129,0.25);">
+        <h2 style="font-size:1.45rem;font-weight:700;margin:0 0 10px;">Ready to test and fix your product photos?</h2>
+        <p style="color:var(--text-secondary);font-size:0.95rem;margin:0 0 20px;">Fix your first 5 listing photos for free with zero downloads or software needed.</p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+          <a class="btn primary lg" href="#/">Open Image Checker</a>
+          <a class="btn lg" href="#/pricing">View Pro Plans</a>
+        </div>
+      </div>
+    </div>`
+  },
+  'guide': {
+    t: 'How to Use Fixerpro',
+    d: 'Learn how to check and fix product photos for Amazon, Flipkart, Meesho, Myntra, and Etsy.',
+    h: () => PAGES['how-to-use'].h()
   },
   'checkout': {
     t: 'Checkout',
