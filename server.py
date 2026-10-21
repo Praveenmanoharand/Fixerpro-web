@@ -653,6 +653,30 @@ class PreflightHandler(BaseHTTPRequestHandler):
             })
             return
 
+        if path == "/robots.txt":
+            robots_file = ROOT / "robots.txt"
+            if robots_file.exists():
+                body = robots_file.read_bytes()
+                self.send_response(200)
+                self.send_header("Content-Type", "text/plain; charset=utf-8")
+                self.send_header("Content-Length", str(len(body)))
+                self._security_headers()
+                self.end_headers()
+                self.wfile.write(body)
+                return
+
+        if path == "/sitemap.xml":
+            sitemap_file = ROOT / "sitemap.xml"
+            if sitemap_file.exists():
+                body = sitemap_file.read_bytes()
+                self.send_response(200)
+                self.send_header("Content-Type", "application/xml; charset=utf-8")
+                self.send_header("Content-Length", str(len(body)))
+                self._security_headers()
+                self.end_headers()
+                self.wfile.write(body)
+                return
+
         # Serve main SPA — all non-API GET requests serve index.html
         if path == "/" or not path.startswith("/api/"):
             self.send_html_file(HTML_FILE)
