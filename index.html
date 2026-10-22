@@ -1320,6 +1320,44 @@ footer a:hover { color: var(--accent); }
   box-shadow: 0 2px 12px rgba(255, 184, 0, 0.18);
 }
 
+/* ── Google Auth & General Auth Loading State ─────────────── */
+.auth-loading-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 24px 16px;
+  background: color-mix(in srgb, var(--bg-card) 92%, transparent);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin: 10px 0;
+  animation: fadeIn 0.25s ease-out;
+}
+.auth-spinner {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid color-mix(in srgb, var(--accent) 25%, transparent);
+  border-top-color: var(--accent);
+  animation: authSpin 0.75s linear infinite;
+}
+@keyframes authSpin {
+  to { transform: rotate(360deg); }
+}
+.auth-loading-text {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.auth-loading-sub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
 /* ══════════════════════════════════════════════════════════════
    RESPONSIVE SYSTEM v2 — theme-aware, no !important wars
    Must stay LAST in the stylesheet so it wins over base rules.
@@ -1997,11 +2035,40 @@ const CONFIG = {
 /* Google One-Tap / OAuth Handler */
 async function handleGoogleCredentialResponse(response) {
   if (!response || !response.credential) return;
+
+  const mGoogle = $('mGoogleBtn');
+  const pageGoogle = $('pageGoogleBtn');
+  const originalMHtml = mGoogle ? mGoogle.innerHTML : '';
+  const originalPageHtml = pageGoogle ? pageGoogle.innerHTML : '';
+
+  const loaderHtml = `
+    <div class="auth-loading-overlay">
+      <div class="auth-spinner"></div>
+      <div class="auth-loading-text">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span>Signing in with Google...</span>
+      </div>
+      <span class="auth-loading-sub">Verifying your account, please wait</span>
+    </div>
+  `;
+
+  if (mGoogle) mGoogle.innerHTML = loaderHtml;
+  if (pageGoogle) pageGoogle.innerHTML = loaderHtml;
+
   try {
     const res = await api('/auth/google', { credential: response.credential });
     if (res && res.user) {
+      if (mGoogle) {
+        mGoogle.innerHTML = `<div class="auth-loading-overlay" style="border-color:var(--accent);"><div class="auth-loading-text" style="color:var(--accent);">✓ Welcome back, ${esc(res.user.name || res.user.email)}!</div></div>`;
+      }
+      if (pageGoogle) {
+        pageGoogle.innerHTML = `<div class="auth-loading-overlay" style="border-color:var(--accent);"><div class="auth-loading-text" style="color:var(--accent);">✓ Welcome back, ${esc(res.user.name || res.user.email)}!</div></div>`;
+      }
+
       U.set(res.user);
       renderAu();
+      await nap(350);
+
       if ($('authModal') && !$('authModal').hidden) {
         const cb = authModalCallback;
         closeAuthModal();
@@ -2012,8 +2079,12 @@ async function handleGoogleCredentialResponse(response) {
       }
     }
   } catch(err) {
+    if (mGoogle) mGoogle.innerHTML = originalMHtml;
+    if (pageGoogle) pageGoogle.innerHTML = originalPageHtml;
+    renderGoogleAuthButtons();
+
     const fb = $('mAuthFeedback') || $('authFeedback');
-    if (fb) fb.innerHTML = `<div class="alert error"><span>${esc(err.message || 'Google sign-in failed.')}</span></div>`;
+    if (fb) fb.innerHTML = `<div class="alert error"><span>${esc(err.message || 'Google sign-in failed. Please try again.')}</span></div>`;
   }
 }
 
