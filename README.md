@@ -2,7 +2,7 @@
 
 **Better Images. Higher Sales.**  
 **Developed & Maintained by Praveen** (`praveenmanoharan.dev@gmail.com`)  
-**Official Support:** `officialverdictv@gmail.com`  
+**Official Support:** `officialfixerpro@gmail.com`  
 **Live Production URL:** [https://market-pro-seven.vercel.app/](https://market-pro-seven.vercel.app/)
 
 [![Tests](https://img.shields.io/badge/tests-34%20passed-00d4aa?style=for-the-badge)](file:///d:/MARKET/test_server.py)
@@ -122,6 +122,6 @@ RAZORPAY_KEY_SECRET=xxxxxxxxxxxxxxxxxxxxxx
 PRO_PLAN_PRICE=499
 
 # Direct Support Email (SMTP)
-SMTP_EMAIL=officialverdictv@gmail.com
+SMTP_EMAIL=officialfixerpro@gmail.com
 SMTP_APP_PASSWORD=your_gmail_app_password_here
 ```

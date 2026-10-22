@@ -48,7 +48,7 @@ python test_server.py
 | **AT-24** | Payment | Razorpay HMAC SHA256 Signature Check | Prevent tampered or forged payment callbacks | Validates signature match; invalid signature returns HTTP 400. |
 | **AT-25** | Payment | Pro Subscription Upgrade & 30-Day Window | Auto-upgrade and expiration calculation | Upgrades user to `pro`; sets `plan_expires_at` to exactly 30 days from now. |
 | **AT-26** | Contact | Contact Form Validation | Prevent spam & empty submissions | Validates name (min 2), email format, and message (min 5). |
-| **AT-27** | Contact | Contact Form SMTP Delivery | Direct delivery to official inbox without opening mail client | Sends SSL/TLS email to `officialverdictv@gmail.com` with Reply-To set to user email. |
+| **AT-27** | Contact | Contact Form SMTP Delivery | Direct delivery to official inbox without opening mail client | Sends SSL/TLS email to `officialfixerpro@gmail.com` with Reply-To set to user email. |
 | **AT-28** | Security | Rate Limiting | Protect against brute-force & denial of service | IP-based token bucket throttles excessive burst requests (HTTP 429). |
 | **AT-29** | Security | CSRF & Origin Validation | Cross-origin request forgery prevention | Validates request origin against host header on non-serverless requests. |
 | **AT-30** | Security | Defensive HTTP Headers | Defensive browser attack surface reduction | Injects `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`. |

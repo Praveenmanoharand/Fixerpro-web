@@ -70,7 +70,7 @@ DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
 RAZORPAY_KEY_ID = os.environ.get("RAZORPAY_KEY_ID", "").strip()
 RAZORPAY_KEY_SECRET = os.environ.get("RAZORPAY_KEY_SECRET", "").strip()
 PRO_PLAN_PRICE = int(os.environ.get("PRO_PLAN_PRICE", "499"))
-SMTP_EMAIL = os.environ.get("SMTP_EMAIL", "officialverdictv@gmail.com").strip()
+SMTP_EMAIL = os.environ.get("SMTP_EMAIL", "officialfixerpro@gmail.com").strip()
 SMTP_APP_PASSWORD = os.environ.get("SMTP_APP_PASSWORD", "").strip()
 
 if os.environ.get("VERCEL"):

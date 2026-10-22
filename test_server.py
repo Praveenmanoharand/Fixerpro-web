@@ -517,7 +517,7 @@ class BackendTests(unittest.TestCase):
             self.assertTrue(payload["user"]["days_left"] >= 29)
 
     def test_contact_form_validates_and_delivers(self):
-        with patch("server.SMTP_EMAIL", "officialverdictv@gmail.com"), \
+        with patch("server.SMTP_EMAIL", "officialfixerpro@gmail.com"), \
              patch("server.SMTP_APP_PASSWORD", "mock_pass"), \
              patch("smtplib.SMTP") as mock_smtp:
             instance = MagicMock()
