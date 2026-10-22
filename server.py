@@ -688,6 +688,19 @@ class PreflightHandler(BaseHTTPRequestHandler):
                 self.wfile.write(body)
                 return
 
+        if path in ("/favicon.png", "/icon.png", "/logo.png", "/logo_web.png"):
+            static_img = ROOT / path.lstrip("/")
+            if static_img.exists():
+                body = static_img.read_bytes()
+                self.send_response(200)
+                self.send_header("Content-Type", "image/png")
+                self.send_header("Content-Length", str(len(body)))
+                self.send_header("Cache-Control", "public, max-age=86400")
+                self._security_headers()
+                self.end_headers()
+                self.wfile.write(body)
+                return
+
         # Serve main SPA — all non-API GET requests serve index.html
         if path == "/" or not path.startswith("/api/"):
             self.send_html_file(HTML_FILE)
