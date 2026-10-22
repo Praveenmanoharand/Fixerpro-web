@@ -536,6 +536,35 @@ class BackendTests(unittest.TestCase):
             self.assertTrue(payload.get("ok"))
             instance.send_message.assert_called_once()
 
+    def test_google_auth_verifies_token_and_creates_session(self):
+        mock_token_data = {
+            "email": "google_seller@example.com",
+            "name": "Google Seller",
+            "email_verified": True
+        }
+
+        with patch("server.verify_google_id_token", return_value=mock_token_data):
+            status, payload, cookie = self.request(
+                "POST",
+                "/api/auth/google",
+                {"credential": "mock_google_id_token_xyz"}
+            )
+            self.assertEqual(status, 200)
+            self.assertEqual(payload["user"]["email"], "google_seller@example.com")
+            self.assertEqual(payload["user"]["name"], "Google Seller")
+            self.assertIn("lp_session=", cookie)
+
+        # Calling again with same verified email should log in existing user
+        with patch("server.verify_google_id_token", return_value=mock_token_data):
+            status, payload, cookie2 = self.request(
+                "POST",
+                "/api/auth/google",
+                {"credential": "mock_google_id_token_xyz"}
+            )
+            self.assertEqual(status, 200)
+            self.assertEqual(payload["user"]["email"], "google_seller@example.com")
+            self.assertIn("lp_session=", cookie2)
+
 
 if __name__ == "__main__":
     unittest.main()

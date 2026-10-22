@@ -544,6 +544,17 @@ def provision_owner(email: str, name: str, password: str) -> None:
         )
 
 
+def verify_google_id_token(credential: str) -> dict[str, Any] | None:
+    """Verify Google ID Token against Google's tokeninfo endpoint."""
+    verify_url = f"https://oauth2.googleapis.com/tokeninfo?id_token={urllib.parse.quote(credential)}"
+    req = urllib.request.Request(verify_url, headers={"User-Agent": "Fixerpro/2.0"})
+    try:
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+    except Exception:
+        return None
+
+
 # ── HTTP Handler ───────────────────────────────────────────────────────────
 
 class PreflightHandler(BaseHTTPRequestHandler):
@@ -733,6 +744,9 @@ class PreflightHandler(BaseHTTPRequestHandler):
         if path == "/api/contact":
             self.contact_handler()
             return
+        if path == "/api/auth/google":
+            self.google_auth_handler()
+            return
         if path == "/api/forgot":
             self.send_json(
                 503,
@@ -844,6 +858,53 @@ class PreflightHandler(BaseHTTPRequestHandler):
             "message": "Payment verified! Your account is now upgraded to Pro.",
             "user": public_user(updated_user) if updated_user else None
         })
+
+    def google_auth_handler(self) -> None:
+        data = self.read_json()
+        if not data:
+            return
+        credential = data.get("credential", "").strip()
+        if not credential:
+            self.send_json(400, {"error": "Missing Google credential token."})
+            return
+
+        token_data = verify_google_id_token(credential)
+        if not token_data:
+            self.send_json(401, {"error": "Invalid or expired Google token."})
+            return
+
+        email = token_data.get("email", "").strip().lower()
+        name = token_data.get("name", "").strip() or email.split("@")[0]
+        email_verified = token_data.get("email_verified")
+        if not email or not email_verified:
+            self.send_json(400, {"error": "Google account email is not verified."})
+            return
+
+        # Check if user already exists
+        with connect_db() as connection:
+            existing = connection.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
+            if existing:
+                user_id = existing["id"]
+            else:
+                salt = secrets.token_bytes(16)
+                dummy_pw = secrets.token_urlsafe(32)
+                now = int(time.time())
+                if connection.is_pg:
+                    res = connection.execute(
+                        "INSERT INTO users (name, email, salt, password_hash, created_at) "
+                        "VALUES (?, ?, ?, ?, ?) RETURNING id",
+                        (name, email, salt, password_hash(dummy_pw, salt), now),
+                    )
+                    user_id = res.fetchone()["id"]
+                else:
+                    cur = connection.execute(
+                        "INSERT INTO users (name, email, salt, password_hash, created_at) "
+                        "VALUES (?, ?, ?, ?, ?)",
+                        (name, email, salt, password_hash(dummy_pw, salt), now),
+                    )
+                    user_id = cur.lastrowid
+
+        self.create_session(user_id, 200)
 
     def contact_handler(self) -> None:
         data = self.read_json()

@@ -1881,6 +1881,16 @@ h1, h2, .plan-price, .modal-header h2 { text-rendering: optimizeLegibility; font
       <button class="modal-tab" id="tabRegister" type="button" role="tab" aria-selected="false">Sign up</button>
     </div>
 
+    <!-- Google One-Tap / Button Container -->
+    <div style="margin:16px 0 14px;display:flex;flex-direction:column;align-items:center;gap:10px;">
+      <div id="mGoogleBtn" style="min-height:44px;display:flex;justify-content:center;width:100%;"></div>
+      <div style="display:flex;align-items:center;width:100%;gap:12px;margin:4px 0 2px;">
+        <span style="flex:1;height:1px;background:var(--border);"></span>
+        <span class="mono" style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;">or continue with email</span>
+        <span style="flex:1;height:1px;background:var(--border);"></span>
+      </div>
+    </div>
+
     <form class="modal-form" id="modalAuthForm" novalidate>
       <div class="field" id="mNameField" hidden>
         <label for="mAuthName">Full name</label>
@@ -1956,9 +1966,10 @@ h1, h2, .plan-price, .modal-header h2 { text-rendering: optimizeLegibility; font
 <!-- ═══ HIDDEN FILE INPUT ════════════════════════════════════ -->
 <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp,image/gif" multiple hidden>
 
-<!-- ═══ JSZip & Razorpay CDN ═════════════════════════════════ -->
+<!-- ═══ JSZip, Razorpay & Google Identity CDN ═════════════════ -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <!-- ═══════════════════════════════════════════════════════════
      JAVASCRIPT — Full Application Logic
@@ -1979,8 +1990,74 @@ const CONFIG = {
   portal: '',
   price: { month: 499, year: 4790, currency: 'INR' },
   checkout: { month: '', year: '' },
-  analytics: { enabled: false, domain: '', src: '', cookieless: true }
+  analytics: { enabled: false, domain: '', src: '', cookieless: true },
+  googleClientId: '1082695503046-e4o98l5r4j189tckj4mkh87o3sq49j7k.apps.googleusercontent.com'
 };
+
+/* Google One-Tap / OAuth Handler */
+async function handleGoogleCredentialResponse(response) {
+  if (!response || !response.credential) return;
+  try {
+    const res = await api('/auth/google', { credential: response.credential });
+    if (res && res.user) {
+      U.set(res.user);
+      renderAu();
+      if ($('authModal') && !$('authModal').hidden) {
+        const cb = authModalCallback;
+        closeAuthModal();
+        stat(`Logged in as ${res.user.email}. Resuming...`);
+        if (typeof cb === 'function') cb();
+      } else {
+        go('#/' + (decodeURIComponent(qs().get('next') || '') || 'account'));
+      }
+    }
+  } catch(err) {
+    const fb = $('mAuthFeedback') || $('authFeedback');
+    if (fb) fb.innerHTML = `<div class="alert error"><span>${esc(err.message || 'Google sign-in failed.')}</span></div>`;
+  }
+}
+
+function initGoogleAuth() {
+  if (!window.google || !window.google.accounts || !window.google.accounts.id) return false;
+  if (!initGoogleAuth._initialized) {
+    window.google.accounts.id.initialize({
+      client_id: CONFIG.googleClientId,
+      callback: handleGoogleCredentialResponse,
+      auto_select: false,
+      cancel_on_tap_outside: true
+    });
+    initGoogleAuth._initialized = true;
+  }
+  return true;
+}
+
+function renderGoogleAuthButtons() {
+  const tryRender = () => {
+    if (!initGoogleAuth()) return;
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const btnOpts = {
+      theme: isDark ? 'filled_black' : 'outline',
+      size: 'large',
+      type: 'standard',
+      shape: 'pill',
+      text: 'continue_with',
+      width: 280,
+      logo_alignment: 'left'
+    };
+    const mContainer = $('mGoogleBtn');
+    if (mContainer) {
+      mContainer.innerHTML = '';
+      window.google.accounts.id.renderButton(mContainer, btnOpts);
+    }
+    const pageContainer = $('pageGoogleBtn');
+    if (pageContainer) {
+      pageContainer.innerHTML = '';
+      window.google.accounts.id.renderButton(pageContainer, btnOpts);
+    }
+  };
+  if (window.google?.accounts?.id) tryRender();
+  else setTimeout(tryRender, 400);
+}
 
 const RULES = {
   amazon: { min: 1000, rec: 2000, fill: 0.85, out: 2000 },
@@ -2134,6 +2211,7 @@ function openAuthModal(options = {}) {
   $('authModalSubtitle').textContent = options.subtitle || 'Create a free account or log in to fix and download your images. No credit card required!';
   setModalAuthMode('login');
   $('mAuthFeedback').innerHTML = '';
+  renderGoogleAuthButtons();
   setTimeout(() => $('mAuthEmail').focus(), 50);
 }
 
@@ -3062,7 +3140,7 @@ const PAGES = {
 
 /* Auth helpers */
 const authField = (id, l, type, ac, hint = '') => `<div class="field"><label for="${id}">${l}</label>${type === 'password' ? `<div class="pw-wrapper"><input type="password" id="${id}" autocomplete="${ac}" aria-describedby="${id}Err"><button type="button" data-show="${id}" aria-label="Show password">Show</button></div>` : `<input type="${type}" id="${id}" autocomplete="${ac}" aria-describedby="${id}Err">`}${hint ? `<p class="note" style="margin:4px 0 0">${hint}</p>` : ''}<p class="field-error" id="${id}Err"></p></div>`;
-const authShell = (h, sub, body, foot) => `<div class="container section"><div class="auth-card card"><h1>${h}</h1><p class="lead" style="font-size:1rem">${sub}</p>${body}<div id="authFeedback"></div><p class="note" style="text-align:center">${foot}</p></div></div>`;
+const authShell = (h, sub, body, foot) => `<div class="container section"><div class="auth-card card"><h1>${h}</h1><p class="lead" style="font-size:1rem">${sub}</p><div style="margin:16px 0 14px;display:flex;flex-direction:column;align-items:center;gap:10px;"><div id="pageGoogleBtn" style="min-height:44px;display:flex;justify-content:center;width:100%;"></div><div style="display:flex;align-items:center;width:100%;gap:12px;margin:4px 0 2px;"><span style="flex:1;height:1px;background:var(--border);"></span><span class="mono" style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;">or continue with email</span><span style="flex:1;height:1px;background:var(--border);"></span></div></div>${body}<div id="authFeedback"></div><p class="note" style="text-align:center">${foot}</p></div></div>`;
 function contactInfoHTML() {
   const C = CONFIG.contact, r = [];
   if (CONFIG.email) r.push(['Official Support', `<a href="mailto:${esc(CONFIG.email)}">${esc(CONFIG.email)}</a>`]);
@@ -3143,6 +3221,7 @@ function createParticles() {
 
 /* ── Auth Form Binding ──────────────────────────────────────── */
 function bindAuth() {
+  renderGoogleAuthButtons();
   document.querySelectorAll('[data-show]').forEach(b => b.onclick = () => {
     const i = $(b.dataset.show), sh = i.type === 'password';
     i.type = sh ? 'text' : 'password';
