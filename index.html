@@ -1104,16 +1104,120 @@ tbody th { text-transform: none; letter-spacing: 0; font-size: 0.95rem; color: v
 /* ── Footer ───────────────────────────────────────────────── */
 footer {
   border-top: 1px solid var(--border);
-  padding: 32px 0;
+  padding: 48px 0 36px;
   color: var(--text-muted);
   font-size: 0.88rem;
+  background: color-mix(in srgb, var(--bg-card) 40%, transparent);
 }
-footer .container {
-  display: flex; gap: 16px; flex-wrap: wrap;
-  justify-content: space-between; align-items: center;
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 1fr;
+  gap: 36px 28px;
+  margin-bottom: 36px;
 }
-footer a { color: var(--text-muted); margin-right: 14px; transition: color 0.2s; }
-footer a:hover { color: var(--accent); }
+.footer-col h4 {
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-primary);
+  margin: 0 0 16px;
+}
+.footer-col ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.footer-col li {
+  margin: 0;
+  padding: 0;
+}
+.footer-col a, .footer-col .lk-btn {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.88rem;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.footer-col a:hover, .footer-col .lk-btn:hover {
+  color: var(--accent);
+  transform: translateX(2px);
+}
+.footer-brand-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.footer-brand-wrap .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+.footer-brand-desc {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 320px;
+}
+.footer-socials {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+.footer-social-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg-card) 80%, transparent);
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.footer-social-pill:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+.footer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+.footer-bottom-links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.footer-bottom a {
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.footer-bottom a:hover {
+  color: var(--accent);
+}
 
 /* ── 404 Error Page ───────────────────────────────────────── */
 .error-page { text-align: center; padding: 80px 24px 60px; }
@@ -1774,10 +1878,15 @@ fieldset { min-width: 0; }
   }
 
   /* ── Footer clears the sticky CTA ── */
-  footer { padding: 24px 0 calc(96px + env(safe-area-inset-bottom, 0px)); }
-  footer .container { flex-direction: column; gap: 12px; text-align: center; }
-  footer .container > span:last-child { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 6px; }
-  footer a { margin: 0; padding: 8px 10px; }
+  footer { padding: 32px 0 calc(96px + env(safe-area-inset-bottom, 0px)); }
+  .footer-grid { grid-template-columns: 1fr; gap: 28px; }
+  .footer-brand-wrap { text-align: left; }
+  .footer-bottom { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .footer-bottom-links { gap: 12px 16px; }
+}
+
+@media (min-width: 601px) and (max-width: 900px) {
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 28px; }
 }
 
 /* ── 600–768px: big phones / small tablets portrait ───────── */
@@ -1922,40 +2031,72 @@ h1, h2, .plan-price, .modal-header h2 { text-rendering: optimizeLegibility; font
 </div>
 
 <!-- ═══ FOOTER ═══════════════════════════════════════════════ -->
-<footer>
-  <div class="container" style="display:flex;flex-direction:column;gap:20px;">
-    <div style="display:flex;justify-content:space-between;align-items:center;width:100%;flex-wrap:wrap;gap:16px;border-bottom:1px solid var(--border);padding-bottom:16px;">
-      <span id="footerBrand"></span>
-      <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:0.86rem;">
-        <strong style="color:var(--text-primary);">Seller Guides:</strong>
-        <a href="#/amazon-image-requirements" style="color:var(--text-muted);">Amazon Checklist 2026</a>
-        <a href="#/pure-white-background-guide" style="color:var(--text-muted);">Pure White #FFFFFF Guide</a>
-        <a href="#/suppressed-listing-image-fix" style="color:var(--text-muted);">Fix Suppressed Listings</a>
-      </div>
-    </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;width:100%;flex-wrap:wrap;gap:14px;font-size:0.84rem;">
-      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-        <span style="color:var(--text-muted);">© 2026 Fixerpro. Built by Praveen.</span>
-        <div style="display:inline-flex;align-items:center;gap:10px;">
-          <a href="https://www.linkedin.com/in/praveenprvin/" target="_blank" rel="noopener noreferrer" aria-label="Founder LinkedIn" title="Praveen M on LinkedIn" style="display:inline-flex;align-items:center;gap:5px;color:var(--text-secondary);text-decoration:none;padding:3px 8px;border-radius:6px;border:1px solid var(--border);background:color-mix(in srgb, var(--bg-card) 60%, transparent);transition:all 0.2s;">
+<footer id="siteFooter">
+  <div class="container">
+    <div class="footer-grid">
+      <!-- Col 1: Brand & Founder Info -->
+      <div class="footer-col footer-brand-wrap">
+        <a class="brand" href="#/" aria-label="Fixerpro home">
+          <img src="data:image/png;base64,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" alt="Fixerpro Logo" width="28" height="28" style="border-radius:6px;object-fit:contain;">
+          <span style="font-weight:800;font-size:1.25rem;letter-spacing:-0.03em;color:var(--text-primary);display:inline-flex;align-items:center;">
+            Fixer<span style="color:#10b981;">pro</span>
+          </span>
+        </a>
+        <p class="footer-brand-desc">AI-powered image validator & background fixer built for Amazon & e-commerce sellers. Ensure 100% compliance and boost sales.</p>
+        <div class="footer-socials">
+          <a href="https://www.linkedin.com/in/praveenprvin/" target="_blank" rel="noopener noreferrer" class="footer-social-pill" aria-label="Founder LinkedIn" title="Praveen M on LinkedIn">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.45a1.6 1.6 0 0 0-1.6 1.6 1.6 1.6 0 0 0 1.6 1.6 1.6 1.6 0 0 0 1.6-1.6 1.6 1.6 0 0 0-1.6-1.6Z"/></svg>
-            <span style="font-size:0.78rem;font-weight:600;">LinkedIn</span>
+            <span>Praveen (Founder)</span>
           </a>
-          <a href="https://www.instagram.com/pr_vi17" target="_blank" rel="noopener noreferrer" aria-label="Founder Instagram" title="Follow on Instagram" style="display:inline-flex;align-items:center;gap:5px;color:var(--text-secondary);text-decoration:none;padding:3px 8px;border-radius:6px;border:1px solid var(--border);background:color-mix(in srgb, var(--bg-card) 60%, transparent);transition:all 0.2s;">
+          <a href="https://www.instagram.com/pr_vi17" target="_blank" rel="noopener noreferrer" class="footer-social-pill" aria-label="Founder Instagram" title="Follow on Instagram">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-            <span style="font-size:0.78rem;font-weight:600;">Instagram</span>
+            <span>@pr_vi17</span>
           </a>
         </div>
       </div>
-      <span>
-        <a href="#/how-to-use">How to Use</a>
-        <a href="#/pricing">Pricing</a>
-        <a href="#/privacy">Privacy</a>
-        <a href="#/terms">Terms</a>
-        <a href="#/refunds">Refunds</a>
-        <a href="#/contact">Contact</a>
-        <button class="lk-btn" id="cookieSettings" type="button" hidden>Cookie settings</button>
-      </span>
+
+      <!-- Col 2: Product -->
+      <div class="footer-col">
+        <h4>Product</h4>
+        <ul>
+          <li><a href="#/">Image Checker</a></li>
+          <li><a href="#/how-to-use">How to Use</a></li>
+          <li><a href="#/rules">Rules Checklist</a></li>
+          <li><a href="#/pricing">Plans & Pricing</a></li>
+          <li><a href="#/contact">Contact & Support</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Seller Guides -->
+      <div class="footer-col">
+        <h4>Seller Guides</h4>
+        <ul>
+          <li><a href="#/amazon-image-requirements">Amazon Checklist 2026</a></li>
+          <li><a href="#/pure-white-background-guide">Pure White #FFFFFF Guide</a></li>
+          <li><a href="#/suppressed-listing-image-fix">Fix Suppressed Listings</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 4: Legal & Policy -->
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#/privacy">Privacy Policy</a></li>
+          <li><a href="#/terms">Terms of Service</a></li>
+          <li><a href="#/refunds">Refund Policy</a></li>
+          <li><button class="lk-btn" id="cookieSettings" type="button" hidden>Cookie Settings</button></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Bottom copyright row -->
+    <div class="footer-bottom">
+      <div>
+        <span>© 2026 Fixerpro. Built by Praveen. All rights reserved.</span>
+      </div>
+      <div class="footer-bottom-links">
+        <span id="footerBrand"></span>
+      </div>
     </div>
   </div>
 </footer>
@@ -3495,6 +3636,12 @@ function route() {
   try { mainEl.innerHTML = p.h(); } catch(e) { mainEl.innerHTML = '<div class="container page-content"><h1>Something went wrong.</h1><p><a href="#/">Go to the checker</a> or reload.</p></div>'; }
   document.querySelectorAll('nav a').forEach(a => a.dataset.r === key && !bad ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current'));
   const s = STICKY[key]; $('stickyCta').hidden = !s; if (s) { $('stickyBtn').textContent = s[0]; $('stickyBtn').disabled = false; $('stickyBtn').onclick = s[1]; }
+  
+  // Hide footer on authentication screens (login, register, forgot) for clean focused cards
+  const isAuthPage = ['login', 'register', 'forgot'].includes(key);
+  const siteFooter = $('siteFooter');
+  if (siteFooter) siteFooter.hidden = isAuthPage;
+
   window.scrollTo(0, 0); mainEl.focus({ preventScroll: true });
   try {
     if (key === '') { bindHome(); bindPrice(); }
@@ -3960,7 +4107,9 @@ document.addEventListener('click', e => {
 });
 
 /* ── Footer ─────────────────────────────────────────────────── */
-$('footerBrand').innerHTML = `© ${new Date().getFullYear()} <strong>Fixerpro</strong> · Better Images. Higher Sales. · Owner & Developer: <strong>Praveen</strong> (<a href="mailto:${CONFIG.ownerEmail}" style="color:var(--text-secondary)">${CONFIG.ownerEmail}</a>) · Support: <a href="mailto:${CONFIG.email}" style="color:var(--text-secondary)">${CONFIG.email}</a>`;
+if ($('footerBrand')) {
+  $('footerBrand').innerHTML = `<span>Support: <a href="mailto:${CONFIG.email}" style="color:var(--text-secondary)">${CONFIG.email}</a></span> · <span>Developer: <a href="mailto:${CONFIG.ownerEmail}" style="color:var(--text-secondary)">${CONFIG.ownerEmail}</a></span>`;
+}
 
 /* ── Init ───────────────────────────────────────────────────── */
 bindModalHandlers();
