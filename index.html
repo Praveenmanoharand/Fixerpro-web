@@ -1903,17 +1903,28 @@ h1, h2, .plan-price, .modal-header h2 { text-rendering: optimizeLegibility; font
 
 <!-- ═══ FOOTER ═══════════════════════════════════════════════ -->
 <footer>
-  <div class="container">
-    <span id="footerBrand"></span>
-    <span>
-      <a href="#/how-to-use">How to Use</a>
-      <a href="#/pricing">Pricing</a>
-      <a href="#/privacy">Privacy</a>
-      <a href="#/terms">Terms</a>
-      <a href="#/refunds">Refunds</a>
-      <a href="#/contact">Contact</a>
-      <button class="lk-btn" id="cookieSettings" type="button" hidden>Cookie settings</button>
-    </span>
+  <div class="container" style="display:flex;flex-direction:column;gap:20px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;width:100%;flex-wrap:wrap;gap:16px;border-bottom:1px solid var(--border);padding-bottom:16px;">
+      <span id="footerBrand"></span>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:0.86rem;">
+        <strong style="color:var(--text-primary);">Seller Guides:</strong>
+        <a href="#/amazon-image-requirements" style="color:var(--text-muted);">Amazon Checklist 2026</a>
+        <a href="#/pure-white-background-guide" style="color:var(--text-muted);">Pure White #FFFFFF Guide</a>
+        <a href="#/suppressed-listing-image-fix" style="color:var(--text-muted);">Fix Suppressed Listings</a>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;width:100%;flex-wrap:wrap;gap:14px;font-size:0.84rem;">
+      <span style="color:var(--text-muted);">© 2026 Fixerpro. All rights reserved.</span>
+      <span>
+        <a href="#/how-to-use">How to Use</a>
+        <a href="#/pricing">Pricing</a>
+        <a href="#/privacy">Privacy</a>
+        <a href="#/terms">Terms</a>
+        <a href="#/refunds">Refunds</a>
+        <a href="#/contact">Contact</a>
+        <button class="lk-btn" id="cookieSettings" type="button" hidden>Cookie settings</button>
+      </span>
+    </div>
   </div>
 </footer>
 
@@ -3226,6 +3237,158 @@ const PAGES = {
   'register': { t: 'Create account', d: 'Create a free Fixerpro account.', h: () => authShell('Create your account', 'Free to start. No card needed.', `<form id="authForm" novalidate data-m="register">${authField('authName','Name','text','name')}${authField('authEmail','Email','email','email')}${authField('authPass','Password','password','new-password','At least 8 characters.')}<div class="field"><label style="display:flex;font-size:.95rem;font-weight:400"><input type="checkbox" id="authTerms" aria-describedby="authTermsErr">I agree to the <a href="#/terms">Terms</a> and <a href="#/privacy">Privacy Policy</a>.</label><p class="field-error" id="authTermsErr"></p></div><button class="btn primary" id="authSubmit" type="submit" style="width:100%">Create account</button></form>`, 'Already registered? <a href="#/login">Log in</a>') },
   'forgot': { t: 'Reset password', d: 'Reset your Fixerpro password.', h: () => authShell('Reset password', 'Enter your email for a reset link.', `<form id="authForm" novalidate data-m="forgot">${authField('authEmail','Email','email','email')}<button class="btn primary" id="authSubmit" type="submit" style="width:100%">Send reset link</button></form>`, '<a href="#/login">Back to log in</a>') },
   'account': { t: 'Your account', d: 'Manage your Fixerpro account.', h: () => { const u = U.get() || {}; return `<div class="container page-content"><h1>Your account</h1><div class="summary-card"><dl><dt>Name</dt><dd>${esc(u.name)}</dd><dt>Email</dt><dd>${esc(u.email)}</dd><dt>Plan</dt><dd>${u.plan==='pro'?'Pro':'Free'}</dd><dt>Role</dt><dd>${u.role==='admin'?'Admin':'User'}</dd></dl></div><div class="actions">${u.plan==='pro'?`<a class="btn primary" href="${CONFIG.portal?esc(CONFIG.portal):'#/contact'}">Manage billing</a>`:'<a class="btn primary" href="#/pricing">Upgrade to Pro</a>'}${u.role==='admin'?'<a class="btn" href="#/admin">Admin dashboard</a>':''}<button class="btn" id="accountLogout" type="button">Log out</button></div></div>`; } },
+  'amazon-image-requirements': {
+    t: 'Amazon Product Image Requirements 2026 (Official Checklist)',
+    d: 'Complete guide to Amazon product image guidelines: 100% pure white background (#FFFFFF), 2000px zoom dimensions, 85% fill ratio, and file formats.',
+    h: () => `<div class="container page-content" style="max-width:920px;">
+      <span class="badge">Amazon Seller Guide 2026</span>
+      <h1>Amazon Product Image Requirements (Official Checklist)</h1>
+      <p class="lead">Everything you need to know about Amazon main photo standards in 2026 to prevent listing suppression and boost search conversions.</p>
+
+      <div class="card" style="margin:24px 0 32px;border-left:4px solid var(--accent);background:color-mix(in srgb, var(--accent) 5%, var(--bg-card));">
+        <p style="margin:0;font-size:0.95rem;line-height:1.6;">
+          <strong>Quick Summary:</strong> Amazon's algorithm strictly audits your main product photo. If the background isn't <strong>RGB (255, 255, 255)</strong>, resolution is below <strong>1000px</strong>, or product fill is under <strong>85%</strong>, your listing will be automatically suppressed from search results.
+        </p>
+      </div>
+
+      <div style="display:flex;gap:12px;margin:28px 0;flex-wrap:wrap;">
+        <a class="btn primary lg" href="#/">Check Your Photos in Fixerpro (Free)</a>
+        <a class="btn lg" href="#/pricing">Explore Pro Features</a>
+      </div>
+
+      <h2>1. The Pure White Background Rule (RGB 255, 255, 255)</h2>
+      <p style="color:var(--text-secondary);line-height:1.7;">Amazon's official seller policy mandates that all MAIN listing images must feature a seamless, <strong>pure white background</strong>. Off-white (#F5F5F5), light grey, gradient, or camera backdrop shadows are automatically flagged by Amazon's visual recognition bots. The background must hit <code>#FFFFFF</code> (RGB 255, 255, 255) across every single boundary pixel.</p>
+
+      <h2>2. Image Dimensions and Zoom Capability</h2>
+      <p style="color:var(--text-secondary);line-height:1.7;">Amazon requires:</p>
+      <ul style="color:var(--text-secondary);line-height:1.8;padding-left:22px;">
+        <li><strong>Minimum resolution:</strong> 1000 pixels on the longest side (required to trigger hover-to-zoom).</li>
+        <li><strong>Recommended resolution:</strong> <strong>2000 × 2000 pixels</strong> (1:1 square ratio) — enables optimal 5x high-definition magnifying zoom on desktop and mobile.</li>
+        <li><strong>Maximum size:</strong> 10,000 pixels or 25 MB file size.</li>
+      </ul>
+
+      <h2>3. The 85% Frame Fill Ratio</h2>
+      <p style="color:var(--text-secondary);line-height:1.7;">Your primary product must occupy <strong>at least 85% of the image frame</strong>. Excess white space around the item makes your product look tiny in search results, directly depressing your click-through rate (CTR). Fixerpro automatically computes your bounding box and fills ~88% of the canvas.</p>
+
+      <h2>4. Prohibited Elements on Main Photos</h2>
+      <div class="card" style="border-color:rgba(239,68,68,0.3);background:rgba(239,68,68,0.04);margin:20px 0;">
+        <ul style="margin:0;padding-left:20px;color:var(--text-secondary);line-height:1.8;">
+          <li>❌ No promotional text (e.g. "Free Shipping", "Best Seller", "100% Organic").</li>
+          <li>❌ No seller logos, copyright watermarks, or badges.</li>
+          <li>❌ No colored borders, placeholders, or mannequin parts (where prohibited).</li>
+          <li>❌ No multiple angles or accessories that aren't included in the package.</li>
+        </ul>
+      </div>
+
+      <h2>5. Accepted File Formats & Color Space</h2>
+      <p style="color:var(--text-secondary);line-height:1.7;">Amazon accepts <strong>JPEG (.jpg)</strong>, <strong>TIFF (.tif)</strong>, and <strong>PNG (.png)</strong>. Images must strictly be formatted in the <strong>sRGB</strong> color profile. CMYK images will appear distorted or washed out when viewed on mobile screens.</p>
+
+      <!-- Interactive Call to Action Banner -->
+      <div style="text-align:center;padding:36px 24px;border-radius:var(--radius-lg);background:linear-gradient(135deg, rgba(16,185,129,0.1), rgba(59,130,246,0.06));border:1px solid var(--border);margin-top:40px;">
+        <h3 style="margin:0 0 10px;font-size:1.4rem;">Audit & Fix Your Amazon Photos in 3 Seconds</h3>
+        <p class="lead" style="margin:0 auto 20px;font-size:0.95rem;">Test your product photo compliance with Fixerpro for free. 1-click cloud AI background replacement included.</p>
+        <a class="btn primary lg" href="#/">Start Free Image Check</a>
+      </div>
+    </div>`
+  },
+  'pure-white-background-guide': {
+    t: 'How to Get Pure White Background (#FFFFFF) for Amazon Photos',
+    d: 'Step-by-step tutorial on converting product photo backgrounds to 100% pure white RGB (255, 255, 255) to pass Amazon listing compliance audits.',
+    h: () => `<div class="container page-content" style="max-width:920px;">
+      <span class="badge">Background Guide</span>
+      <h1>How to Get Pure White Background (#FFFFFF) for Amazon Listing Photos</h1>
+      <p class="lead">A complete guide for sellers on creating compliant RGB (255, 255, 255) pure white canvases without spending hours in Photoshop.</p>
+
+      <h2>Why Amazon Rejects "Almost White" Photos</h2>
+      <p style="color:var(--text-secondary);line-height:1.7;">Most sellers take photos against a white poster board or lightbox. While the background looks white to the human eye, digital camera sensors capture light falloff, subtle shadows, and dust specs. In reality, the pixels measure <code>#EBEBEB</code> or <code>#F4F4F4</code>.</p>
+      <p style="color:var(--text-secondary);line-height:1.7;">Amazon's automated review bots inspect the hex code of edge pixels. If any edge pixel falls below <strong>RGB 255, 255, 255</strong>, the image is marked as non-compliant.</p>
+
+      <h2>The Three Ways to Achieve Pure White #FFFFFF</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));gap:20px;margin:28px 0 36px;">
+        <div class="card">
+          <h3 style="margin-top:0;">1. Manual Photoshop Cutout</h3>
+          <p style="color:var(--text-secondary);font-size:0.9rem;line-height:1.6;">Requires using the Pen Tool or Magnetic Lasso. Takes 10–20 minutes per photo and requires expensive Adobe subscriptions.</p>
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0;">2. Freelance Outsourcing</h3>
+          <p style="color:var(--text-secondary);font-size:0.9rem;line-height:1.6;">Fiverr or agencies charge $3–$10 per image with 24–48 hour turnaround times, which delays catalog launches.</p>
+        </div>
+        <div class="card" style="border-color:var(--accent);background:color-mix(in srgb, var(--accent) 5%, var(--bg-card));">
+          <h3 style="margin-top:0;color:var(--accent);">3. Fixerpro 1-Click AI Fix</h3>
+          <p style="color:var(--text-secondary);font-size:0.9rem;line-height:1.6;">Upload directly in your browser. Our neural network removes the background, injects true #FFFFFF white, and sizes the photo to 2000px in under 3 seconds.</p>
+        </div>
+      </div>
+
+      <h2>How Fixerpro Inspects Background Purity</h2>
+      <p style="color:var(--text-secondary);line-height:1.7;">Fixerpro samples perimeter pixels across top, bottom, left, and right borders. It calculates both <strong>Pure White Ratio</strong> (exact 255, 255, 255) and <strong>Near White Ratio</strong>. If even 1% of the border contains dark shadows or backdrop edges, it warns you before you upload to Amazon Seller Central.</p>
+
+      <div style="text-align:center;padding:32px 20px;border-radius:var(--radius-lg);background:linear-gradient(135deg, rgba(16,185,129,0.08), rgba(59,130,246,0.05));border:1px solid var(--border);margin-top:36px;">
+        <h3 style="margin:0 0 10px;">Transform Your Background to Pure White Now</h3>
+        <p class="lead" style="margin:0 auto 20px;font-size:0.95rem;">Upload your product photo to see instant compliance metrics and fix with one click.</p>
+        <a class="btn primary lg" href="#/">Fix Your Background Free</a>
+      </div>
+    </div>`
+  },
+  'suppressed-listing-image-fix': {
+    t: 'Why is My Amazon Listing Suppressed? (Main Image Fix Guide)',
+    d: 'Learn how to identify and fix Amazon listing suppressions caused by main product image violations. Step-by-step unsuppression guide for sellers.',
+    h: () => `<div class="container page-content" style="max-width:920px;">
+      <span class="badge">Listing Troubleshooting</span>
+      <h1>Why is My Amazon Listing Suppressed? (Main Image Fix Guide)</h1>
+      <p class="lead">If your Amazon product listing suddenly disappeared from search results, a non-compliant main image is the #1 culprit. Here is how to fix it immediately.</p>
+
+      <h2>What is Amazon Search Suppression?</h2>
+      <p style="color:var(--text-secondary);line-height:1.7;">Search suppression means Amazon hides your ASIN from organic customer search results and category browse pages. Customers can only find your product if they possess a direct URL. This immediately results in a <strong>90%+ drop in sales and organic rank</strong>.</p>
+
+      <h2>Top 5 Main Image Triggers for Listing Suppression</h2>
+      <div class="card" style="margin:24px 0 32px;">
+        <ol style="margin:0;padding-left:22px;color:var(--text-secondary);line-height:1.8;">
+          <li><strong>Non-white Background:</strong> Background contains colors, off-white tones, gradient studio backdrops, or real-room settings.</li>
+          <li><strong>Resolution Too Low:</strong> Image is smaller than 500 × 500 pixels (fails Amazon's technical ingestion).</li>
+          <li><strong>Excessive White Space:</strong> Product occupies less than 85% of the frame (appears microscopic on smartphone screens).</li>
+          <li><strong>Watermarks & Promotional Text:</strong> Badges like "Sale", "New", seller logos, or contact numbers embedded onto the image.</li>
+          <li><strong>Illustrations or Renderings:</strong> Using drawings, CAD mockups, or vector sketches instead of real photographs of the physical product.</li>
+        </ol>
+      </div>
+
+      <h2>Step-by-Step Guide to Unsuppress Your Listing</h2>
+      <div style="display:flex;flex-direction:column;gap:16px;margin:24px 0;">
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <span class="mono" style="background:var(--accent);color:var(--on-accent);font-weight:700;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;flex:none;">1</span>
+          <div>
+            <h4 style="margin:0 0 4px;">Run the image through Fixerpro</h4>
+            <p style="margin:0;color:var(--text-secondary);font-size:0.92rem;line-height:1.6;">Drag your current image into <a href="#/">Fixerpro Checker</a>. Look at the Red / Yellow / Green badges to find out why Amazon flagged the file.</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <span class="mono" style="background:var(--accent);color:var(--on-accent);font-weight:700;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;flex:none;">2</span>
+          <div>
+            <h4 style="margin:0 0 4px;">Apply 1-Click Amazon Studio Fix</h4>
+            <p style="margin:0;color:var(--text-secondary);font-size:0.92rem;line-height:1.6;">Click the <strong>Fix</strong> button. Fixerpro generates an Amazon-compliant 2000 × 2000 px photo with pure #FFFFFF background and 88% product fill.</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <span class="mono" style="background:var(--accent);color:var(--on-accent);font-weight:700;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;flex:none;">3</span>
+          <div>
+            <h4 style="margin:0 0 4px;">Re-upload to Amazon Seller Central</h4>
+            <p style="margin:0;color:var(--text-secondary);font-size:0.92rem;line-height:1.6;">Navigate to <em>Inventory &gt; Manage Inventory &gt; Edit &gt; Images</em>. Replace the main image with your Fixerpro download and click <em>Save and Finish</em>.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="border-left:4px solid #3b82f6;background:color-mix(in srgb, #3b82f6 5%, var(--bg-card));margin-top:24px;">
+        <p style="margin:0;font-size:0.95rem;line-height:1.6;">
+          <strong>Recovery Timeline:</strong> Once you upload an image that passes all rules, Amazon's algorithm normally reinstates the suppressed listing within <strong>15 minutes to 4 hours</strong>.
+        </p>
+      </div>
+
+      <div style="text-align:center;padding:32px 20px;border-radius:var(--radius-lg);background:linear-gradient(135deg, rgba(16,185,129,0.08), rgba(59,130,246,0.05));border:1px solid var(--border);margin-top:36px;">
+        <h3 style="margin:0 0 10px;">Check If Your Listing Photos Are Safe</h3>
+        <p class="lead" style="margin:0 auto 20px;font-size:0.95rem;">Test your product images now before Amazon suppresses your listing.</p>
+        <a class="btn primary lg" href="#/">Run Free Photo Audit</a>
+      </div>
+    </div>`
+  },
   'admin': { t: 'Admin dashboard', d: 'Fixerpro owner dashboard.', h: () => `<div class="container page-content"><span class="badge">Owner Tools</span><h1>Admin dashboard</h1><p class="lead">Account and plan totals for this instance.</p><div id="adminMsg" role="status" aria-live="polite">Loading admin summary...</div><div class="summary-card"><dl><dt>Total accounts</dt><dd id="adminUsers">—</dd><dt>Pro accounts</dt><dd id="adminPro">—</dd><dt>Active sessions</dt><dd id="adminSessions">—</dd></dl></div><div class="actions"><a class="btn" href="#/account">Account</a><a class="btn" href="#/">Image checker</a></div></div>` },
   '404': {
     t: 'Page not found',
