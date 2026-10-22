@@ -20,7 +20,7 @@
       "dest": "/$1"
     },
     {
-      "src": "/(favicon\\.png|icon\\.png|logo\\.png|logo_web\\.png)",
+      "src": "/(favicon\\.png|icon\\.png|logo\\.png|logo_web\\.png|og-image\\.png)",
       "dest": "/$1"
     },
     {

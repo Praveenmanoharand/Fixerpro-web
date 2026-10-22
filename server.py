@@ -688,7 +688,7 @@ class PreflightHandler(BaseHTTPRequestHandler):
                 self.wfile.write(body)
                 return
 
-        if path in ("/favicon.png", "/icon.png", "/logo.png", "/logo_web.png"):
+        if path in ("/favicon.png", "/icon.png", "/logo.png", "/logo_web.png", "/og-image.png"):
             static_img = ROOT / path.lstrip("/")
             if static_img.exists():
                 body = static_img.read_bytes()
